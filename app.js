@@ -201,7 +201,9 @@ const I18N = {
     copyQuoteBtn: '📋 Цитата',
     toastQuoteCopied: '✓ Цитату симптому скопійовано!',
     activeFiltersTitle: 'Активні фільтри:',
-    activeFilterReset: 'Скинути все'
+    activeFilterReset: 'Скинути все',
+    btnSearchSubmit: 'Знайти',
+    btnSearchTitle: 'Шукати'
   },
   ru: {
     pageTitle: 'Materia Medica — Поисковый Реперторий (Джон Генри Кларк)',
@@ -358,7 +360,9 @@ const I18N = {
     copyQuoteBtn: '📋 Цитата',
     toastQuoteCopied: '✓ Цитата скопирована в буфер обмена!',
     activeFiltersTitle: 'Активные фильтры:',
-    activeFilterReset: 'Сбросить все'
+    activeFilterReset: 'Сбросить все',
+    btnSearchSubmit: 'Найти',
+    btnSearchTitle: 'Искать'
   }
 };
 
@@ -711,7 +715,7 @@ function parseModalities(sec) {
 
 function findModalitySnippet(text, patterns) {
   if (!text) return '';
-  const sentences = text.split(/(?<=[.;!?])\s+/);
+  const sentences = text.replace(/([.;!?])\s+/g, '$1\n').split('\n');
   for (const s of sentences) {
     const sLow = s.toLowerCase();
     for (const p of patterns) {
@@ -855,7 +859,7 @@ function searchRemedies(query) {
           continue;
         }
 
-        const sentences = secText.replace(/\n+/g, ' ').split(/(?<=[.?!])\s+/);
+        const sentences = secText.replace(/\n+/g, ' ').replace(/([.?!])\s+/g, '$1\n').split('\n');
 
         for (const sent of sentences) {
           const sTrim = sent.trim();
@@ -968,8 +972,12 @@ function highlightSnippet(sentence, matchedPatterns) {
   if (sorted.length === 0) return safe;
 
   const escaped = sorted.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-  const regex = new RegExp(`(?<=^|[^а-яёїієґa-z0-9])(${escaped.join('|')})[а-яёїієґa-z0-9'’]*`, 'gi');
-  return safe.replace(regex, (match) => `<mark class="hl-primary">${match}</mark>`);
+  try {
+    const regex = new RegExp(`(^|[^а-яёїієґa-z0-9])(${escaped.join('|')}[а-яёїієґa-z0-9'’]*)`, 'gi');
+    return safe.replace(regex, (match, pfx, word) => `${pfx}<mark class="hl-primary">${word}</mark>`);
+  } catch (e) {
+    return safe;
+  }
 }
 
 // ==========================================
@@ -1035,6 +1043,19 @@ function updateUILanguage() {
   if (btnClear && t.btnClearTitle) {
     btnClear.title = t.btnClearTitle;
     btnClear.setAttribute('aria-label', t.btnClearTitle);
+  }
+
+  const btnSearchSubmit = document.getElementById('btnSearchSubmit');
+  if (btnSearchSubmit && t.btnSearchSubmit) {
+    btnSearchSubmit.innerText = t.btnSearchSubmit;
+    btnSearchSubmit.title = t.btnSearchTitle || t.btnSearchSubmit;
+    btnSearchSubmit.setAttribute('aria-label', t.btnSearchTitle || t.btnSearchSubmit);
+  }
+
+  const btnSearchIcon = document.getElementById('btnSearchIcon');
+  if (btnSearchIcon && t.btnSearchTitle) {
+    btnSearchIcon.title = t.btnSearchTitle;
+    btnSearchIcon.setAttribute('aria-label', t.btnSearchTitle);
   }
 
   const txtAdvToggle = document.getElementById('txtAdvToggle');
@@ -1485,6 +1506,7 @@ let activeSuggestionIndex = -1;
 let currentRemedySuggestions = [];
 let remedyAutocompleteInitialized = false;
 let unifiedSearchInitialized = false;
+let searchDebounceTimer = null;
 
 function normalizeRemedyKey(str) {
   if (!str) return '';
@@ -1752,12 +1774,47 @@ function initUnifiedSearch() {
   unifiedSearchInitialized = true;
 
   const input = document.getElementById('searchInput');
+  const searchForm = document.getElementById('searchForm');
+  const btnSearchSubmit = document.getElementById('btnSearchSubmit');
+  const btnSearchIcon = document.getElementById('btnSearchIcon');
   const clearBtn = document.getElementById('btnClear');
   const btnCatalog = document.getElementById('btnCatalogDropdown');
   const dropdown = document.getElementById('searchSuggestionsDropdown');
   const btnMenuCatalog = document.getElementById('btnMenuOpenCatalog');
 
-  let debounceTimer;
+  function triggerSearch() {
+    closeSearchSuggestions();
+    clearTimeout(searchDebounceTimer);
+    if (input) {
+      runSearch(input.value);
+    }
+  }
+
+  // Form submit (handles mobile keyboard 'Search'/'Go' key)
+  if (searchForm) {
+    searchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      triggerSearch();
+      if (input) input.blur();
+    });
+  }
+
+  // Submit button ('Знайти' / 'Найти')
+  if (btnSearchSubmit) {
+    btnSearchSubmit.addEventListener('click', (e) => {
+      e.preventDefault();
+      triggerSearch();
+      if (input) input.blur();
+    });
+  }
+
+  // Search icon button (🔍)
+  if (btnSearchIcon) {
+    btnSearchIcon.addEventListener('click', (e) => {
+      e.preventDefault();
+      triggerSearch();
+    });
+  }
 
   if (input) {
     input.addEventListener('input', (e) => {
@@ -1777,10 +1834,18 @@ function initUnifiedSearch() {
       }
 
       // 2. Symptom search debounced
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
         runSearch(q);
-      }, 120);
+      }, 150);
+    });
+
+    input.addEventListener('change', () => {
+      triggerSearch();
+    });
+
+    input.addEventListener('search', () => {
+      triggerSearch();
     });
 
     input.addEventListener('keydown', (e) => {
@@ -1819,9 +1884,9 @@ function initUnifiedSearch() {
           e.preventDefault();
           selectSuggestedRemedy(currentRemedySuggestions[activeSuggestionIndex]);
         } else {
-          closeSearchSuggestions();
-          clearTimeout(debounceTimer);
-          runSearch(input.value);
+          e.preventDefault();
+          triggerSearch();
+          input.blur();
         }
       } else if (e.key === 'Escape') {
         if (isDropdownOpen) {
@@ -1902,8 +1967,10 @@ function initUnifiedSearch() {
 
   // Click outside listener
   document.addEventListener('click', (e) => {
+    const form = document.getElementById('searchForm');
     const wrapper = document.getElementById('searchInputWrapper');
-    if (wrapper && !wrapper.contains(e.target) && (!btnCatalog || !btnCatalog.contains(e.target))) {
+    const container = form || wrapper;
+    if (container && !container.contains(e.target) && (!btnCatalog || !btnCatalog.contains(e.target))) {
       closeSearchSuggestions();
     }
   });
@@ -2120,9 +2187,10 @@ function renderModalSections(remedy, category = 'all', query = '') {
 
     let formattedText = escapeHtml(sText);
     if (qTrim) {
-      const escapedQ = qTrim.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const reg = new RegExp(`(?<=^|[^а-яёїієґa-z0-9])(${escapedQ})[а-яёїієґa-z0-9'’]*`, 'gi');
-      formattedText = formattedText.replace(reg, m => `<mark>${m}</mark>`);
+      try {
+        const reg = new RegExp(`(^|[^а-яёїієґa-z0-9])(${escapedQ}[а-яёїієґa-z0-9'’]*)`, 'gi');
+        formattedText = formattedText.replace(reg, (m, pfx, word) => `${pfx}<mark>${word}</mark>`);
+      } catch (e) {}
     }
 
     html += `
@@ -2296,147 +2364,163 @@ function escapeHtml(str) {
 }
 
 // ==========================================
-// 11. EVENT LISTENERS
+// 11. EVENT LISTENERS & APP STARTUP
 // ==========================================
-if (typeof document !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', () => {
-    initApp();
+let appStarted = false;
 
-    initUnifiedSearch();
+function startApp() {
+  if (appStarted) return;
+  appStarted = true;
 
-    // Top-right dropdown menu wiring
-    const btnHeaderMenu = document.getElementById('btnHeaderMenu');
-    if (btnHeaderMenu) {
-      btnHeaderMenu.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleTopMenu();
-      });
-    }
+  initApp();
+  initUnifiedSearch();
 
-    document.addEventListener('click', (e) => {
-      const wrapper = document.getElementById('topMenuWrapper');
-      if (wrapper && wrapper.classList.contains('open') && !wrapper.contains(e.target)) {
-        closeTopMenu();
-      }
+  const searchInput = document.getElementById('searchInput');
+
+  // Top-right dropdown menu wiring
+  const btnHeaderMenu = document.getElementById('btnHeaderMenu');
+  if (btnHeaderMenu) {
+    btnHeaderMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleTopMenu();
     });
+  }
 
-    const btnUa = document.getElementById('langBtnUa');
-    const btnRu = document.getElementById('langBtnRu');
-    if (btnUa) {
-      btnUa.addEventListener('click', () => {
-        switchLanguage('ua');
-        closeTopMenu();
-      });
+  document.addEventListener('click', (e) => {
+    const wrapper = document.getElementById('topMenuWrapper');
+    if (wrapper && wrapper.classList.contains('open') && !wrapper.contains(e.target)) {
+      closeTopMenu();
     }
-    if (btnRu) {
-      btnRu.addEventListener('click', () => {
-        switchLanguage('ru');
-        closeTopMenu();
-      });
-    }
+  });
 
-    // Download menu modal wiring
-    const btnOpenDownloads = document.getElementById('btnOpenDownloads');
-    if (btnOpenDownloads) {
-      btnOpenDownloads.addEventListener('click', () => {
-        closeTopMenu();
-        openDownloadModal();
-      });
-    }
+  const btnUa = document.getElementById('langBtnUa');
+  const btnRu = document.getElementById('langBtnRu');
+  if (btnUa) {
+    btnUa.addEventListener('click', () => {
+      switchLanguage('ua');
+      closeTopMenu();
+    });
+  }
+  if (btnRu) {
+    btnRu.addEventListener('click', () => {
+      switchLanguage('ru');
+      closeTopMenu();
+    });
+  }
 
-    const dlModalCloseBtn = document.getElementById('dlModalCloseBtn');
-    if (dlModalCloseBtn) dlModalCloseBtn.addEventListener('click', closeDownloadModal);
+  // Download menu modal wiring
+  const btnOpenDownloads = document.getElementById('btnOpenDownloads');
+  if (btnOpenDownloads) {
+    btnOpenDownloads.addEventListener('click', () => {
+      closeTopMenu();
+      openDownloadModal();
+    });
+  }
 
-    const downloadModal = document.getElementById('downloadModal');
-    if (downloadModal) {
-      downloadModal.addEventListener('click', (e) => {
-        if (e.target.id === 'downloadModal') closeDownloadModal();
-      });
-    }
+  const dlModalCloseBtn = document.getElementById('dlModalCloseBtn');
+  if (dlModalCloseBtn) dlModalCloseBtn.addEventListener('click', closeDownloadModal);
 
-    const btnDlLangUa = document.getElementById('btnDlLangUa');
-    const btnDlLangRu = document.getElementById('btnDlLangRu');
-    if (btnDlLangUa) btnDlLangUa.addEventListener('click', () => updateDownloadModalFiles('ua'));
-    if (btnDlLangRu) btnDlLangRu.addEventListener('click', () => updateDownloadModalFiles('ru'));
+  const downloadModal = document.getElementById('downloadModal');
+  if (downloadModal) {
+    downloadModal.addEventListener('click', (e) => {
+      if (e.target.id === 'downloadModal') closeDownloadModal();
+    });
+  }
 
-    const toggleBtn = document.getElementById('btnToggleAdvanced');
-    const advPanel = document.getElementById('advancedPanel');
-    if (toggleBtn && advPanel) {
-      toggleBtn.addEventListener('click', () => {
-        const isHidden = advPanel.style.display === 'none';
-        advPanel.style.display = isHidden ? 'block' : 'none';
-        toggleBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-      });
-    }
+  const btnDlLangUa = document.getElementById('btnDlLangUa');
+  const btnDlLangRu = document.getElementById('btnDlLangRu');
+  if (btnDlLangUa) btnDlLangUa.addEventListener('click', () => updateDownloadModalFiles('ua'));
+  if (btnDlLangRu) btnDlLangRu.addEventListener('click', () => updateDownloadModalFiles('ru'));
 
-    const inWorse = document.getElementById('inputWorseCustom');
-    if (inWorse) {
-      inWorse.addEventListener('input', (e) => {
-        filterState.worseCustom = e.target.value;
-        updateFiltersBadge();
-        updateActiveFiltersStrip();
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          runSearch(input ? input.value : '');
-        }, 200);
-      });
-    }
+  const toggleBtn = document.getElementById('btnToggleAdvanced');
+  const advPanel = document.getElementById('advancedPanel');
+  if (toggleBtn && advPanel) {
+    toggleBtn.addEventListener('click', () => {
+      const isHidden = advPanel.style.display === 'none';
+      advPanel.style.display = isHidden ? 'block' : 'none';
+      toggleBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+    });
+  }
 
-    const inBetter = document.getElementById('inputBetterCustom');
-    if (inBetter) {
-      inBetter.addEventListener('input', (e) => {
-        filterState.betterCustom = e.target.value;
-        updateFiltersBadge();
-        updateActiveFiltersStrip();
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          runSearch(input ? input.value : '');
-        }, 200);
-      });
-    }
+  const inWorse = document.getElementById('inputWorseCustom');
+  if (inWorse) {
+    inWorse.addEventListener('input', (e) => {
+      filterState.worseCustom = e.target.value;
+      updateFiltersBadge();
+      updateActiveFiltersStrip();
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        const inp = document.getElementById('searchInput');
+        runSearch(inp ? inp.value : '');
+      }, 200);
+    });
+  }
 
-    const selectSec = document.getElementById('selectSection');
-    if (selectSec) {
-      selectSec.addEventListener('change', (e) => {
-        filterState.section = e.target.value;
-        updateFiltersBadge();
-        updateActiveFiltersStrip();
-        runSearch(input ? input.value : '');
-      });
-    }
+  const inBetter = document.getElementById('inputBetterCustom');
+  if (inBetter) {
+    inBetter.addEventListener('input', (e) => {
+      filterState.betterCustom = e.target.value;
+      updateFiltersBadge();
+      updateActiveFiltersStrip();
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        const inp = document.getElementById('searchInput');
+        runSearch(inp ? inp.value : '');
+      }, 200);
+    });
+  }
 
-    const btnReset = document.getElementById('btnResetFilters');
-    if (btnReset) {
-      btnReset.addEventListener('click', resetAllFilters);
-    }
+  const selectSec = document.getElementById('selectSection');
+  if (selectSec) {
+    selectSec.addEventListener('change', (e) => {
+      filterState.section = e.target.value;
+      updateFiltersBadge();
+      updateActiveFiltersStrip();
+      const inp = document.getElementById('searchInput');
+      runSearch(inp ? inp.value : '');
+    });
+  }
 
-    const modalCloseBtn = document.getElementById('modalCloseBtn');
-    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
-    const remedyModal = document.getElementById('remedyModal');
-    if (remedyModal) {
-      remedyModal.addEventListener('click', (e) => {
-        if (e.target.id === 'remedyModal') closeModal();
-      });
-    }
+  const btnReset = document.getElementById('btnResetFilters');
+  if (btnReset) {
+    btnReset.addEventListener('click', resetAllFilters);
+  }
 
+  const modalCloseBtn = document.getElementById('modalCloseBtn');
+  if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+  const remedyModal = document.getElementById('remedyModal');
+  if (remedyModal) {
+    remedyModal.addEventListener('click', (e) => {
+      if (e.target.id === 'remedyModal') closeModal();
+    });
+  }
+
+  if (typeof window !== 'undefined' && window.addEventListener) {
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeTopMenu();
         closeModal();
         closeDownloadModal();
       }
-      if (e.key === '/' && document.activeElement !== input) {
+      const inp = document.getElementById('searchInput');
+      if (e.key === '/' && inp && document.activeElement !== inp) {
         const rModal = document.getElementById('remedyModal');
         const dModal = document.getElementById('downloadModal');
         if ((rModal && rModal.classList.contains('open')) || (dModal && dModal.classList.contains('open'))) return;
         e.preventDefault();
-        if (input) {
-          input.focus();
-          input.select();
-        }
+        inp.focus();
+        inp.select();
       }
     });
-  });
+  }
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startApp);
+  } else {
+    startApp();
+  }
 }
 
 // Global scope exports

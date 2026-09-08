@@ -57,7 +57,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="style.css?v=4.4">
+  <link rel="stylesheet" href="style.css?v=4.5">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
 </head>
 <body>
@@ -148,8 +148,8 @@
 
   <main>
     <div class="search-box-card" id="searchBoxCard">
-      <div class="search-input-wrapper" id="searchInputWrapper">
-        <span class="search-icon">🔍</span>
+      <form id="searchForm" class="search-input-wrapper" onsubmit="event.preventDefault(); return false;">
+        <button type="button" class="btn-search-icon" id="btnSearchIcon" title="Шукати" aria-label="Шукати">🔍</button>
         <input 
           type="text" 
           id="searchInput" 
@@ -165,6 +165,7 @@
         />
         <div class="search-actions-right">
           <button type="button" id="btnClear" class="btn-clear" title="Очистити" aria-label="Очистити" style="display: none;">✕</button>
+          <button type="submit" id="btnSearchSubmit" class="btn-search-submit" title="Шукати" aria-label="Шукати">Знайти</button>
           <button type="button" id="btnCatalogDropdown" class="btn-catalog-dropdown" title="Каталог усіх препаратів (341)" aria-label="Каталог усіх препаратів">
             <span class="btn-catalog-icon">📖</span>
             <span class="btn-catalog-text-full">Препарати</span>
@@ -176,7 +177,7 @@
 
         <!-- Floating Live Suggestions Dropdown (Remedies & Catalog) -->
         <div id="searchSuggestionsDropdown" class="search-suggestions-dropdown" role="listbox" style="display: none;"></div>
-      </div>
+      </form>
 
       <!-- Active Filters Quick Bar -->
       <div class="active-filters-strip" id="activeFiltersStrip" style="display: none;"></div>
@@ -392,6 +393,6 @@ python3 search.py --id 18</code></pre>
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
-  <script src="app.js?v=4.4"></script>
+  <script src="app.js?v=4.5"></script>
 </body>
 </html>
