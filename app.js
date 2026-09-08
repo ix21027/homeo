@@ -1375,11 +1375,6 @@ function updateDownloadModalTexts() {
   const btnCsv = document.getElementById('txtBtnDlCsv');
   if (btnCsv) btnCsv.innerText = t.txtBtnDlCsv;
 
-  const cliTitle = document.getElementById('txtDlCliTitle');
-  if (cliTitle) cliTitle.innerText = t.txtDlCliTitle;
-  const footnote = document.getElementById('dlFootnote');
-  if (footnote) footnote.innerText = t.dlFootnote;
-
   const dlCloseBtn = document.getElementById('dlModalCloseBtn');
   if (dlCloseBtn && t.modalClose) {
     dlCloseBtn.setAttribute('aria-label', t.modalClose);

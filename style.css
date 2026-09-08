@@ -1639,38 +1639,6 @@ body.modal-open {
   transform: translateY(-1px);
 }
 
-.dl-cli-box {
-  margin-top: 1.15rem;
-  background: #0f172a;
-  color: #f8fafc;
-  padding: 0.85rem 1rem;
-  border-radius: 8px;
-}
-
-.dl-cli-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #94a3b8;
-  margin-bottom: 0.35rem;
-}
-
-.dl-cli-code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.8rem;
-  color: #38bdf8;
-  line-height: 1.5;
-  background: transparent;
-  margin: 0;
-}
-
-.dl-modal-footer {
-  margin-top: 1.15rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
 /* Toast Notifications */
 .toast-container {
   position: fixed;
