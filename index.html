@@ -25,21 +25,62 @@
           </div>
         </div>
         <div class="header-right">
-          <div class="lang-switch" role="group" aria-label="Вибір мови / Выбор языка">
-            <button type="button" class="lang-btn active" data-lang="ua" id="langBtnUa" title="Українська версія">
-              🇺🇦 UA
+          <div class="top-menu-dropdown-wrapper" id="topMenuWrapper">
+            <button type="button" class="btn-header-menu" id="btnHeaderMenu" aria-expanded="false" aria-haspopup="true" title="Меню та налаштування">
+              <span class="menu-icon">☰</span>
+              <span class="menu-text" id="txtMenuBtn">Меню</span>
+              <span class="menu-lang-tag" id="menuCurrentLangBadge">UA</span>
+              <span class="menu-arrow">▼</span>
             </button>
-            <button type="button" class="lang-btn" data-lang="ru" id="langBtnRu" title="Русская версия">
-              🌐 RU
-            </button>
-          </div>
-          <div class="downloads-menu-wrapper">
-            <button type="button" id="btnOpenDownloads" class="btn-downloads-menu" aria-haspopup="dialog" aria-expanded="false" title="Завантажити базу даних">
-              <span class="btn-dl-icon">📥</span>
-              <span id="txtDownloadMenuBtn">Завантажити БД</span>
-              <span class="btn-dl-badge">SQLite • JSON • CSV</span>
-              <span class="btn-dl-arrow">▼</span>
-            </button>
+            
+            <div class="header-menu-dropdown" id="headerMenuDropdown">
+              <!-- Language Selection Section -->
+              <div class="menu-section">
+                <div class="menu-section-header">
+                  <span class="menu-section-icon">🌐</span>
+                  <span class="menu-section-title" id="txtMenuLangTitle">Мова сайту</span>
+                </div>
+                <div class="menu-lang-options" role="group" aria-label="Вибір мови">
+                  <button type="button" class="menu-lang-btn active" data-lang="ua" id="langBtnUa" title="Українська версія">
+                    <span class="menu-flag">🇺🇦</span>
+                    <span class="menu-lang-name">Українська</span>
+                    <span class="menu-check">✓</span>
+                  </button>
+                  <button type="button" class="menu-lang-btn" data-lang="ru" id="langBtnRu" title="Русская версия">
+                    <span class="menu-flag">🌐</span>
+                    <span class="menu-lang-name">Русский</span>
+                    <span class="menu-check">✓</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="menu-divider"></div>
+
+              <!-- Downloads Section -->
+              <div class="menu-section">
+                <div class="menu-section-header">
+                  <span class="menu-section-icon">📥</span>
+                  <span class="menu-section-title" id="txtMenuDlTitle">База даних</span>
+                </div>
+                <button type="button" class="menu-action-item" id="btnOpenDownloads" title="Завантажити базу даних">
+                  <span class="menu-item-icon">💾</span>
+                  <div class="menu-item-info">
+                    <div class="menu-item-title" id="txtMenuDlDb">Завантажити базу даних</div>
+                    <div class="menu-item-sub">SQLite, JSON, CSV (UA / RU)</div>
+                  </div>
+                  <span class="menu-item-arrow">→</span>
+                </button>
+              </div>
+
+              <div class="menu-divider"></div>
+
+              <!-- Quick Info Section -->
+              <div class="menu-section menu-section-info">
+                <div class="menu-info-text" id="txtMenuInfo">
+                  🌿 <strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Працює автономно на GitHub Pages.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

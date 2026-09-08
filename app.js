@@ -146,6 +146,13 @@ const I18N = {
     modalCatSkin: '🩹 Шкіра',
     modalCatMod: '⚖️ Модальності',
     modalCatClin: '📋 Клініка',
+    menuBtn: 'Меню',
+    menuBtnTitle: 'Меню та налаштування',
+    menuLangTitle: 'Мова сайту',
+    menuDlTitle: 'База даних',
+    menuDlDb: 'Завантажити базу даних',
+    menuDlDbSub: 'SQLite, JSON, CSV (UA / RU)',
+    menuInfo: '🌿 <strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Працює автономно на GitHub Pages.',
     downloadMenuBtn: 'Завантажити БД',
     downloadMenuBadge: 'SQLite • JSON • CSV',
     dlModalTitle: '📥 Завантаження бази даних',
@@ -276,6 +283,13 @@ const I18N = {
     modalCatSkin: '🩹 Кожа',
     modalCatMod: '⚖️ Модальности',
     modalCatClin: '📋 Клиника',
+    menuBtn: 'Меню',
+    menuBtnTitle: 'Меню и настройки',
+    menuLangTitle: 'Язык сайта',
+    menuDlTitle: 'База данных',
+    menuDlDb: 'Скачать базу данных',
+    menuDlDbSub: 'SQLite, JSON, CSV (UA / RU)',
+    menuInfo: '🌿 <strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Работает автономно на GitHub Pages.',
     downloadMenuBtn: 'Скачать БД',
     downloadMenuBadge: 'SQLite • JSON • CSV',
     dlModalTitle: '📥 Скачивание базы данных',
@@ -920,6 +934,22 @@ function updateUILanguage() {
   const txtDlMenuBtn = document.getElementById('txtDownloadMenuBtn');
   if (txtDlMenuBtn) txtDlMenuBtn.innerText = t.downloadMenuBtn;
 
+  // Header Dropdown Menu Localization
+  const txtMenuBtn = document.getElementById('txtMenuBtn');
+  if (txtMenuBtn && t.menuBtn) txtMenuBtn.innerText = t.menuBtn;
+  const btnHeaderMenu = document.getElementById('btnHeaderMenu');
+  if (btnHeaderMenu && t.menuBtnTitle) btnHeaderMenu.title = t.menuBtnTitle;
+  const menuBadge = document.getElementById('menuCurrentLangBadge');
+  if (menuBadge) menuBadge.innerText = currentLang.toUpperCase();
+  const txtMenuLangTitle = document.getElementById('txtMenuLangTitle');
+  if (txtMenuLangTitle && t.menuLangTitle) txtMenuLangTitle.innerText = t.menuLangTitle;
+  const txtMenuDlTitle = document.getElementById('txtMenuDlTitle');
+  if (txtMenuDlTitle && t.menuDlTitle) txtMenuDlTitle.innerText = t.menuDlTitle;
+  const txtMenuDlDb = document.getElementById('txtMenuDlDb');
+  if (txtMenuDlDb && t.menuDlDb) txtMenuDlDb.innerText = t.menuDlDb;
+  const txtMenuInfo = document.getElementById('txtMenuInfo');
+  if (txtMenuInfo && t.menuInfo) txtMenuInfo.innerHTML = t.menuInfo;
+
   updateDownloadModalTexts();
   updateDownloadModalFiles(downloadModalLang);
 
@@ -1191,6 +1221,19 @@ function showToast(message, duration = 2500) {
   }, duration);
 }
 
+function toggleTopMenu(forceOpen) {
+  const wrapper = document.getElementById('topMenuWrapper');
+  const btn = document.getElementById('btnHeaderMenu');
+  if (!wrapper) return;
+  const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !wrapper.classList.contains('open');
+  wrapper.classList.toggle('open', shouldOpen);
+  if (btn) btn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+}
+
+function closeTopMenu() {
+  toggleTopMenu(false);
+}
+
 function openDownloadModal() {
   const modal = document.getElementById('downloadModal');
   if (!modal) return;
@@ -1413,8 +1456,8 @@ function runSearch(query) {
                              filterState.section;
 
   if (!qTrim && !hasModalityFilters) {
-    statusBar.innerHTML = t.statusEmpty;
-    container.innerHTML = '';
+    if (statusBar) statusBar.innerHTML = t.statusEmpty;
+    if (container) container.innerHTML = '';
     return;
   }
 
@@ -1423,16 +1466,20 @@ function runSearch(query) {
   const elapsed = (performance.now() - t0).toFixed(1);
 
   if (results.length === 0) {
-    statusBar.innerHTML = t.statusNotFound;
-    container.innerHTML = `
+    if (statusBar) statusBar.innerHTML = t.statusNotFound;
+    if (container) {
+      container.innerHTML = `
       <div style="text-align: center; padding: 3rem; background: white; border-radius: 12px; border: 1px solid #e2e8f0;">
         <p style="font-size: 1.1rem; color: #64748b;">${t.statusNotFound}</p>
       </div>`;
+    }
     return;
   }
 
   lastSearchResults = results;
-  statusBar.innerHTML = t.statusFound.replace('{count}', results.length).replace('{time}', elapsed);
+  if (statusBar) {
+    statusBar.innerHTML = t.statusFound.replace('{count}', results.length).replace('{time}', elapsed);
+  }
 
   const cardsHtml = results.map((item, index) => {
     const r = item.remedy;
@@ -1807,14 +1854,45 @@ if (typeof document !== 'undefined') {
       });
     }
 
+    // Top-right dropdown menu wiring
+    const btnHeaderMenu = document.getElementById('btnHeaderMenu');
+    if (btnHeaderMenu) {
+      btnHeaderMenu.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleTopMenu();
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      const wrapper = document.getElementById('topMenuWrapper');
+      if (wrapper && wrapper.classList.contains('open') && !wrapper.contains(e.target)) {
+        closeTopMenu();
+      }
+    });
+
     const btnUa = document.getElementById('langBtnUa');
     const btnRu = document.getElementById('langBtnRu');
-    if (btnUa) btnUa.addEventListener('click', () => switchLanguage('ua'));
-    if (btnRu) btnRu.addEventListener('click', () => switchLanguage('ru'));
+    if (btnUa) {
+      btnUa.addEventListener('click', () => {
+        switchLanguage('ua');
+        closeTopMenu();
+      });
+    }
+    if (btnRu) {
+      btnRu.addEventListener('click', () => {
+        switchLanguage('ru');
+        closeTopMenu();
+      });
+    }
 
     // Download menu modal wiring
     const btnOpenDownloads = document.getElementById('btnOpenDownloads');
-    if (btnOpenDownloads) btnOpenDownloads.addEventListener('click', openDownloadModal);
+    if (btnOpenDownloads) {
+      btnOpenDownloads.addEventListener('click', () => {
+        closeTopMenu();
+        openDownloadModal();
+      });
+    }
 
     const dlModalCloseBtn = document.getElementById('dlModalCloseBtn');
     if (dlModalCloseBtn) dlModalCloseBtn.addEventListener('click', closeDownloadModal);
@@ -1900,6 +1978,7 @@ if (typeof document !== 'undefined') {
 
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
+        closeTopMenu();
         closeModal();
         closeDownloadModal();
       }
@@ -1919,6 +1998,8 @@ if (typeof document !== 'undefined') {
 
 // Global scope exports
 if (typeof window !== 'undefined') {
+  window.toggleTopMenu = toggleTopMenu;
+  window.closeTopMenu = closeTopMenu;
   window.openRemedyModal = openRemedyModal;
   window.closeModal = closeModal;
   window.switchLanguage = switchLanguage;
