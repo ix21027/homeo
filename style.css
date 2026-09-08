@@ -123,11 +123,11 @@ header {
 }
 
 .btn-catalog-header .btn-catalog-count {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.28);
   color: #ffffff;
-  padding: 0.15rem 0.42rem;
+  padding: 0.15rem 0.5rem;
   border-radius: 999px;
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   font-weight: 800;
   line-height: 1;
 }
