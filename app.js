@@ -1527,7 +1527,7 @@ function highlightRemedyMatch(text, query) {
   }
 }
 
-function searchRemedies(query) {
+function searchRemedyNames(query) {
   if (!remediesData || remediesData.length === 0) return [];
 
   const rawQ = (query || '').trim();
@@ -1766,7 +1766,7 @@ function initUnifiedSearch() {
 
       // 1. Live remedy suggestions
       if (q.trim().length >= 1) {
-        const matches = searchRemedies(q);
+        const matches = searchRemedyNames(q);
         if (matches.length > 0) {
           openSearchSuggestions(matches, q, false);
         } else {
@@ -1790,7 +1790,7 @@ function initUnifiedSearch() {
         if (!isDropdownOpen) {
           const q = input.value.trim();
           if (q) {
-            const matches = searchRemedies(q);
+            const matches = searchRemedyNames(q);
             if (matches.length > 0) {
               openSearchSuggestions(matches, q, false);
               updateActiveSearchSuggestion(0);
@@ -1880,7 +1880,7 @@ function initUnifiedSearch() {
       if (isDropdownOpen) {
         closeSearchSuggestions();
       } else {
-        const all = searchRemedies('');
+        const all = searchRemedyNames('');
         openSearchSuggestions(all, '', true);
         if (input) input.focus();
       }
@@ -1891,7 +1891,7 @@ function initUnifiedSearch() {
   if (btnMenuCatalog) {
     btnMenuCatalog.addEventListener('click', () => {
       closeTopMenu();
-      const all = searchRemedies('');
+      const all = searchRemedyNames('');
       openSearchSuggestions(all, '', true);
       if (input) {
         input.scrollIntoView({ behavior: 'smooth', block: 'center' });
