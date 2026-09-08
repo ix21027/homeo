@@ -190,8 +190,7 @@ const I18N = {
     activeFilterReset: 'Скинути все',
     hBadgeRemedies: '🌿 341 препарат',
     hBadgeSymptoms: '📖 11 771 симптом',
-    hBadgeOffline: '⚡ 100% Офлайн',
-    footerText: 'База даних створена на основі архіву <strong>homeopat-sam.com</strong> (Materia Medica, 2018). Повністю автономний клієнтський застосунок для <strong>GitHub Pages</strong>.'
+    hBadgeOffline: '⚡ 100% Офлайн'
   },
   ru: {
     pageTitle: 'Materia Medica — Поисковый Реперторий (Джон Генри Кларк)',
@@ -337,8 +336,7 @@ const I18N = {
     activeFilterReset: 'Сбросить все',
     hBadgeRemedies: '🌿 341 препарат',
     hBadgeSymptoms: '📖 11 771 симптом',
-    hBadgeOffline: '⚡ 100% Офлайн',
-    footerText: 'База данных создана на основе архива <strong>homeopat-sam.com</strong> (Materia Medica, 2018). Полностью автономное клиентское приложение для <strong>GitHub Pages</strong>.'
+    hBadgeOffline: '⚡ 100% Офлайн'
   }
 };
 
@@ -1057,9 +1055,6 @@ function updateUILanguage() {
   if (txtModalPrint) txtModalPrint.innerText = t.txtModalPrint;
 
   updateActiveFiltersStrip();
-
-  const footerEl = document.querySelector('footer p');
-  if (footerEl) footerEl.innerHTML = t.footerText;
 }
 
 function renderModalityChips() {
