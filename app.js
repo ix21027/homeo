@@ -153,16 +153,16 @@ const I18N = {
     menuDlDb: 'Завантажити базу даних',
     menuDlDbSub: 'SQLite, JSON, CSV (UA / RU)',
     menuInfo: '🌿 <strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Працює автономно на GitHub Pages.',
-    remedyPickerLabel: 'Пошук препарату за назвою (341):',
-    remedyPickerHint: 'Введіть назву або виберіть зі списку',
-    remedySearchPlaceholder: 'Введіть назву (напр. Aconitum, Арніка, Belladonna)...',
-    remedyNotFound: 'Препарат не знайдено',
-    remedyNotFoundHint: 'Спробуйте іншу назву або натисніть ▼ щоб відкрити повний список.',
-    remedyFoundCount: 'Знайдено: {n} із 341',
-    remedyAllCount: 'Усі 341 препаратів (A-Z)',
-    btnClearRemedyTitle: 'Очистити поле пошуку',
-    btnToggleRemedyTitle: 'Показати всі препарати',
-    btnReadRemedy: 'Читати опис',
+    searchPlaceholder: 'Введіть симптом або назву препарату (напр. ячмінь, Aconitum, Арніка)...',
+    suggHeaderRemedies: '💊 Препарати за запитом "{q}" ({n}):',
+    suggCatalogTitle: '📖 Каталог усіх препаратів (341):',
+    suggReadRemedy: 'Читати опис ➔',
+    suggFooterHint: 'Натисніть на препарат для опису, або Enter для пошуку симптомів',
+    btnCatalogTitle: 'Каталог усіх 341 препаратів',
+    btnCatalogTextFull: 'Препарати',
+    menuCatHeader: 'Каталог',
+    menuCatalogTitle: 'Каталог препаратів (341)',
+    menuCatalogSub: 'Швидкий вибір та опис за назвою',
     downloadMenuBtn: 'Завантажити БД',
     downloadMenuBadge: 'SQLite • JSON • CSV',
     dlModalTitle: '📥 Завантаження бази даних',
@@ -299,16 +299,16 @@ const I18N = {
     menuDlDb: 'Скачать базу данных',
     menuDlDbSub: 'SQLite, JSON, CSV (UA / RU)',
     menuInfo: '🌿 <strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Работает автономно на GitHub Pages.',
-    remedyPickerLabel: 'Поиск препарата по названию (341):',
-    remedyPickerHint: 'Введите название или выберите из списка',
-    remedySearchPlaceholder: 'Введите название (напр. Aconitum, Арника, Belladonna)...',
-    remedyNotFound: 'Препарат не найден',
-    remedyNotFoundHint: 'Попробуйте другое название или нажмите ▼ чтобы открыть весь список.',
-    remedyFoundCount: 'Найдено: {n} из 341',
-    remedyAllCount: 'Все 341 препаратов (A-Z)',
-    btnClearRemedyTitle: 'Очистить поле поиска',
-    btnToggleRemedyTitle: 'Показать все препараты',
-    btnReadRemedy: 'Читать описание',
+    searchPlaceholder: 'Введите симптом или название препарата (напр. ячмень, Aconitum, Арника)...',
+    suggHeaderRemedies: '💊 Препараты по запросу "{q}" ({n}):',
+    suggCatalogTitle: '📖 Каталог всех препаратов (341):',
+    suggReadRemedy: 'Читать описание ➔',
+    suggFooterHint: 'Нажмите на препарат для описания, или Enter для поиска симптомов',
+    btnCatalogTitle: 'Каталог всех 341 препаратов',
+    btnCatalogTextFull: 'Препараты',
+    menuCatHeader: 'Каталог',
+    menuCatalogTitle: 'Каталог препаратов (341)',
+    menuCatalogSub: 'Быстрый выбор и описание по названию',
     downloadMenuBtn: 'Скачать БД',
     downloadMenuBadge: 'SQLite • JSON • CSV',
     dlModalTitle: '📥 Скачивание базы данных',
@@ -968,33 +968,23 @@ function updateUILanguage() {
   const txtMenuInfo = document.getElementById('txtMenuInfo');
   if (txtMenuInfo && t.menuInfo) txtMenuInfo.innerHTML = t.menuInfo;
 
-  // Remedy Quick Search localization
-  const lblRemedySelect = document.getElementById('lblRemedySelect');
-  if (lblRemedySelect && t.remedyPickerLabel) lblRemedySelect.innerText = t.remedyPickerLabel;
-  const txtRemedyPickerHint = document.getElementById('txtRemedyPickerHint');
-  if (txtRemedyPickerHint && t.remedyPickerHint) txtRemedyPickerHint.innerText = t.remedyPickerHint;
-  const remedySearchInput = document.getElementById('remedySearchInput');
-  if (remedySearchInput && t.remedySearchPlaceholder) remedySearchInput.placeholder = t.remedySearchPlaceholder;
-  const btnClearRemedySearch = document.getElementById('btnClearRemedySearch');
-  if (btnClearRemedySearch && t.btnClearRemedyTitle) {
-    btnClearRemedySearch.title = t.btnClearRemedyTitle;
-    btnClearRemedySearch.setAttribute('aria-label', t.btnClearRemedyTitle);
+  // Unified search box & catalog button localization
+  const searchInputEl = document.getElementById('searchInput');
+  if (searchInputEl && t.searchPlaceholder) searchInputEl.placeholder = t.searchPlaceholder;
+  const btnCatalog = document.getElementById('btnCatalogDropdown');
+  if (btnCatalog && t.btnCatalogTitle) {
+    btnCatalog.title = t.btnCatalogTitle;
+    btnCatalog.setAttribute('aria-label', t.btnCatalogTitle);
   }
-  const btnToggleRemedyList = document.getElementById('btnToggleRemedyList');
-  if (btnToggleRemedyList && t.btnToggleRemedyTitle) {
-    btnToggleRemedyList.title = t.btnToggleRemedyTitle;
-    btnToggleRemedyList.setAttribute('aria-label', t.btnToggleRemedyTitle);
-  }
-  const txtBtnReadRemedy = document.getElementById('txtBtnReadRemedy');
-  if (txtBtnReadRemedy && t.btnReadRemedy) txtBtnReadRemedy.innerText = t.btnReadRemedy;
+  const btnCatalogText = btnCatalog ? btnCatalog.querySelector('.btn-catalog-text-full') : null;
+  if (btnCatalogText && t.btnCatalogTextFull) btnCatalogText.innerText = t.btnCatalogTextFull;
 
-  // Refresh selected remedy name in input on language switch
-  if (selectedRemedyId && remediesData && remedySearchInput) {
-    const r = remediesData.find(item => item.id === selectedRemedyId);
-    if (r) {
-      remedySearchInput.value = `${r.latin}${r.cyr ? ` (${r.cyr})` : ''}`;
-    }
-  }
+  const txtMenuCatHeader = document.getElementById('txtMenuCatHeader');
+  if (txtMenuCatHeader && t.menuCatHeader) txtMenuCatHeader.innerText = t.menuCatHeader;
+  const txtMenuCatalog = document.getElementById('txtMenuCatalog');
+  if (txtMenuCatalog && t.menuCatalogTitle) txtMenuCatalog.innerText = t.menuCatalogTitle;
+  const txtMenuCatalogSub = document.getElementById('txtMenuCatalogSub');
+  if (txtMenuCatalogSub && t.menuCatalogSub) txtMenuCatalogSub.innerText = t.menuCatalogSub;
 
   updateDownloadModalTexts();
   updateDownloadModalFiles(downloadModalLang);
@@ -1580,122 +1570,129 @@ function searchRemedies(query) {
   return results.map(item => item.remedy);
 }
 
-function openRemedyDropdown(matches, query) {
-  const dropdown = document.getElementById('remedySuggestionsDropdown');
-  const wrapper = document.getElementById('remedyAutocompleteWrapper');
-  const card = document.getElementById('remedyPickerCard');
-  const input = document.getElementById('remedySearchInput');
-  if (!dropdown || !wrapper) return;
+function openSearchSuggestions(matches, query, isCatalog = false) {
+  const dropdown = document.getElementById('searchSuggestionsDropdown');
+  const card = document.getElementById('searchBoxCard');
+  const input = document.getElementById('searchInput');
+  if (!dropdown) return;
 
   currentRemedySuggestions = matches;
   activeSuggestionIndex = -1;
   const t = I18N[currentLang];
-  const isAll = !query || !query.trim();
 
   if (matches.length === 0) {
-    dropdown.innerHTML = `
-      <div class="remedy-sugg-empty">
-        <p>🔍 ${escapeHtml(t.remedyNotFound || 'Препарат не знайдено')}: <strong>"${escapeHtml(query)}"</strong></p>
-        <small>${escapeHtml(t.remedyNotFoundHint || 'Спробуйте іншу назву або натисніть ▼ щоб відкрити повний список.')}</small>
-      </div>
-    `;
+    if (isCatalog) {
+      dropdown.innerHTML = `
+        <div class="sugg-empty">
+          <p>Препарати відсутні</p>
+        </div>
+      `;
+    } else {
+      closeSearchSuggestions();
+      return;
+    }
   } else {
     let html = '';
-    let currentLetter = '';
 
-    if (isAll) {
+    if (isCatalog) {
+      // Full catalog of 341 remedies A-Z
+      html += `
+        <div class="sugg-header">
+          <strong>${escapeHtml(t.suggCatalogTitle || '📖 Каталог усіх препаратів (341):')}</strong>
+          <span style="font-size: 0.74rem; color: #64748b;">Оберіть для відкриття опису</span>
+        </div>
+      `;
+      let currentLetter = '';
       for (let i = 0; i < matches.length; i++) {
         const r = matches[i];
         const letter = (r.latin || '?')[0].toUpperCase();
         if (letter !== currentLetter) {
           currentLetter = letter;
-          html += `<div class="remedy-dropdown-group-header">— ${escapeHtml(letter)} —</div>`;
+          html += `<div class="sugg-group-header">— ${escapeHtml(letter)} —</div>`;
         }
         html += `
-          <div class="remedy-suggestion-item" data-id="${r.id}" data-idx="${i}" role="option" aria-selected="false">
-            <div class="remedy-sugg-main">
-              <div class="remedy-sugg-title">
-                <span class="remedy-sugg-latin">${escapeHtml(r.latin)}</span>
-                ${r.cyr ? `<span class="remedy-sugg-cyr">(${escapeHtml(r.cyr)})</span>` : ''}
+          <div class="sugg-item" data-id="${r.id}" data-idx="${i}" role="option" aria-selected="false">
+            <div class="sugg-main">
+              <div class="sugg-title">
+                <span class="sugg-latin">${escapeHtml(r.latin)}</span>
+                ${r.cyr ? `<span class="sugg-cyr">(${escapeHtml(r.cyr)})</span>` : ''}
               </div>
-              ${r.common ? `<div class="remedy-sugg-common">🌿 ${escapeHtml(r.common)}</div>` : ''}
+              ${r.common ? `<div class="sugg-common">🌿 ${escapeHtml(r.common)}</div>` : ''}
             </div>
-            <div class="remedy-sugg-action">
-              <span class="remedy-sugg-arrow" title="${escapeHtml(t.btnReadRemedy || 'Читати опис')}">➔</span>
-            </div>
+            <span class="sugg-action-badge">${escapeHtml(t.suggReadRemedy || 'Читати опис ➔')}</span>
           </div>
         `;
       }
-      html += `<div class="remedy-dropdown-footer">${escapeHtml(t.remedyAllCount || 'Усі 341 препаратів (A-Z)')}</div>`;
+      html += `<div class="sugg-footer"><span>Усі 341 препаратів</span></div>`;
     } else {
-      const displayMatches = matches.slice(0, 30);
+      // Live search suggestions
+      const displayMatches = matches.slice(0, 15);
+      const headerTpl = t.suggHeaderRemedies || '💊 Препарати за запитом "{q}" ({n}):';
+      const headerText = headerTpl.replace('{q}', escapeHtml(query)).replace('{n}', matches.length);
+      html += `
+        <div class="sugg-header">
+          <strong>${headerText}</strong>
+          <span style="font-size: 0.74rem; color: #64748b;">↓/↑ для вибору, Enter для переходу</span>
+        </div>
+      `;
       for (let i = 0; i < displayMatches.length; i++) {
         const r = displayMatches[i];
         html += `
-          <div class="remedy-suggestion-item" data-id="${r.id}" data-idx="${i}" role="option" aria-selected="false">
-            <div class="remedy-sugg-main">
-              <div class="remedy-sugg-title">
-                <span class="remedy-sugg-latin">${highlightRemedyMatch(r.latin, query)}</span>
-                ${r.cyr ? `<span class="remedy-sugg-cyr">(${highlightRemedyMatch(r.cyr, query)})</span>` : ''}
+          <div class="sugg-item" data-id="${r.id}" data-idx="${i}" role="option" aria-selected="false">
+            <div class="sugg-main">
+              <div class="sugg-title">
+                <span class="sugg-latin">${highlightRemedyMatch(r.latin, query)}</span>
+                ${r.cyr ? `<span class="sugg-cyr">(${highlightRemedyMatch(r.cyr, query)})</span>` : ''}
               </div>
-              ${r.common ? `<div class="remedy-sugg-common">🌿 ${highlightRemedyMatch(r.common, query)}</div>` : ''}
+              ${r.common ? `<div class="sugg-common">🌿 ${highlightRemedyMatch(r.common, query)}</div>` : ''}
             </div>
-            <div class="remedy-sugg-action">
-              <span class="remedy-sugg-arrow" title="${escapeHtml(t.btnReadRemedy || 'Читати опис')}">➔</span>
-            </div>
+            <span class="sugg-action-badge">${escapeHtml(t.suggReadRemedy || 'Читати опис ➔')}</span>
           </div>
         `;
       }
-      const countTpl = t.remedyFoundCount || 'Знайдено: {n} із 341';
-      const countText = countTpl.replace('{n}', matches.length);
-      html += `<div class="remedy-dropdown-footer">${escapeHtml(countText)}</div>`;
+      html += `
+        <div class="sugg-footer">
+          <span>${escapeHtml(t.suggFooterHint || 'Натисніть на препарат для опису, або Enter для пошуку симптомів')}</span>
+        </div>
+      `;
     }
 
     dropdown.innerHTML = html;
   }
 
   dropdown.style.display = 'block';
-  wrapper.classList.add('open');
   if (card) card.classList.add('dropdown-open');
   if (input) input.setAttribute('aria-expanded', 'true');
 }
 
-function closeRemedyDropdown() {
-  const dropdown = document.getElementById('remedySuggestionsDropdown');
-  const wrapper = document.getElementById('remedyAutocompleteWrapper');
-  const card = document.getElementById('remedyPickerCard');
-  const input = document.getElementById('remedySearchInput');
+function closeSearchSuggestions() {
+  const dropdown = document.getElementById('searchSuggestionsDropdown');
+  const card = document.getElementById('searchBoxCard');
+  const input = document.getElementById('searchInput');
   if (dropdown) dropdown.style.display = 'none';
-  if (wrapper) wrapper.classList.remove('open');
   if (card) card.classList.remove('dropdown-open');
   if (input) input.setAttribute('aria-expanded', 'false');
   activeSuggestionIndex = -1;
 }
 
-function selectRemedy(remedy) {
+function selectSuggestedRemedy(remedy) {
   if (!remedy) return;
-  selectedRemedyId = remedy.id;
-
-  const input = document.getElementById('remedySearchInput');
+  const input = document.getElementById('searchInput');
   if (input) {
     input.value = `${remedy.latin}${remedy.cyr ? ` (${remedy.cyr})` : ''}`;
   }
+  const clearBtn = document.getElementById('btnClear');
+  if (clearBtn) clearBtn.style.display = 'flex';
 
-  const btnClear = document.getElementById('btnClearRemedySearch');
-  if (btnClear) btnClear.style.display = 'flex';
-
-  const btnOpen = document.getElementById('btnOpenSelectedRemedy');
-  if (btnOpen) btnOpen.disabled = false;
-
-  closeRemedyDropdown();
+  closeSearchSuggestions();
   openRemedyModal(remedy.id);
 }
 
-function updateActiveSuggestion(newIdx) {
-  const dropdown = document.getElementById('remedySuggestionsDropdown');
+function updateActiveSearchSuggestion(newIdx) {
+  const dropdown = document.getElementById('searchSuggestionsDropdown');
   if (!dropdown) return;
 
-  const items = dropdown.querySelectorAll('.remedy-suggestion-item');
+  const items = dropdown.querySelectorAll('.sugg-item');
   if (items.length === 0) return;
 
   items.forEach(el => {
@@ -1714,167 +1711,170 @@ function updateActiveSuggestion(newIdx) {
   }
 }
 
-function initRemedyAutocomplete() {
-  const input = document.getElementById('remedySearchInput');
-  const btnClear = document.getElementById('btnClearRemedySearch');
-  const btnToggle = document.getElementById('btnToggleRemedyList');
-  const dropdown = document.getElementById('remedySuggestionsDropdown');
-  const btnOpen = document.getElementById('btnOpenSelectedRemedy');
+function initUnifiedSearch() {
+  if (unifiedSearchInitialized) return;
+  unifiedSearchInitialized = true;
 
-  if (!input || !dropdown) return;
+  const input = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('btnClear');
+  const btnCatalog = document.getElementById('btnCatalogDropdown');
+  const dropdown = document.getElementById('searchSuggestionsDropdown');
+  const btnMenuCatalog = document.getElementById('btnMenuOpenCatalog');
 
-  if (!remedyAutocompleteInitialized) {
-    remedyAutocompleteInitialized = true;
+  let debounceTimer;
 
-    // Typing event
-    input.addEventListener('input', () => {
-      const q = input.value;
-      if (btnClear) btnClear.style.display = q ? 'flex' : 'none';
+  if (input) {
+    input.addEventListener('input', (e) => {
+      const q = e.target.value;
+      if (clearBtn) clearBtn.style.display = q.trim() ? 'flex' : 'none';
 
-      if (selectedRemedyId) {
-        const cur = remediesData ? remediesData.find(r => r.id === selectedRemedyId) : null;
-        const curName = cur ? `${cur.latin}${cur.cyr ? ` (${cur.cyr})` : ''}` : '';
-        if (q.trim() !== curName.trim()) {
-          selectedRemedyId = null;
-          if (btnOpen) btnOpen.disabled = true;
+      // 1. Live remedy suggestions
+      if (q.trim().length >= 1) {
+        const matches = searchRemedies(q);
+        if (matches.length > 0) {
+          openSearchSuggestions(matches, q, false);
+        } else {
+          closeSearchSuggestions();
         }
-      }
-
-      if (q.trim().length > 0) {
-        const matches = searchRemedies(q);
-        openRemedyDropdown(matches, q);
       } else {
-        closeRemedyDropdown();
-        if (btnOpen) btnOpen.disabled = true;
+        closeSearchSuggestions();
       }
+
+      // 2. Symptom search debounced
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        runSearch(q);
+      }, 120);
     });
 
-    // Focus event: if input has text, show suggestions
-    input.addEventListener('focus', () => {
-      const q = input.value.trim();
-      if (q.length > 0) {
-        const matches = searchRemedies(q);
-        openRemedyDropdown(matches, q);
-      }
-    });
-
-    // Keyboard navigation
     input.addEventListener('keydown', (e) => {
-      const isDropdownOpen = dropdown.style.display === 'block';
+      const isDropdownOpen = dropdown && dropdown.style.display === 'block';
 
       if (e.key === 'ArrowDown') {
-        e.preventDefault();
         if (!isDropdownOpen) {
-          const matches = searchRemedies(input.value);
-          openRemedyDropdown(matches, input.value);
-          updateActiveSuggestion(0);
+          const q = input.value.trim();
+          if (q) {
+            const matches = searchRemedies(q);
+            if (matches.length > 0) {
+              openSearchSuggestions(matches, q, false);
+              updateActiveSearchSuggestion(0);
+              e.preventDefault();
+            }
+          }
         } else {
-          const items = dropdown.querySelectorAll('.remedy-suggestion-item');
+          e.preventDefault();
+          const items = dropdown.querySelectorAll('.sugg-item');
           if (items.length > 0) {
             const next = activeSuggestionIndex + 1 >= items.length ? 0 : activeSuggestionIndex + 1;
-            updateActiveSuggestion(next);
+            updateActiveSearchSuggestion(next);
           }
         }
       } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
         if (isDropdownOpen) {
-          const items = dropdown.querySelectorAll('.remedy-suggestion-item');
+          e.preventDefault();
+          const items = dropdown.querySelectorAll('.sugg-item');
           if (items.length > 0) {
             const prev = activeSuggestionIndex - 1 < 0 ? items.length - 1 : activeSuggestionIndex - 1;
-            updateActiveSuggestion(prev);
+            updateActiveSearchSuggestion(prev);
           }
         }
       } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (isDropdownOpen) {
-          if (activeSuggestionIndex >= 0 && currentRemedySuggestions[activeSuggestionIndex]) {
-            selectRemedy(currentRemedySuggestions[activeSuggestionIndex]);
-          } else if (currentRemedySuggestions.length > 0) {
-            selectRemedy(currentRemedySuggestions[0]);
-          }
-        } else if (selectedRemedyId) {
-          openRemedyModal(selectedRemedyId);
-        } else if (input.value.trim()) {
-          const matches = searchRemedies(input.value);
-          if (matches.length > 0) {
-            selectRemedy(matches[0]);
-          }
+        if (isDropdownOpen && activeSuggestionIndex >= 0 && currentRemedySuggestions[activeSuggestionIndex]) {
+          e.preventDefault();
+          selectSuggestedRemedy(currentRemedySuggestions[activeSuggestionIndex]);
+        } else {
+          closeSearchSuggestions();
+          clearTimeout(debounceTimer);
+          runSearch(input.value);
         }
       } else if (e.key === 'Escape') {
         if (isDropdownOpen) {
           e.preventDefault();
-          closeRemedyDropdown();
+          closeSearchSuggestions();
         }
       }
     });
 
-    // Delegated click on dropdown suggestions
+    // Keyboard shortcut '/'
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement !== input) {
+        const isInputFocused = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+        if (!isInputFocused) {
+          e.preventDefault();
+          input.focus();
+          input.select();
+        }
+      }
+    });
+  }
+
+  // Click on suggested remedy
+  if (dropdown) {
     dropdown.addEventListener('click', (e) => {
-      const item = e.target.closest('.remedy-suggestion-item');
+      const item = e.target.closest('.sugg-item');
       if (!item) return;
       const id = parseInt(item.getAttribute('data-id'), 10);
       if (id && remediesData) {
         const remedy = remediesData.find(r => r.id === id);
         if (remedy) {
-          selectRemedy(remedy);
+          selectSuggestedRemedy(remedy);
         }
-      }
-    });
-
-    // Clear button
-    if (btnClear) {
-      btnClear.addEventListener('click', () => {
-        input.value = '';
-        selectedRemedyId = null;
-        btnClear.style.display = 'none';
-        if (btnOpen) btnOpen.disabled = true;
-        closeRemedyDropdown();
-        input.focus();
-      });
-    }
-
-    // Dropdown toggle button (▼)
-    if (btnToggle) {
-      btnToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isDropdownOpen = dropdown.style.display === 'block';
-        if (isDropdownOpen) {
-          closeRemedyDropdown();
-        } else {
-          const q = input.value.trim();
-          const matches = searchRemedies(q);
-          openRemedyDropdown(matches, q);
-          input.focus();
-        }
-      });
-    }
-
-    // "Читати опис" action button
-    if (btnOpen) {
-      btnOpen.addEventListener('click', () => {
-        if (selectedRemedyId) {
-          openRemedyModal(selectedRemedyId);
-        } else if (input.value.trim()) {
-          const matches = searchRemedies(input.value);
-          if (matches.length > 0) {
-            selectRemedy(matches[0]);
-          }
-        }
-      });
-    }
-
-    // Click outside listener
-    document.addEventListener('click', (e) => {
-      const wrapper = document.getElementById('remedyAutocompleteWrapper');
-      if (wrapper && !wrapper.contains(e.target)) {
-        closeRemedyDropdown();
       }
     });
   }
+
+  // Clear button
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      clearBtn.style.display = 'none';
+      closeSearchSuggestions();
+      runSearch('');
+    });
+  }
+
+  // Catalog dropdown button (📖 341 ▼)
+  if (btnCatalog) {
+    btnCatalog.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isDropdownOpen = dropdown && dropdown.style.display === 'block';
+      if (isDropdownOpen) {
+        closeSearchSuggestions();
+      } else {
+        const all = searchRemedies('');
+        openSearchSuggestions(all, '', true);
+        if (input) input.focus();
+      }
+    });
+  }
+
+  // Catalog item from header menu
+  if (btnMenuCatalog) {
+    btnMenuCatalog.addEventListener('click', () => {
+      closeTopMenu();
+      const all = searchRemedies('');
+      openSearchSuggestions(all, '', true);
+      if (input) {
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        input.focus();
+      }
+    });
+  }
+
+  // Click outside listener
+  document.addEventListener('click', (e) => {
+    const wrapper = document.getElementById('searchInputWrapper');
+    if (wrapper && !wrapper.contains(e.target) && (!btnCatalog || !btnCatalog.contains(e.target))) {
+      closeSearchSuggestions();
+    }
+  });
 }
 
 function populateRemedySelector() {
-  initRemedyAutocomplete();
+  initUnifiedSearch();
 }
 
 async function initApp() {
@@ -2294,31 +2294,7 @@ if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
     initApp();
 
-    const input = document.getElementById('searchInput');
-    const clearBtn = document.getElementById('btnClear');
-
-    let debounceTimer;
-    if (input) {
-      input.addEventListener('input', (e) => {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          runSearch(e.target.value);
-        }, 120);
-      });
-    }
-
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        if (input) {
-          input.value = '';
-          input.focus();
-        }
-        runSearch('');
-      });
-    }
-
-    // Direct Remedy Quick Search with Auto-Suggestions
-    initRemedyAutocomplete();
+    initUnifiedSearch();
 
     // Top-right dropdown menu wiring
     const btnHeaderMenu = document.getElementById('btnHeaderMenu');

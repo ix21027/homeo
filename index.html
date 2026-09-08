@@ -8,7 +8,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Materia Medica — Пошуковий Реперторій (Джон Генрі Кларк)</title>
   <meta name="description" content="База даних гомеопатичних препаратів Materia Medica з повнотекстовим розумним пошуком симптомів та модальностей. Працює на GitHub Pages.">
-  <link rel="stylesheet" href="style.css?v=3.4">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="stylesheet" href="style.css?v=4.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
 </head>
 <body>
@@ -65,6 +68,22 @@
                 </button>
               </div>
 
+              <!-- Catalog Section -->
+              <div class="menu-section">
+                <div class="menu-section-header">
+                  <span class="menu-section-icon">📖</span>
+                  <span class="menu-section-title" id="txtMenuCatHeader">Каталог</span>
+                </div>
+                <button type="button" class="menu-action-item" id="btnMenuOpenCatalog" title="Каталог препаратів">
+                  <span class="menu-item-icon">🌿</span>
+                  <div class="menu-item-info">
+                    <div class="menu-item-title" id="txtMenuCatalog">Каталог препаратів (341)</div>
+                    <div class="menu-item-sub" id="txtMenuCatalogSub">Швидкий перегляд та опис за назвою</div>
+                  </div>
+                  <span class="menu-item-arrow">→</span>
+                </button>
+              </div>
+
               <div class="menu-divider"></div>
 
               <!-- Quick Info Section -->
@@ -90,63 +109,35 @@
   </header>
 
   <main>
-    <!-- Direct Remedy Quick Search with Auto-Suggestions (341 remedies) -->
-    <div class="remedy-picker-card" id="remedyPickerCard">
-      <div class="remedy-picker-header">
-        <div class="remedy-picker-title-wrap">
-          <span class="remedy-picker-icon">📖</span>
-          <label for="remedySearchInput" class="remedy-picker-title" id="lblRemedySelect">Пошук препарату за назвою (341):</label>
-        </div>
-        <span class="remedy-picker-hint" id="txtRemedyPickerHint">Введіть назву або виберіть зі списку</span>
-      </div>
-      <div class="remedy-picker-body">
-        <div class="remedy-autocomplete-wrapper" id="remedyAutocompleteWrapper">
-          <div class="remedy-input-container">
-            <span class="remedy-input-icon">💊</span>
-            <input 
-              type="text" 
-              id="remedySearchInput" 
-              class="remedy-search-input" 
-              placeholder="Введіть назву (наприклад: Aconitum, Арніка, Belladonna)..." 
-              autocomplete="off" 
-              autocorrect="off" 
-              autocapitalize="off" 
-              spellcheck="false"
-              aria-autocomplete="list"
-              aria-expanded="false"
-              aria-controls="remedySuggestionsDropdown"
-              role="combobox"
-            />
-            <button type="button" id="btnClearRemedySearch" class="btn-clear-remedy" title="Очистити поле" aria-label="Очистити" style="display: none;">✕</button>
-            <button type="button" id="btnToggleRemedyList" class="btn-toggle-remedy-list" title="Показати всі препарати" aria-label="Показати всі препарати">
-              <span class="combobox-arrow">▼</span>
-            </button>
-          </div>
-          
-          <!-- Floating Suggestions Dropdown -->
-          <div id="remedySuggestionsDropdown" class="remedy-suggestions-dropdown" role="listbox" style="display: none;"></div>
-        </div>
-        <button type="button" id="btnOpenSelectedRemedy" class="btn-read-remedy" disabled title="Читати опис обраного препарату">
-          <span id="txtBtnReadRemedy">Читати опис</span> ➔
-        </button>
-      </div>
-    </div>
-
-    <div class="search-box-card">
-      <div class="search-input-wrapper">
+    <div class="search-box-card" id="searchBoxCard">
+      <div class="search-input-wrapper" id="searchInputWrapper">
         <span class="search-icon">🔍</span>
         <input 
           type="text" 
           id="searchInput" 
-          placeholder="Введіть симптом, наприклад: ячмінь на правій нижній повіці, біль у попереку..."
+          placeholder="Введіть симптом або назву препарату (напр. ячмінь, Aconitum, Арніка)..."
           autocomplete="off"
           autocorrect="off"
           autocapitalize="off"
           spellcheck="false"
           enterkeyhint="search"
+          aria-autocomplete="list"
+          aria-expanded="false"
+          aria-controls="searchSuggestionsDropdown"
         />
-        <button type="button" id="btnClear" class="btn-clear" title="Очистити" aria-label="Очистити">✕</button>
-        <kbd class="search-kbd-hint" id="searchKbdHint" title="Натисніть / для швидкого пошуку">/</kbd>
+        <div class="search-actions-right">
+          <button type="button" id="btnClear" class="btn-clear" title="Очистити" aria-label="Очистити" style="display: none;">✕</button>
+          <button type="button" id="btnCatalogDropdown" class="btn-catalog-dropdown" title="Каталог усіх препаратів (341)" aria-label="Каталог усіх препаратів">
+            <span class="btn-catalog-icon">📖</span>
+            <span class="btn-catalog-text-full">Препарати</span>
+            <span class="btn-catalog-count">341</span>
+            <span class="combobox-arrow">▼</span>
+          </button>
+          <kbd class="search-kbd-hint" id="searchKbdHint" title="Натисніть / для швидкого пошуку">/</kbd>
+        </div>
+
+        <!-- Floating Live Suggestions Dropdown (Remedies & Catalog) -->
+        <div id="searchSuggestionsDropdown" class="search-suggestions-dropdown" role="listbox" style="display: none;"></div>
       </div>
 
       <!-- Active Filters Quick Bar -->
@@ -369,6 +360,6 @@ python3 search.py --id 18</code></pre>
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
-  <script src="app.js?v=3.4"></script>
+  <script src="app.js?v=4.0"></script>
 </body>
 </html>
