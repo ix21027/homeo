@@ -973,28 +973,6 @@ function updateUILanguage() {
     modalCloseBtn.setAttribute('aria-label', t.modalClose);
     modalCloseBtn.title = t.modalClose;
   }
-
-  const qLabel = document.getElementById('txtQuickLabel');
-  if (qLabel) qLabel.innerText = t.quickLabel;
-  const qList = document.getElementById('quickChipsList');
-  if (qList) {
-    qList.innerHTML = t.quickQueries.map(item => `
-      <button type="button" class="chip ${item.priority ? 'chip-priority' : ''}" data-query="${item.q}">
-        ${item.text}
-      </button>
-    `).join('');
-    qList.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const q = chip.getAttribute('data-query');
-        if (q && searchInput) {
-          searchInput.value = q;
-          searchInput.focus();
-          runSearch(q);
-        }
-      });
-    });
-  }
-
   const txtModalCopy = document.getElementById('txtModalCopy');
   if (txtModalCopy) txtModalCopy.innerText = t.txtModalCopy;
   const txtModalPrint = document.getElementById('txtModalPrint');

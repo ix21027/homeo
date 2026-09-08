@@ -545,57 +545,6 @@ main {
   color: #b91c1c;
 }
 
-.quick-queries {
-  margin-top: 1rem;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
-
-.quick-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-right: 0.25rem;
-}
-
-.chip {
-  background: #f1f5f9;
-  border: 1px solid var(--border);
-  color: #334155;
-  font-size: 0.8rem;
-  font-weight: 500;
-  padding: 0.3rem 0.65rem;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  user-select: none;
-}
-
-.chip:hover {
-  background: var(--primary-light);
-  color: var(--primary);
-  border-color: var(--primary);
-  transform: translateY(-1px);
-}
-
-.chip.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary-dark);
-}
-
-.chip-priority {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #b91c1c;
-}
-.chip-priority:hover {
-  background: #fecaca;
-  color: #991b1b;
-}
-
 .status-bar {
   margin: 1.25rem 0 0.75rem;
   display: flex;
