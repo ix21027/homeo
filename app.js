@@ -1012,8 +1012,6 @@ function updateUILanguage() {
   if (txtMenuDlTitle && t.menuDlTitle) txtMenuDlTitle.innerText = t.menuDlTitle;
   const txtMenuDlDb = document.getElementById('txtMenuDlDb');
   if (txtMenuDlDb && t.menuDlDb) txtMenuDlDb.innerText = t.menuDlDb;
-  const txtMenuInfo = document.getElementById('txtMenuInfo');
-  if (txtMenuInfo && t.menuInfo) txtMenuInfo.innerHTML = t.menuInfo;
 
   // Unified search box & catalog button localization
   const searchInputEl = document.getElementById('searchInput');
@@ -1025,13 +1023,6 @@ function updateUILanguage() {
   }
   const btnCatalogText = btnCatalog ? btnCatalog.querySelector('.btn-catalog-text-full') : null;
   if (btnCatalogText && t.btnCatalogTextFull) btnCatalogText.innerText = t.btnCatalogTextFull;
-
-  const txtMenuCatHeader = document.getElementById('txtMenuCatHeader');
-  if (txtMenuCatHeader && t.menuCatHeader) txtMenuCatHeader.innerText = t.menuCatHeader;
-  const txtMenuCatalog = document.getElementById('txtMenuCatalog');
-  if (txtMenuCatalog && t.menuCatalogTitle) txtMenuCatalog.innerText = t.menuCatalogTitle;
-  const txtMenuCatalogSub = document.getElementById('txtMenuCatalogSub');
-  if (txtMenuCatalogSub && t.menuCatalogSub) txtMenuCatalogSub.innerText = t.menuCatalogSub;
 
   updateDownloadModalTexts();
   updateDownloadModalFiles(downloadModalLang);
@@ -1780,7 +1771,6 @@ function initUnifiedSearch() {
   const clearBtn = document.getElementById('btnClear');
   const btnCatalog = document.getElementById('btnCatalogDropdown');
   const dropdown = document.getElementById('searchSuggestionsDropdown');
-  const btnMenuCatalog = document.getElementById('btnMenuOpenCatalog');
 
   function triggerSearch() {
     closeSearchSuggestions();
@@ -1948,19 +1938,6 @@ function initUnifiedSearch() {
         const all = searchRemedyNames('');
         openSearchSuggestions(all, '', true);
         if (input) input.focus();
-      }
-    });
-  }
-
-  // Catalog item from header menu
-  if (btnMenuCatalog) {
-    btnMenuCatalog.addEventListener('click', () => {
-      closeTopMenu();
-      const all = searchRemedyNames('');
-      openSearchSuggestions(all, '', true);
-      if (input) {
-        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        input.focus();
       }
     });
   }

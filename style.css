@@ -326,21 +326,6 @@ header {
   transform: translateX(2px);
 }
 
-/* Quick Info in Dropdown */
-.menu-section-info {
-  padding: 0.15rem 0.35rem 0.1rem;
-}
-
-.menu-info-text {
-  font-size: 0.73rem;
-  line-height: 1.4;
-  color: #64748b;
-  background: #f8fafc;
-  padding: 0.5rem 0.65rem;
-  border-radius: 7px;
-  border: 1px dashed #cbd5e1;
-}
-
 .header-badges {
   display: flex;
   gap: 0.45rem;
