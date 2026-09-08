@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ix21027.github.io/homeo/sitemap.xml

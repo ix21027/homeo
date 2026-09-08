@@ -93,14 +93,14 @@ header {
 .btn-header-menu {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
   background: rgba(255, 255, 255, 0.16);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.32);
-  padding: 0.48rem 0.9rem;
+  width: 42px;
+  height: 42px;
+  padding: 0;
   border-radius: 10px;
-  font-size: 0.875rem;
-  font-weight: 700;
   cursor: pointer;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -127,7 +127,7 @@ header {
 }
 
 .menu-icon {
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   line-height: 1;
 }
 
@@ -1858,8 +1858,9 @@ footer {
   }
 
   .btn-header-menu {
-    padding: 0.42rem 0.75rem;
-    font-size: 0.82rem;
+    width: 38px;
+    height: 38px;
+    padding: 0;
     border-radius: 9px;
   }
 
@@ -2272,13 +2273,9 @@ footer {
   }
 
   .btn-header-menu {
-    padding: 0.38rem 0.55rem;
-    gap: 0.3rem;
-    font-size: 0.78rem;
-  }
-
-  .menu-text {
-    display: none;
+    width: 36px;
+    height: 36px;
+    padding: 0;
   }
 
   .h-badge {

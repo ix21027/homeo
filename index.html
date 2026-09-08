@@ -7,11 +7,57 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Materia Medica — Пошуковий Реперторій (Джон Генрі Кларк)</title>
-  <meta name="description" content="База даних гомеопатичних препаратів Materia Medica з повнотекстовим розумним пошуком симптомів та модальностей. Працює на GitHub Pages.">
+  <meta name="description" content="База даних гомеопатичних препаратів Materia Medica з повнотекстовим розумним пошуком симптомів та модальностей. 341 препарат, 11 771 симптом. Працює автономно на GitHub Pages.">
+  <meta name="keywords" content="Materia Medica, Джон Генрі Кларк, гомеопатія, реперторій, гомеопатичні препарати, пошук симптомів, модальності, розширений пошук, Aconitum, Belladonna, гомеопатия, реперторий, кларк">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="author" content="Materia Medica Repertory">
+  <link rel="canonical" href="https://ix21027.github.io/homeo/">
+
+  <!-- Open Graph / Social Media Preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ix21027.github.io/homeo/">
+  <meta property="og:title" content="🌿 Materia Medica — Пошуковий Реперторій (Джон Генрі Кларк)">
+  <meta property="og:description" content="База даних гомеопатичних препаратів Materia Medica з повнотекстовим розумним пошуком симптомів та модальностей. 341 препарат, 11 771 симптом.">
+  <meta property="og:site_name" content="Materia Medica Online">
+  <meta property="og:locale" content="uk_UA">
+  <meta property="og:locale:alternate" content="ru_RU">
+
+  <!-- Schema.org JSON-LD Structured Data for Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://ix21027.github.io/homeo/#website",
+        "url": "https://ix21027.github.io/homeo/",
+        "name": "Materia Medica — Пошуковий Реперторій",
+        "description": "База даних гомеопатичних препаратів Materia Medica з розумним пошуком симптомів та модальностей (341 препарат, 11 771 симптом)",
+        "inLanguage": ["uk", "ru"],
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://ix21027.github.io/homeo/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "MedicalWebPage",
+        "@id": "https://ix21027.github.io/homeo/#webpage",
+        "url": "https://ix21027.github.io/homeo/",
+        "name": "Materia Medica — Пошуковий Реперторій (Джон Генрі Кларк)",
+        "about": {
+          "@type": "MedicalSpecialty",
+          "name": "Homeopathy"
+        }
+      }
+    ]
+  }
+  </script>
+
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="style.css?v=4.1">
+  <link rel="stylesheet" href="style.css?v=4.2">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
 </head>
 <body>
@@ -22,11 +68,8 @@
         <h1 id="headerTitle">🌿 Materia Medica</h1>
         <div class="header-right">
           <div class="top-menu-dropdown-wrapper" id="topMenuWrapper">
-            <button type="button" class="btn-header-menu" id="btnHeaderMenu" aria-expanded="false" aria-haspopup="true" title="Меню та налаштування">
+            <button type="button" class="btn-header-menu" id="btnHeaderMenu" aria-expanded="false" aria-haspopup="true" title="Меню" aria-label="Меню">
               <span class="menu-icon">☰</span>
-              <span class="menu-text" id="txtMenuBtn">Меню</span>
-              <span class="menu-lang-tag" id="menuCurrentLangBadge">UA</span>
-              <span class="menu-arrow">▼</span>
             </button>
             
             <div class="header-menu-dropdown" id="headerMenuDropdown">
@@ -349,6 +392,6 @@ python3 search.py --id 18</code></pre>
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
-  <script src="app.js?v=4.1"></script>
+  <script src="app.js?v=4.2"></script>
 </body>
 </html>
