@@ -1523,15 +1523,9 @@ function runSearch(query) {
         ${modHtml}
 
         <div class="card-actions">
-          <div class="card-actions-left">
-            <button type="button" class="btn-details" onclick="openRemedyModal(${r.id})">
-              ${t.cardBtnDetails}
-            </button>
-            <button type="button" class="btn-copy-quote" onclick="copySnippetQuote(${index})" title="${t.copyQuoteBtn}">
-              ${t.copyQuoteBtn}
-            </button>
-          </div>
-          <span class="remedy-id-text">ID: ${r.id}</span>
+          <button type="button" class="btn-details" onclick="openRemedyModal(${r.id})">
+            ${t.cardBtnDetails}
+          </button>
         </div>
       </article>
     `;

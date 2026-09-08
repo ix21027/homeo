@@ -874,17 +874,9 @@ mark.hl-modifier {
 .card-actions {
   margin-top: 0.85rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.card-actions-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
 }
 
 .btn-details {
