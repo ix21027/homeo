@@ -57,7 +57,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="style.css?v=5.0">
+  <link rel="stylesheet" href="style.css?v=5.1">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%231e6091%22/><path d=%22M50 25 v50 M25 50 h50%22 stroke=%22white%22 stroke-width=%2212%22 stroke-linecap=%22round%22/></svg>">
 </head>
 <body>
@@ -67,6 +67,16 @@
       <div class="header-nav-bar">
         <h1 id="headerTitle">Materia Medica</h1>
         <div class="header-right">
+          <!-- Catalog Dropdown (to the left of menu) -->
+          <div class="header-catalog-wrapper" id="headerCatalogWrapper">
+            <button type="button" id="btnCatalogDropdown" class="btn-catalog-dropdown btn-catalog-header" title="Каталог усіх препаратів (341)" aria-label="Каталог усіх препаратів" aria-expanded="false" aria-haspopup="listbox">
+              <span class="btn-catalog-text-full">Препарати</span>
+              <span class="btn-catalog-count">341</span>
+              <span class="combobox-arrow">▼</span>
+            </button>
+            <div id="headerCatalogDropdown" class="header-catalog-dropdown" role="listbox" style="display: none;"></div>
+          </div>
+
           <div class="top-menu-dropdown-wrapper" id="topMenuWrapper">
             <button type="button" class="btn-header-menu" id="btnHeaderMenu" aria-expanded="false" aria-haspopup="true" title="Меню" aria-label="Меню">
               <span class="menu-icon">☰</span>
@@ -130,11 +140,6 @@
         <div class="search-actions-right">
           <button type="button" id="btnClear" class="btn-clear" title="Очистити" aria-label="Очистити" style="display: none;">✕</button>
           <button type="submit" id="btnSearchSubmit" class="btn-search-submit" title="Шукати" aria-label="Шукати">Знайти</button>
-          <button type="button" id="btnCatalogDropdown" class="btn-catalog-dropdown" title="Каталог усіх препаратів (341)" aria-label="Каталог усіх препаратів">
-            <span class="btn-catalog-text-full">Препарати</span>
-            <span class="btn-catalog-count">341</span>
-            <span class="combobox-arrow">▼</span>
-          </button>
           <kbd class="search-kbd-hint" id="searchKbdHint" title="Натисніть / для швидкого пошуку">/</kbd>
         </div>
 
@@ -344,6 +349,6 @@
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
-  <script src="app.js?v=5.0"></script>
+  <script src="app.js?v=5.1"></script>
 </body>
 </html>

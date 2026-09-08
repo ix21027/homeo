@@ -175,6 +175,8 @@ const I18N = {
     suggFooterHint: 'Натисніть на препарат для опису, або Enter для пошуку симптомів',
     btnCatalogTitle: 'Каталог усіх 341 препаратів',
     btnCatalogTextFull: 'Препарати',
+    catalogFilterPlaceholder: 'Пошук серед 341 препаратів...',
+    txtRemediesCount: 'препаратів',
     menuCatHeader: 'Каталог',
     menuCatalogTitle: 'Каталог препаратів (341)',
     menuCatalogSub: 'Швидкий вибір та опис за назвою',
@@ -334,6 +336,8 @@ const I18N = {
     suggFooterHint: 'Нажмите на препарат для описания, или Enter для поиска симптомов',
     btnCatalogTitle: 'Каталог всех 341 препаратов',
     btnCatalogTextFull: 'Препараты',
+    catalogFilterPlaceholder: 'Поиск среди 341 препаратов...',
+    txtRemediesCount: 'препаратов',
     menuCatHeader: 'Каталог',
     menuCatalogTitle: 'Каталог препаратов (341)',
     menuCatalogSub: 'Быстрый выбор и описание по названию',
@@ -1308,12 +1312,151 @@ function toggleTopMenu(forceOpen) {
   const btn = document.getElementById('btnHeaderMenu');
   if (!wrapper) return;
   const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !wrapper.classList.contains('open');
+  if (shouldOpen) closeHeaderCatalog();
   wrapper.classList.toggle('open', shouldOpen);
   if (btn) btn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
 }
 
 function closeTopMenu() {
   toggleTopMenu(false);
+}
+
+function renderHeaderCatalog(filterQuery = '') {
+  const dropdown = document.getElementById('headerCatalogDropdown');
+  if (!dropdown) return;
+  const t = I18N[currentLang] || I18N.ua;
+  const query = (filterQuery || '').trim();
+  const matches = searchRemedyNames(query);
+
+  let html = `
+    <div class="header-catalog-search-wrap">
+      <input 
+        type="text" 
+        id="headerCatalogFilterInput" 
+        class="header-catalog-filter-input" 
+        placeholder="${escapeHtml(t.catalogFilterPlaceholder || 'Пошук серед 341 препаратів...')}" 
+        value="${escapeHtml(query)}"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      />
+    </div>
+  `;
+
+  if (matches.length === 0) {
+    html += `
+      <div style="padding: 1.5rem; text-align: center; color: #64748b; font-size: 0.88rem;">
+        <p>${escapeHtml(t.statusNotFound || 'Препарати не знайдені')}</p>
+      </div>
+    `;
+  } else {
+    html += `
+      <div class="sugg-header">
+        <strong>${escapeHtml(t.suggCatalogTitle || 'Каталог усіх препаратів (341):')}</strong>
+        <span style="font-size: 0.74rem; color: #64748b;">${matches.length} ${t.txtRemediesCount || 'препаратів'}</span>
+      </div>
+    `;
+
+    let currentLetter = '';
+    for (let i = 0; i < matches.length; i++) {
+      const r = matches[i];
+      if (!query) {
+        const letter = (r.latin || '?')[0].toUpperCase();
+        if (letter !== currentLetter) {
+          currentLetter = letter;
+          html += `<div class="sugg-group-header">— ${escapeHtml(letter)} —</div>`;
+        }
+      }
+      html += `
+        <div class="sugg-item" data-id="${r.id}" role="option" aria-selected="false">
+          <div class="sugg-main">
+            <div class="sugg-title">
+              <span class="sugg-latin">${query ? highlightRemedyMatch(r.latin, query) : escapeHtml(r.latin)}</span>
+              ${r.cyr ? `<span class="sugg-cyr">(${query ? highlightRemedyMatch(r.cyr, query) : escapeHtml(r.cyr)})</span>` : ''}
+            </div>
+            ${r.common ? `<div class="sugg-common">${query ? highlightRemedyMatch(r.common, query) : escapeHtml(r.common)}</div>` : ''}
+          </div>
+          <span class="sugg-action-badge">${escapeHtml(t.suggReadRemedy || 'Читати опис →')}</span>
+        </div>
+      `;
+    }
+    html += `<div class="sugg-footer"><span>Усі ${matches.length} препаратів</span></div>`;
+  }
+
+  dropdown.innerHTML = html;
+
+  // Filter input event listeners
+  const filterInput = document.getElementById('headerCatalogFilterInput');
+  if (filterInput) {
+    filterInput.addEventListener('input', (e) => {
+      const val = e.target.value;
+      renderHeaderCatalog(val);
+      const updated = document.getElementById('headerCatalogFilterInput');
+      if (updated) {
+        updated.focus();
+        updated.setSelectionRange(val.length, val.length);
+      }
+    });
+    filterInput.addEventListener('click', (e) => e.stopPropagation());
+    filterInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeHeaderCatalog();
+      }
+    });
+  }
+
+  // Remedy items click
+  dropdown.querySelectorAll('.sugg-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = parseInt(item.getAttribute('data-id'), 10);
+      if (id) {
+        closeHeaderCatalog();
+        openRemedyModal(id);
+      }
+    });
+  });
+}
+
+function openHeaderCatalog() {
+  const wrapper = document.getElementById('headerCatalogWrapper');
+  const dropdown = document.getElementById('headerCatalogDropdown');
+  const btn = document.getElementById('btnCatalogDropdown');
+  if (!wrapper || !dropdown) return;
+
+  closeTopMenu();
+  closeSearchSuggestions();
+
+  renderHeaderCatalog('');
+  dropdown.style.display = 'block';
+  wrapper.classList.add('open');
+  if (btn) btn.setAttribute('aria-expanded', 'true');
+
+  setTimeout(() => {
+    const filterInput = document.getElementById('headerCatalogFilterInput');
+    if (filterInput) filterInput.focus();
+  }, 40);
+}
+
+function closeHeaderCatalog() {
+  const wrapper = document.getElementById('headerCatalogWrapper');
+  const dropdown = document.getElementById('headerCatalogDropdown');
+  const btn = document.getElementById('btnCatalogDropdown');
+  if (dropdown) dropdown.style.display = 'none';
+  if (wrapper) wrapper.classList.remove('open');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+
+function toggleHeaderCatalog(forceOpen) {
+  const wrapper = document.getElementById('headerCatalogWrapper');
+  if (!wrapper) return;
+  const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !wrapper.classList.contains('open');
+  if (shouldOpen) {
+    openHeaderCatalog();
+  } else {
+    closeHeaderCatalog();
+  }
 }
 
 function openDownloadModal() {
@@ -1924,18 +2067,11 @@ function initUnifiedSearch() {
     });
   }
 
-  // Catalog dropdown button
+  // Catalog dropdown button (in header, to the left of menu)
   if (btnCatalog) {
     btnCatalog.addEventListener('click', (e) => {
       e.stopPropagation();
-      const isDropdownOpen = dropdown && dropdown.style.display === 'block';
-      if (isDropdownOpen) {
-        closeSearchSuggestions();
-      } else {
-        const all = searchRemedyNames('');
-        openSearchSuggestions(all, '', true);
-        if (input) input.focus();
-      }
+      toggleHeaderCatalog();
     });
   }
 
@@ -1944,8 +2080,12 @@ function initUnifiedSearch() {
     const form = document.getElementById('searchForm');
     const wrapper = document.getElementById('searchInputWrapper');
     const container = form || wrapper;
-    if (container && !container.contains(e.target) && (!btnCatalog || !btnCatalog.contains(e.target))) {
+    if (container && !container.contains(e.target)) {
       closeSearchSuggestions();
+    }
+    const catWrapper = document.getElementById('headerCatalogWrapper');
+    if (catWrapper && !catWrapper.contains(e.target)) {
+      closeHeaderCatalog();
     }
   });
 }
@@ -2343,6 +2483,10 @@ function startApp() {
     if (wrapper && wrapper.classList.contains('open') && !wrapper.contains(e.target)) {
       closeTopMenu();
     }
+    const catWrapper = document.getElementById('headerCatalogWrapper');
+    if (catWrapper && catWrapper.classList.contains('open') && !catWrapper.contains(e.target)) {
+      closeHeaderCatalog();
+    }
   });
 
   const btnUa = document.getElementById('langBtnUa');
@@ -2450,6 +2594,7 @@ function startApp() {
   if (typeof window !== 'undefined' && window.addEventListener) {
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
+        closeHeaderCatalog();
         closeTopMenu();
         closeModal();
         closeDownloadModal();
@@ -2479,6 +2624,9 @@ if (typeof document !== 'undefined') {
 if (typeof window !== 'undefined') {
   window.toggleTopMenu = toggleTopMenu;
   window.closeTopMenu = closeTopMenu;
+  window.openHeaderCatalog = openHeaderCatalog;
+  window.closeHeaderCatalog = closeHeaderCatalog;
+  window.toggleHeaderCatalog = toggleHeaderCatalog;
   window.openRemedyModal = openRemedyModal;
   window.closeModal = closeModal;
   window.switchLanguage = switchLanguage;
