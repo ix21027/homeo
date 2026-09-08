@@ -153,8 +153,15 @@ const I18N = {
     menuDlDb: 'Завантажити базу даних',
     menuDlDbSub: 'SQLite, JSON, CSV (UA / RU)',
     menuInfo: '🌿 <strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Працює автономно на GitHub Pages.',
-    remedyPickerLabel: 'Каталог препаратів (341):',
-    remedySelectPlaceholder: '— Оберіть препарат зі списку (341) щоб відкрити опис —',
+    remedyPickerLabel: 'Пошук препарату за назвою (341):',
+    remedyPickerHint: 'Введіть назву або виберіть зі списку',
+    remedySearchPlaceholder: 'Введіть назву (напр. Aconitum, Арніка, Belladonna)...',
+    remedyNotFound: 'Препарат не знайдено',
+    remedyNotFoundHint: 'Спробуйте іншу назву або натисніть ▼ щоб відкрити повний список.',
+    remedyFoundCount: 'Знайдено: {n} із 341',
+    remedyAllCount: 'Усі 341 препаратів (A-Z)',
+    btnClearRemedyTitle: 'Очистити поле пошуку',
+    btnToggleRemedyTitle: 'Показати всі препарати',
     btnReadRemedy: 'Читати опис',
     downloadMenuBtn: 'Завантажити БД',
     downloadMenuBadge: 'SQLite • JSON • CSV',
@@ -293,8 +300,15 @@ const I18N = {
     menuDlDb: 'Скачать базу данных',
     menuDlDbSub: 'SQLite, JSON, CSV (UA / RU)',
     menuInfo: '🌿 <strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Работает автономно на GitHub Pages.',
-    remedyPickerLabel: 'Каталог препаратов (341):',
-    remedySelectPlaceholder: '— Выберите препарат из списка (341) чтобы открыть описание —',
+    remedyPickerLabel: 'Поиск препарата по названию (341):',
+    remedyPickerHint: 'Введите название или выберите из списка',
+    remedySearchPlaceholder: 'Введите название (напр. Aconitum, Арника, Belladonna)...',
+    remedyNotFound: 'Препарат не найден',
+    remedyNotFoundHint: 'Попробуйте другое название или нажмите ▼ чтобы открыть весь список.',
+    remedyFoundCount: 'Найдено: {n} из 341',
+    remedyAllCount: 'Все 341 препаратов (A-Z)',
+    btnClearRemedyTitle: 'Очистить поле поиска',
+    btnToggleRemedyTitle: 'Показать все препараты',
     btnReadRemedy: 'Читать описание',
     downloadMenuBtn: 'Скачать БД',
     downloadMenuBadge: 'SQLite • JSON • CSV',
@@ -956,12 +970,33 @@ function updateUILanguage() {
   const txtMenuInfo = document.getElementById('txtMenuInfo');
   if (txtMenuInfo && t.menuInfo) txtMenuInfo.innerHTML = t.menuInfo;
 
-  // Remedy Quick Selector localization
+  // Remedy Quick Search localization
   const lblRemedySelect = document.getElementById('lblRemedySelect');
   if (lblRemedySelect && t.remedyPickerLabel) lblRemedySelect.innerText = t.remedyPickerLabel;
+  const txtRemedyPickerHint = document.getElementById('txtRemedyPickerHint');
+  if (txtRemedyPickerHint && t.remedyPickerHint) txtRemedyPickerHint.innerText = t.remedyPickerHint;
+  const remedySearchInput = document.getElementById('remedySearchInput');
+  if (remedySearchInput && t.remedySearchPlaceholder) remedySearchInput.placeholder = t.remedySearchPlaceholder;
+  const btnClearRemedySearch = document.getElementById('btnClearRemedySearch');
+  if (btnClearRemedySearch && t.btnClearRemedyTitle) {
+    btnClearRemedySearch.title = t.btnClearRemedyTitle;
+    btnClearRemedySearch.setAttribute('aria-label', t.btnClearRemedyTitle);
+  }
+  const btnToggleRemedyList = document.getElementById('btnToggleRemedyList');
+  if (btnToggleRemedyList && t.btnToggleRemedyTitle) {
+    btnToggleRemedyList.title = t.btnToggleRemedyTitle;
+    btnToggleRemedyList.setAttribute('aria-label', t.btnToggleRemedyTitle);
+  }
   const txtBtnReadRemedy = document.getElementById('txtBtnReadRemedy');
   if (txtBtnReadRemedy && t.btnReadRemedy) txtBtnReadRemedy.innerText = t.btnReadRemedy;
-  populateRemedySelector();
+
+  // Refresh selected remedy name in input on language switch
+  if (selectedRemedyId && remediesData && remedySearchInput) {
+    const r = remediesData.find(item => item.id === selectedRemedyId);
+    if (r) {
+      remedySearchInput.value = `${r.latin}${r.cyr ? ` (${r.cyr})` : ''}`;
+    }
+  }
 
   updateDownloadModalTexts();
   updateDownloadModalFiles(downloadModalLang);
@@ -1422,32 +1457,429 @@ async function switchLanguage(newLang) {
   }
 }
 
-function populateRemedySelector() {
-  const select = document.getElementById('selectRemedy');
-  if (!select || !remediesData || remediesData.length === 0) return;
+// ==========================================
+// REMEDY AUTOCOMPLETE & SUGGESTIONS COMBOBOX
+// ==========================================
+let selectedRemedyId = null;
+let activeSuggestionIndex = -1;
+let currentRemedySuggestions = [];
+let remedyAutocompleteInitialized = false;
 
-  const t = I18N[currentLang];
-  const sorted = [...remediesData].sort((a, b) => (a.latin || '').localeCompare(b.latin || ''));
+function normalizeRemedyKey(str) {
+  if (!str) return '';
+  return str.toLowerCase()
+    .replace(/і/g, 'и')
+    .replace(/є/g, 'е')
+    .replace(/ї/g, 'и')
+    .replace(/ґ/g, 'г')
+    .replace(/й/g, 'и')
+    .replace(/ы/g, 'и')
+    .replace(/э/g, 'е')
+    .replace(/я/g, 'а')
+    .replace(/ю/g, 'у')
+    .replace(/(.)\1+/gu, '$1')
+    .trim();
+}
 
-  const groups = {};
-  for (const r of sorted) {
-    const letter = (r.latin || '?')[0].toUpperCase();
-    if (!groups[letter]) groups[letter] = [];
-    groups[letter].push(r);
-  }
-
-  let html = `<option value="">${t.remedySelectPlaceholder || '— Оберіть препарат зі списку (341) щоб відкрити опис —'}</option>`;
-  for (const letter of Object.keys(groups).sort()) {
-    html += `<optgroup label="— ${letter} —">`;
-    for (const r of groups[letter]) {
-      const cyrText = r.cyr ? ` (${r.cyr})` : '';
-      const commonText = r.common ? ` — ${r.common}` : '';
-      html += `<option value="${r.id}">${escapeHtml(r.latin)}${escapeHtml(cyrText)}${escapeHtml(commonText)}</option>`;
+function highlightRemedyMatch(text, query) {
+  if (!text) return '';
+  const escapedText = escapeHtml(text);
+  if (!query || !query.trim()) return escapedText;
+  const rawQ = query.trim();
+  const qClean = rawQ.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  try {
+    const directRegex = new RegExp(`(${qClean})`, 'gi');
+    if (directRegex.test(text)) {
+      return escapedText.replace(directRegex, '<mark class="remedy-match-hl">$1</mark>');
     }
-    html += `</optgroup>`;
+    const words = rawQ.split(/\s+/).filter(w => w.length >= 3);
+    if (words.length > 0) {
+      const pattern = words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+      const wordRegex = new RegExp(`(${pattern})`, 'gi');
+      if (wordRegex.test(text)) {
+        return escapedText.replace(wordRegex, '<mark class="remedy-match-hl">$1</mark>');
+      }
+    }
+    return escapedText;
+  } catch (e) {
+    return escapedText;
+  }
+}
+
+function searchRemedies(query) {
+  if (!remediesData || remediesData.length === 0) return [];
+
+  const rawQ = (query || '').trim();
+  if (!rawQ) {
+    // Return all remedies sorted alphabetically by Latin name
+    return [...remediesData].sort((a, b) => (a.latin || '').localeCompare(b.latin || ''));
   }
 
-  select.innerHTML = html;
+  const rawLower = rawQ.toLowerCase();
+  const qNorm = normalizeRemedyKey(rawQ);
+  const qWords = qNorm.split(/\s+/).filter(Boolean);
+  const qStems = qWords.map(w => w.length >= 4 ? w.replace(/[аеиуояією]$/u, '') : w);
+
+  const results = [];
+  for (const r of remediesData) {
+    let score = 0;
+    const lat = (r.latin || '').toLowerCase();
+    const latNorm = normalizeRemedyKey(r.latin || '');
+    const cyr = (r.cyr || '').toLowerCase();
+    const cyrNorm = normalizeRemedyKey(r.cyr || '');
+    const com = (r.common || '').toLowerCase();
+    const comNorm = normalizeRemedyKey(r.common || '');
+
+    // Exact raw prefix matches (top priority)
+    if (lat.startsWith(rawLower)) {
+      score = Math.max(score, 100);
+    } else if (cyr.startsWith(rawLower)) {
+      score = Math.max(score, 95);
+    } else if (lat.includes(rawLower)) {
+      score = Math.max(score, 80);
+    } else if (cyr.includes(rawLower)) {
+      score = Math.max(score, 75);
+    } else if (com.startsWith(rawLower)) {
+      score = Math.max(score, 60);
+    } else if (com.includes(rawLower)) {
+      score = Math.max(score, 50);
+    }
+
+    // Normalized matches (handles double letters, cyrillic variants, transliteration)
+    if (score === 0 && qNorm) {
+      if (latNorm.startsWith(qNorm) || cyrNorm.startsWith(qNorm)) {
+        score = Math.max(score, 70);
+      } else if (latNorm.includes(qNorm) || cyrNorm.includes(qNorm)) {
+        score = Math.max(score, 55);
+      } else if (comNorm.includes(qNorm)) {
+        score = Math.max(score, 45);
+      }
+    }
+
+    // Stem matches (handles word endings: бджола -> бджолина, тощо)
+    if (score === 0 && qStems.length > 0) {
+      for (const st of qStems) {
+        if (st.length >= 3) {
+          if (cyrNorm.includes(st) || latNorm.includes(st)) {
+            score = Math.max(score, 40);
+            break;
+          } else if (comNorm.includes(st)) {
+            score = Math.max(score, 30);
+            break;
+          }
+        }
+      }
+    }
+
+    if (score > 0) {
+      results.push({ remedy: r, score });
+    }
+  }
+
+  // Sort by score descending, then alphabetically by Latin name
+  results.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return (a.remedy.latin || '').localeCompare(b.remedy.latin || '');
+  });
+
+  return results.map(item => item.remedy);
+}
+
+function openRemedyDropdown(matches, query) {
+  const dropdown = document.getElementById('remedySuggestionsDropdown');
+  const wrapper = document.getElementById('remedyAutocompleteWrapper');
+  const card = document.getElementById('remedyPickerCard');
+  const input = document.getElementById('remedySearchInput');
+  if (!dropdown || !wrapper) return;
+
+  currentRemedySuggestions = matches;
+  activeSuggestionIndex = -1;
+  const t = I18N[currentLang];
+  const isAll = !query || !query.trim();
+
+  if (matches.length === 0) {
+    dropdown.innerHTML = `
+      <div class="remedy-sugg-empty">
+        <p>🔍 ${escapeHtml(t.remedyNotFound || 'Препарат не знайдено')}: <strong>"${escapeHtml(query)}"</strong></p>
+        <small>${escapeHtml(t.remedyNotFoundHint || 'Спробуйте іншу назву або натисніть ▼ щоб відкрити повний список.')}</small>
+      </div>
+    `;
+  } else {
+    let html = '';
+    let currentLetter = '';
+
+    if (isAll) {
+      for (let i = 0; i < matches.length; i++) {
+        const r = matches[i];
+        const letter = (r.latin || '?')[0].toUpperCase();
+        if (letter !== currentLetter) {
+          currentLetter = letter;
+          html += `<div class="remedy-dropdown-group-header">— ${escapeHtml(letter)} —</div>`;
+        }
+        html += `
+          <div class="remedy-suggestion-item" data-id="${r.id}" data-idx="${i}" role="option" aria-selected="false">
+            <div class="remedy-sugg-main">
+              <div class="remedy-sugg-title">
+                <span class="remedy-sugg-latin">${escapeHtml(r.latin)}</span>
+                ${r.cyr ? `<span class="remedy-sugg-cyr">(${escapeHtml(r.cyr)})</span>` : ''}
+              </div>
+              ${r.common ? `<div class="remedy-sugg-common">🌿 ${escapeHtml(r.common)}</div>` : ''}
+            </div>
+            <div class="remedy-sugg-action">
+              <span class="remedy-sugg-arrow" title="${escapeHtml(t.btnReadRemedy || 'Читати опис')}">➔</span>
+            </div>
+          </div>
+        `;
+      }
+      html += `<div class="remedy-dropdown-footer">${escapeHtml(t.remedyAllCount || 'Усі 341 препаратів (A-Z)')}</div>`;
+    } else {
+      const displayMatches = matches.slice(0, 30);
+      for (let i = 0; i < displayMatches.length; i++) {
+        const r = displayMatches[i];
+        html += `
+          <div class="remedy-suggestion-item" data-id="${r.id}" data-idx="${i}" role="option" aria-selected="false">
+            <div class="remedy-sugg-main">
+              <div class="remedy-sugg-title">
+                <span class="remedy-sugg-latin">${highlightRemedyMatch(r.latin, query)}</span>
+                ${r.cyr ? `<span class="remedy-sugg-cyr">(${highlightRemedyMatch(r.cyr, query)})</span>` : ''}
+              </div>
+              ${r.common ? `<div class="remedy-sugg-common">🌿 ${highlightRemedyMatch(r.common, query)}</div>` : ''}
+            </div>
+            <div class="remedy-sugg-action">
+              <span class="remedy-sugg-arrow" title="${escapeHtml(t.btnReadRemedy || 'Читати опис')}">➔</span>
+            </div>
+          </div>
+        `;
+      }
+      const countTpl = t.remedyFoundCount || 'Знайдено: {n} із 341';
+      const countText = countTpl.replace('{n}', matches.length);
+      html += `<div class="remedy-dropdown-footer">${escapeHtml(countText)}</div>`;
+    }
+
+    dropdown.innerHTML = html;
+  }
+
+  dropdown.style.display = 'block';
+  wrapper.classList.add('open');
+  if (card) card.classList.add('dropdown-open');
+  if (input) input.setAttribute('aria-expanded', 'true');
+}
+
+function closeRemedyDropdown() {
+  const dropdown = document.getElementById('remedySuggestionsDropdown');
+  const wrapper = document.getElementById('remedyAutocompleteWrapper');
+  const card = document.getElementById('remedyPickerCard');
+  const input = document.getElementById('remedySearchInput');
+  if (dropdown) dropdown.style.display = 'none';
+  if (wrapper) wrapper.classList.remove('open');
+  if (card) card.classList.remove('dropdown-open');
+  if (input) input.setAttribute('aria-expanded', 'false');
+  activeSuggestionIndex = -1;
+}
+
+function selectRemedy(remedy) {
+  if (!remedy) return;
+  selectedRemedyId = remedy.id;
+
+  const input = document.getElementById('remedySearchInput');
+  if (input) {
+    input.value = `${remedy.latin}${remedy.cyr ? ` (${remedy.cyr})` : ''}`;
+  }
+
+  const btnClear = document.getElementById('btnClearRemedySearch');
+  if (btnClear) btnClear.style.display = 'flex';
+
+  const btnOpen = document.getElementById('btnOpenSelectedRemedy');
+  if (btnOpen) btnOpen.disabled = false;
+
+  closeRemedyDropdown();
+  openRemedyModal(remedy.id);
+}
+
+function updateActiveSuggestion(newIdx) {
+  const dropdown = document.getElementById('remedySuggestionsDropdown');
+  if (!dropdown) return;
+
+  const items = dropdown.querySelectorAll('.remedy-suggestion-item');
+  if (items.length === 0) return;
+
+  items.forEach(el => {
+    el.classList.remove('active');
+    el.setAttribute('aria-selected', 'false');
+  });
+
+  if (newIdx >= 0 && newIdx < items.length) {
+    activeSuggestionIndex = newIdx;
+    const target = items[newIdx];
+    target.classList.add('active');
+    target.setAttribute('aria-selected', 'true');
+    target.scrollIntoView({ block: 'nearest' });
+  } else {
+    activeSuggestionIndex = -1;
+  }
+}
+
+function initRemedyAutocomplete() {
+  const input = document.getElementById('remedySearchInput');
+  const btnClear = document.getElementById('btnClearRemedySearch');
+  const btnToggle = document.getElementById('btnToggleRemedyList');
+  const dropdown = document.getElementById('remedySuggestionsDropdown');
+  const btnOpen = document.getElementById('btnOpenSelectedRemedy');
+
+  if (!input || !dropdown) return;
+
+  if (!remedyAutocompleteInitialized) {
+    remedyAutocompleteInitialized = true;
+
+    // Typing event
+    input.addEventListener('input', () => {
+      const q = input.value;
+      if (btnClear) btnClear.style.display = q ? 'flex' : 'none';
+
+      if (selectedRemedyId) {
+        const cur = remediesData ? remediesData.find(r => r.id === selectedRemedyId) : null;
+        const curName = cur ? `${cur.latin}${cur.cyr ? ` (${cur.cyr})` : ''}` : '';
+        if (q.trim() !== curName.trim()) {
+          selectedRemedyId = null;
+          if (btnOpen) btnOpen.disabled = true;
+        }
+      }
+
+      if (q.trim().length > 0) {
+        const matches = searchRemedies(q);
+        openRemedyDropdown(matches, q);
+      } else {
+        closeRemedyDropdown();
+        if (btnOpen) btnOpen.disabled = true;
+      }
+    });
+
+    // Focus event: if input has text, show suggestions
+    input.addEventListener('focus', () => {
+      const q = input.value.trim();
+      if (q.length > 0) {
+        const matches = searchRemedies(q);
+        openRemedyDropdown(matches, q);
+      }
+    });
+
+    // Keyboard navigation
+    input.addEventListener('keydown', (e) => {
+      const isDropdownOpen = dropdown.style.display === 'block';
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!isDropdownOpen) {
+          const matches = searchRemedies(input.value);
+          openRemedyDropdown(matches, input.value);
+          updateActiveSuggestion(0);
+        } else {
+          const items = dropdown.querySelectorAll('.remedy-suggestion-item');
+          if (items.length > 0) {
+            const next = activeSuggestionIndex + 1 >= items.length ? 0 : activeSuggestionIndex + 1;
+            updateActiveSuggestion(next);
+          }
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (isDropdownOpen) {
+          const items = dropdown.querySelectorAll('.remedy-suggestion-item');
+          if (items.length > 0) {
+            const prev = activeSuggestionIndex - 1 < 0 ? items.length - 1 : activeSuggestionIndex - 1;
+            updateActiveSuggestion(prev);
+          }
+        }
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (isDropdownOpen) {
+          if (activeSuggestionIndex >= 0 && currentRemedySuggestions[activeSuggestionIndex]) {
+            selectRemedy(currentRemedySuggestions[activeSuggestionIndex]);
+          } else if (currentRemedySuggestions.length > 0) {
+            selectRemedy(currentRemedySuggestions[0]);
+          }
+        } else if (selectedRemedyId) {
+          openRemedyModal(selectedRemedyId);
+        } else if (input.value.trim()) {
+          const matches = searchRemedies(input.value);
+          if (matches.length > 0) {
+            selectRemedy(matches[0]);
+          }
+        }
+      } else if (e.key === 'Escape') {
+        if (isDropdownOpen) {
+          e.preventDefault();
+          closeRemedyDropdown();
+        }
+      }
+    });
+
+    // Delegated click on dropdown suggestions
+    dropdown.addEventListener('click', (e) => {
+      const item = e.target.closest('.remedy-suggestion-item');
+      if (!item) return;
+      const id = parseInt(item.getAttribute('data-id'), 10);
+      if (id && remediesData) {
+        const remedy = remediesData.find(r => r.id === id);
+        if (remedy) {
+          selectRemedy(remedy);
+        }
+      }
+    });
+
+    // Clear button
+    if (btnClear) {
+      btnClear.addEventListener('click', () => {
+        input.value = '';
+        selectedRemedyId = null;
+        btnClear.style.display = 'none';
+        if (btnOpen) btnOpen.disabled = true;
+        closeRemedyDropdown();
+        input.focus();
+      });
+    }
+
+    // Dropdown toggle button (▼)
+    if (btnToggle) {
+      btnToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isDropdownOpen = dropdown.style.display === 'block';
+        if (isDropdownOpen) {
+          closeRemedyDropdown();
+        } else {
+          const q = input.value.trim();
+          const matches = searchRemedies(q);
+          openRemedyDropdown(matches, q);
+          input.focus();
+        }
+      });
+    }
+
+    // "Читати опис" action button
+    if (btnOpen) {
+      btnOpen.addEventListener('click', () => {
+        if (selectedRemedyId) {
+          openRemedyModal(selectedRemedyId);
+        } else if (input.value.trim()) {
+          const matches = searchRemedies(input.value);
+          if (matches.length > 0) {
+            selectRemedy(matches[0]);
+          }
+        }
+      });
+    }
+
+    // Click outside listener
+    document.addEventListener('click', (e) => {
+      const wrapper = document.getElementById('remedyAutocompleteWrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        closeRemedyDropdown();
+      }
+    });
+  }
+}
+
+function populateRemedySelector() {
+  initRemedyAutocomplete();
 }
 
 async function initApp() {
@@ -1890,24 +2322,8 @@ if (typeof document !== 'undefined') {
       });
     }
 
-    // Direct Remedy Quick Selector wiring
-    const selectRemedy = document.getElementById('selectRemedy');
-    const btnOpenRemedy = document.getElementById('btnOpenSelectedRemedy');
-    if (selectRemedy) {
-      selectRemedy.addEventListener('change', (e) => {
-        const id = parseInt(e.target.value, 10);
-        if (btnOpenRemedy) btnOpenRemedy.disabled = !id;
-        if (id) {
-          openRemedyModal(id);
-        }
-      });
-    }
-    if (btnOpenRemedy) {
-      btnOpenRemedy.addEventListener('click', () => {
-        const id = parseInt(selectRemedy ? selectRemedy.value : 0, 10);
-        if (id) openRemedyModal(id);
-      });
-    }
+    // Direct Remedy Quick Search with Auto-Suggestions
+    initRemedyAutocomplete();
 
     // Top-right dropdown menu wiring
     const btnHeaderMenu = document.getElementById('btnHeaderMenu');
