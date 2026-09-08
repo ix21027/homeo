@@ -1751,7 +1751,10 @@ async function openRemedyModal(remedyId) {
             class="modal-search-input" 
             placeholder="${t.modalSearchPlaceholder || '🔍 Шукати симптоми у цьому описі...'}"
             autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
             spellcheck="false"
+            enterkeyhint="search"
           />
         </div>
         <div class="modal-cat-bar" id="modalCatBar">

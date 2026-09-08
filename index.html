@@ -2,7 +2,10 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f3e2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Materia Medica — Пошуковий Реперторій (Джон Генрі Кларк)</title>
   <meta name="description" content="База даних гомеопатичних препаратів Materia Medica з повнотекстовим розумним пошуком симптомів та модальностей. Працює на GitHub Pages.">
   <link rel="stylesheet" href="style.css">
@@ -96,7 +99,10 @@
           id="searchInput" 
           placeholder="Введіть симптом, наприклад: ячмінь на правій нижній повіці, біль у попереку..."
           autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
           spellcheck="false"
+          enterkeyhint="search"
         />
         <button type="button" id="btnClear" class="btn-clear" title="Очистити" aria-label="Очистити">✕</button>
         <kbd class="search-kbd-hint" id="searchKbdHint" title="Натисніть / для швидкого пошуку">/</kbd>
