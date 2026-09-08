@@ -18,6 +18,11 @@
           <p class="header-subtitle" id="headerSubtitle">
             Пошуковий гомеопатичний реперторій: 341 препарат, 11 770+ симптомів за капітальною працею <em>Джона Генрі Кларка</em>.
           </p>
+          <div class="header-badges">
+            <span class="h-badge" id="hBadgeRemedies">🌿 341 препарат</span>
+            <span class="h-badge" id="hBadgeSymptoms">📖 11 771 симптом</span>
+            <span class="h-badge" id="hBadgeOffline">⚡ 100% Офлайн</span>
+          </div>
         </div>
         <div class="header-right">
           <div class="lang-switch" role="group" aria-label="Вибір мови / Выбор языка">
@@ -28,16 +33,13 @@
               🌐 RU
             </button>
           </div>
-          <div class="downloads-bar" id="downloadsBar">
-            <a href="materia_medica_ua.db" id="dlDb" class="btn-download" download="materia_medica_ua.db" title="Завантажити базу даних SQLite">
-              💾 <span id="txtDlDb">База SQLite (.db)</span>
-            </a>
-            <a href="materia_medica_ua.json" id="dlJson" class="btn-download" download="materia_medica_ua.json" title="Завантажити повний файл JSON">
-              📄 <span id="txtDlJson">Дані JSON (.json)</span>
-            </a>
-            <a href="materia_medica_ua.csv" id="dlCsv" class="btn-download" download="materia_medica_ua.csv" title="Завантажити таблицю CSV для Excel">
-              📊 <span id="txtDlCsv">Таблиця CSV (.csv)</span>
-            </a>
+          <div class="downloads-menu-wrapper">
+            <button type="button" id="btnOpenDownloads" class="btn-downloads-menu" aria-haspopup="dialog" aria-expanded="false" title="Завантажити базу даних">
+              <span class="btn-dl-icon">📥</span>
+              <span id="txtDownloadMenuBtn">Завантажити БД</span>
+              <span class="btn-dl-badge">SQLite • JSON • CSV</span>
+              <span class="btn-dl-arrow">▼</span>
+            </button>
           </div>
         </div>
       </div>
@@ -56,7 +58,11 @@
           spellcheck="false"
         />
         <button type="button" id="btnClear" class="btn-clear" title="Очистити" aria-label="Очистити">✕</button>
+        <kbd class="search-kbd-hint" id="searchKbdHint" title="Натисніть / для швидкого пошуку">/</kbd>
       </div>
+
+      <!-- Active Filters Quick Bar -->
+      <div class="active-filters-strip" id="activeFiltersStrip" style="display: none;"></div>
 
       <div class="search-toggle-bar">
         <button type="button" id="btnToggleAdvanced" class="btn-toggle-advanced" aria-expanded="false" aria-controls="advancedPanel">
@@ -139,14 +145,148 @@
   <div class="modal-overlay" id="remedyModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="modal-title" id="modalTitle">Препарат</div>
-        <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Закрити" title="Закрити">✕</button>
+        <div class="modal-title-group">
+          <div class="modal-title" id="modalTitle">Препарат</div>
+        </div>
+        <div class="modal-header-actions">
+          <button type="button" class="btn-modal-tool" id="btnModalCopyText" title="Копіювати назву та синоніми" aria-label="Копіювати">
+            📋 <span id="txtModalCopy">Копіювати</span>
+          </button>
+          <button type="button" class="btn-modal-tool" id="btnModalPrint" title="Роздрукувати картку препарату" aria-label="Роздрукувати">
+            🖨️ <span id="txtModalPrint">Друк</span>
+          </button>
+          <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Закрити" title="Закрити">✕</button>
+        </div>
       </div>
       <div class="modal-body" id="modalBody">
         <!-- Injected via JavaScript -->
       </div>
     </div>
   </div>
+
+  <!-- Dedicated Database Download Modal -->
+  <div class="modal-overlay" id="downloadModal" role="dialog" aria-modal="true" aria-labelledby="dlModalTitle">
+    <div class="modal-content dl-modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="dlModalTitle">📥 Завантаження бази даних</div>
+        <button type="button" class="modal-close" id="dlModalCloseBtn" aria-label="Закрити" title="Закрити">✕</button>
+      </div>
+      <div class="modal-body dl-modal-body">
+        <p class="dl-modal-subtitle" id="dlModalSubtitle">
+          Оберіть мову вмісту та необхідний формат бази даних для автономної роботи:
+        </p>
+        
+        <!-- Database Language Switcher -->
+        <div class="dl-lang-section">
+          <label class="dl-section-label" id="lblDlDbLang">Мова даних у базі:</label>
+          <div class="dl-lang-picker" role="radiogroup" aria-label="Мова бази даних">
+            <button type="button" class="dl-lang-card active" id="btnDlLangUa" data-dlang="ua">
+              <span class="dl-lang-flag">🇺🇦</span>
+              <div class="dl-lang-info">
+                <span class="dl-lang-title" id="txtDlLangUaTitle">Українська версія</span>
+                <span class="dl-lang-desc" id="txtDlLangUaDesc">341 препарат, 100% переклад усіх 11 771 симптомів</span>
+              </div>
+              <span class="dl-lang-check">✓</span>
+            </button>
+            <button type="button" class="dl-lang-card" id="btnDlLangRu" data-dlang="ru">
+              <span class="dl-lang-flag">🌐</span>
+              <div class="dl-lang-info">
+                <span class="dl-lang-title" id="txtDlLangRuTitle">Русская версия</span>
+                <span class="dl-lang-desc" id="txtDlLangRuDesc">341 препарат, оригинальный текст Кларка</span>
+              </div>
+              <span class="dl-lang-check">✓</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Download Cards Grid -->
+        <div class="dl-cards-grid">
+          <!-- SQLite Card -->
+          <div class="dl-card">
+            <div class="dl-card-icon">💾</div>
+            <div class="dl-card-info">
+              <div class="dl-card-header">
+                <h3 class="dl-card-name" id="dlCardTitleSqlite">SQLite База даних (.db)</h3>
+                <span class="dl-badge dl-badge-featured">FTS5 Search</span>
+              </div>
+              <p class="dl-card-desc" id="dlCardDescSqlite">
+                Повна реляційна база з 23 полями та 11 771 рубрикою. Включає повнотекстовий індекс FTS5 (unicode61). Сумісна з Python, DB Browser for SQLite, DBeaver.
+              </p>
+              <div class="dl-card-meta">
+                <span class="dl-file-size" id="dlSizeSqlite">~73 MB</span>
+                <span class="dl-file-format">.db (SQLite 3)</span>
+              </div>
+            </div>
+            <div class="dl-card-action">
+              <a href="materia_medica_ua.db" id="dlLinkSqlite" class="btn-dl-action" download="materia_medica_ua.db">
+                <span>⬇️</span> <span id="txtBtnDlSqlite">Завантажити .db</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- JSON Card -->
+          <div class="dl-card">
+            <div class="dl-card-icon">📄</div>
+            <div class="dl-card-info">
+              <div class="dl-card-header">
+                <h3 class="dl-card-name" id="dlCardTitleJson">JSON Датасет (.json)</h3>
+                <span class="dl-badge">API / Web</span>
+              </div>
+              <p class="dl-card-desc" id="dlCardDescJson">
+                Повний структурований масив усіх 341 препаратів з ієрархією рубрик, синонімами, модальностями та симптомами. Зручно для вебу, парсерів та штучного інтелекту.
+              </p>
+              <div class="dl-card-meta">
+                <span class="dl-file-size" id="dlSizeJson">~22 MB</span>
+                <span class="dl-file-format">.json (UTF-8)</span>
+              </div>
+            </div>
+            <div class="dl-card-action">
+              <a href="materia_medica_ua.json" id="dlLinkJson" class="btn-dl-action" download="materia_medica_ua.json">
+                <span>⬇️</span> <span id="txtBtnDlJson">Завантажити .json</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- CSV Card -->
+          <div class="dl-card">
+            <div class="dl-card-icon">📊</div>
+            <div class="dl-card-info">
+              <div class="dl-card-header">
+                <h3 class="dl-card-name" id="dlCardTitleCsv">CSV Таблиця (.csv)</h3>
+                <span class="dl-badge">Excel / Sheets</span>
+              </div>
+              <p class="dl-card-desc" id="dlCardDescCsv">
+                11 771 рядок рубрик і симптомів у кодуванні UTF-8 (id, latin_name, cyrillic_name, common_name, section, content). Готова до відкриття в Excel або Google Таблицях.
+              </p>
+              <div class="dl-card-meta">
+                <span class="dl-file-size" id="dlSizeCsv">~10 MB</span>
+                <span class="dl-file-format">.csv (UTF-8)</span>
+              </div>
+            </div>
+            <div class="dl-card-action">
+              <a href="materia_medica_ua.csv" id="dlLinkCsv" class="btn-dl-action" download="materia_medica_ua.csv">
+                <span>⬇️</span> <span id="txtBtnDlCsv">Завантажити .csv</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="dl-cli-box">
+          <div class="dl-cli-title">💻 <span id="txtDlCliTitle">Швидкий пошук у терміналі (CLI):</span></div>
+          <pre class="dl-cli-code"><code>python3 search.py --stats
+python3 search.py "ячмінь на повіці"
+python3 search.py --id 18</code></pre>
+        </div>
+
+        <div class="dl-modal-footer">
+          <span class="dl-footnote" id="dlFootnote">💡 Усі файли відкриті для некомерційного використання. Джерело: архів Materia Medica Джона Генрі Кларка (homeopat-sam.com).</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <footer>
     <p>

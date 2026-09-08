@@ -27,6 +27,9 @@ const DATA_CACHE = {
 };
 
 let remediesData = [];
+let lastSearchResults = [];
+let currentModalRemedy = null;
+let downloadModalLang = currentLang;
 
 // ==========================================
 // 1. ADVANCED MODALITIES & FILTER STATE
@@ -131,6 +134,46 @@ const I18N = {
     modalSource: 'Джерело:',
     modalClose: 'Закрити',
     modalError: 'Не вдалося відкрити опис:',
+    txtModalCopy: 'Копіювати',
+    txtModalPrint: 'Друк',
+    modalSearchPlaceholder: '🔍 Шукати симптоми у цьому описі...',
+    modalCatAll: 'Всі рубрики',
+    modalCatMind: '🧘 Психіка',
+    modalCatHead: '🧠 Голова & Очі',
+    modalCatResp: '🫁 Дихання',
+    modalCatDigest: '🥣 Травлення',
+    modalCatBack: '🦴 Спина & Суглоби',
+    modalCatSkin: '🩹 Шкіра',
+    modalCatMod: '⚖️ Модальності',
+    modalCatClin: '📋 Клініка',
+    downloadMenuBtn: 'Завантажити БД',
+    downloadMenuBadge: 'SQLite • JSON • CSV',
+    dlModalTitle: '📥 Завантаження бази даних',
+    dlModalSubtitle: 'Оберіть мову вмісту та необхідний формат бази даних для автономної роботи:',
+    lblDlDbLang: 'Мова даних у базі:',
+    dlLangUaTitle: 'Українська версія',
+    dlLangUaDesc: '341 препарат, 100% переклад усіх 11 771 симптомів',
+    dlLangRuTitle: 'Русская версия',
+    dlLangRuDesc: '341 препарат, оригінальний текст Кларка',
+    dlCardTitleSqlite: 'SQLite База даних (.db)',
+    dlCardDescSqlite: 'Повна реляційна база з 23 полями та 11 771 рубрикою. Включає повнотекстовий індекс FTS5 (unicode61). Сумісна з Python, DB Browser for SQLite, DBeaver.',
+    dlCardTitleJson: 'JSON Датасет (.json)',
+    dlCardDescJson: 'Повний структурований масив усіх 341 препаратів з ієрархією рубрик, синонімами, модальностями та симптомами. Зручно для вебу, парсерів та штучного інтелекту.',
+    dlCardTitleCsv: 'CSV Таблиця (.csv)',
+    dlCardDescCsv: '11 771 рядок рубрик і симптомів у кодуванні UTF-8 (id, latin_name, cyrillic_name, common_name, section, content). Готова до відкриття в Excel або Google Таблицях.',
+    txtBtnDlSqlite: 'Завантажити .db',
+    txtBtnDlJson: 'Завантажити .json',
+    txtBtnDlCsv: 'Завантажити .csv',
+    txtDlCliTitle: 'Швидкий пошук у терміналі (CLI):',
+    dlFootnote: '💡 Усі файли відкриті для некомерційного використання. Джерело: архів Materia Medica Джона Генрі Кларка (homeopat-sam.com).',
+    copyQuoteBtn: '📋 Цитата',
+    toastQuoteCopied: '✓ Цитату симптому скопійовано!',
+    toastRemedyCopied: '✓ Назву та опис скопійовано!',
+    activeFiltersTitle: 'Активні фільтри:',
+    activeFilterReset: 'Скинути все',
+    hBadgeRemedies: '🌿 341 препарат',
+    hBadgeSymptoms: '📖 11 771 симптом',
+    hBadgeOffline: '⚡ 100% Офлайн',
     footerText: 'База даних створена на основі архіву <strong>homeopat-sam.com</strong> (Materia Medica, 2018). Повністю автономний клієнтський застосунок для <strong>GitHub Pages</strong>.'
   },
   ru: {
@@ -221,6 +264,46 @@ const I18N = {
     modalSource: 'Источник:',
     modalClose: 'Закрыть',
     modalError: 'Не удалось открыть описание:',
+    txtModalCopy: 'Копировать',
+    txtModalPrint: 'Печать',
+    modalSearchPlaceholder: '🔍 Искать симптомы в этом описании...',
+    modalCatAll: 'Все рубрики',
+    modalCatMind: '🧘 Психика',
+    modalCatHead: '🧠 Голова и Глаза',
+    modalCatResp: '🫁 Дыхание',
+    modalCatDigest: '🥣 Пищеварение',
+    modalCatBack: '🦴 Спина и Суставы',
+    modalCatSkin: '🩹 Кожа',
+    modalCatMod: '⚖️ Модальности',
+    modalCatClin: '📋 Клиника',
+    downloadMenuBtn: 'Скачать БД',
+    downloadMenuBadge: 'SQLite • JSON • CSV',
+    dlModalTitle: '📥 Скачивание базы данных',
+    dlModalSubtitle: 'Выберите язык содержимого и необходимый формат базы данных для автономной работы:',
+    lblDlDbLang: 'Язык данных в базе:',
+    dlLangUaTitle: 'Украинская версия',
+    dlLangUaDesc: '341 препарат, 100% перевод всех 11 771 симптомов',
+    dlLangRuTitle: 'Русская версия',
+    dlLangRuDesc: '341 препарат, оригинальный текст Кларка',
+    dlCardTitleSqlite: 'SQLite База данных (.db)',
+    dlCardDescSqlite: 'Полная реляционная база с 23 полями и 11 771 рубрикой. Включает полнотекстовый индекс FTS5 (unicode61). Совместима с Python, DB Browser for SQLite, DBeaver.',
+    dlCardTitleJson: 'JSON Датасет (.json)',
+    dlCardDescJson: 'Полный структурированный массив всех 341 препаратов с иерархией рубрик, синонимами, модальностями и симптомами. Удобно для веба, парсеров и ИИ.',
+    dlCardTitleCsv: 'CSV Таблица (.csv)',
+    dlCardDescCsv: '11 771 строка рубрик и симптомов в кодировке UTF-8 (id, latin_name, cyrillic_name, common_name, section, content). Готова к открытию в Excel или Google Таблицах.',
+    txtBtnDlSqlite: 'Скачать .db',
+    txtBtnDlJson: 'Скачать .json',
+    txtBtnDlCsv: 'Скачать .csv',
+    txtDlCliTitle: 'Быстрый поиск в терминале (CLI):',
+    dlFootnote: '💡 Все файлы открыты для некоммерческого использования. Источник: архив Materia Medica Джона Генри Кларка (homeopat-sam.com).',
+    copyQuoteBtn: '📋 Цитата',
+    toastQuoteCopied: '✓ Цитата скопирована в буфер обмена!',
+    toastRemedyCopied: '✓ Название и описание скопированы!',
+    activeFiltersTitle: 'Активные фильтры:',
+    activeFilterReset: 'Сбросить все',
+    hBadgeRemedies: '🌿 341 препарат',
+    hBadgeSymptoms: '📖 11 771 симптом',
+    hBadgeOffline: '⚡ 100% Офлайн',
     footerText: 'База данных создана на основе архива <strong>homeopat-sam.com</strong> (Materia Medica, 2018). Полностью автономное клиентское приложение для <strong>GitHub Pages</strong>.'
   }
 };
@@ -827,30 +910,18 @@ function updateUILanguage() {
   const subEl = document.getElementById('headerSubtitle');
   if (subEl) subEl.innerHTML = t.headerSubtitle;
 
-  const dlDb = document.getElementById('dlDb');
-  if (dlDb) {
-    dlDb.href = t.dlDbFile;
-    dlDb.setAttribute('download', t.dlDbFile);
-    if (t.dlDbTitle) dlDb.title = t.dlDbTitle;
-    const txtDb = document.getElementById('txtDlDb');
-    if (txtDb) txtDb.innerText = t.dlDb;
-  }
-  const dlJson = document.getElementById('dlJson');
-  if (dlJson) {
-    dlJson.href = t.dlJsonFile;
-    dlJson.setAttribute('download', t.dlJsonFile);
-    if (t.dlJsonTitle) dlJson.title = t.dlJsonTitle;
-    const txtJson = document.getElementById('txtDlJson');
-    if (txtJson) txtJson.innerText = t.dlJson;
-  }
-  const dlCsv = document.getElementById('dlCsv');
-  if (dlCsv) {
-    dlCsv.href = t.dlCsvFile;
-    dlCsv.setAttribute('download', t.dlCsvFile);
-    if (t.dlCsvTitle) dlCsv.title = t.dlCsvTitle;
-    const txtCsv = document.getElementById('txtDlCsv');
-    if (txtCsv) txtCsv.innerText = t.dlCsv;
-  }
+  const bRemedies = document.getElementById('hBadgeRemedies');
+  if (bRemedies) bRemedies.innerText = t.hBadgeRemedies;
+  const bSymptoms = document.getElementById('hBadgeSymptoms');
+  if (bSymptoms) bSymptoms.innerText = t.hBadgeSymptoms;
+  const bOffline = document.getElementById('hBadgeOffline');
+  if (bOffline) bOffline.innerText = t.hBadgeOffline;
+
+  const txtDlMenuBtn = document.getElementById('txtDownloadMenuBtn');
+  if (txtDlMenuBtn) txtDlMenuBtn.innerText = t.downloadMenuBtn;
+
+  updateDownloadModalTexts();
+  updateDownloadModalFiles(downloadModalLang);
 
   const searchInput = document.getElementById('searchInput');
   if (searchInput) searchInput.placeholder = t.searchPlaceholder;
@@ -924,6 +995,13 @@ function updateUILanguage() {
     });
   }
 
+  const txtModalCopy = document.getElementById('txtModalCopy');
+  if (txtModalCopy) txtModalCopy.innerText = t.txtModalCopy;
+  const txtModalPrint = document.getElementById('txtModalPrint');
+  if (txtModalPrint) txtModalPrint.innerText = t.txtModalPrint;
+
+  updateActiveFiltersStrip();
+
   const footerEl = document.querySelector('footer p');
   if (footerEl) footerEl.innerHTML = t.footerText;
 }
@@ -971,6 +1049,7 @@ function renderModalityChips() {
         }
       }
       updateFiltersBadge();
+      updateActiveFiltersStrip();
       const input = document.getElementById('searchInput');
       runSearch(input ? input.value : '');
     });
@@ -989,6 +1068,260 @@ function updateFiltersBadge() {
     badge.innerText = count;
     badge.style.display = count > 0 ? 'inline-flex' : 'none';
   }
+}
+
+function updateActiveFiltersStrip() {
+  const strip = document.getElementById('activeFiltersStrip');
+  if (!strip) return;
+  const t = I18N[currentLang];
+
+  const hasFilters = filterState.worseChips.size > 0 ||
+                     filterState.betterChips.size > 0 ||
+                     Boolean(filterState.worseCustom.trim()) ||
+                     Boolean(filterState.betterCustom.trim()) ||
+                     Boolean(filterState.section);
+
+  if (!hasFilters) {
+    strip.style.display = 'none';
+    strip.innerHTML = '';
+    return;
+  }
+
+  strip.style.display = 'flex';
+  let html = `<span class="active-filter-label">${t.activeFiltersTitle || 'Активні фільтри:'}</span>`;
+
+  for (const cid of filterState.worseChips) {
+    const chipDef = t.worseChips.find(c => c.id === cid);
+    const label = chipDef ? chipDef.label : cid;
+    html += `<button type="button" class="active-filter-pill is-worse" onclick="toggleWorseChip('${escapeHtml(cid)}')">🔴 ${escapeHtml(label)} <span class="pill-remove">✕</span></button>`;
+  }
+
+  for (const cid of filterState.betterChips) {
+    const chipDef = t.betterChips.find(c => c.id === cid);
+    const label = chipDef ? chipDef.label : cid;
+    html += `<button type="button" class="active-filter-pill is-better" onclick="toggleBetterChip('${escapeHtml(cid)}')">🟢 ${escapeHtml(label)} <span class="pill-remove">✕</span></button>`;
+  }
+
+  if (filterState.worseCustom.trim()) {
+    html += `<button type="button" class="active-filter-pill is-worse" onclick="clearCustomWorse()">🔴 ${escapeHtml(filterState.worseCustom.trim())} <span class="pill-remove">✕</span></button>`;
+  }
+
+  if (filterState.betterCustom.trim()) {
+    html += `<button type="button" class="active-filter-pill is-better" onclick="clearCustomBetter()">🟢 ${escapeHtml(filterState.betterCustom.trim())} <span class="pill-remove">✕</span></button>`;
+  }
+
+  if (filterState.section) {
+    const secDef = t.sections.find(s => s.val === filterState.section);
+    const label = secDef ? secDef.text : filterState.section;
+    html += `<button type="button" class="active-filter-pill is-sec" onclick="clearSectionFilter()">📍 ${escapeHtml(label)} <span class="pill-remove">✕</span></button>`;
+  }
+
+  html += `<button type="button" class="active-filter-pill" onclick="resetAllFilters()">${t.activeFilterReset || 'Скинути все'} ✕</button>`;
+  strip.innerHTML = html;
+}
+
+function toggleWorseChip(cid) {
+  if (filterState.worseChips.has(cid)) {
+    filterState.worseChips.delete(cid);
+  } else {
+    filterState.worseChips.add(cid);
+  }
+  renderModalityChips();
+  updateFiltersBadge();
+  updateActiveFiltersStrip();
+  const input = document.getElementById('searchInput');
+  runSearch(input ? input.value : '');
+}
+
+function toggleBetterChip(cid) {
+  if (filterState.betterChips.has(cid)) {
+    filterState.betterChips.delete(cid);
+  } else {
+    filterState.betterChips.add(cid);
+  }
+  renderModalityChips();
+  updateFiltersBadge();
+  updateActiveFiltersStrip();
+  const input = document.getElementById('searchInput');
+  runSearch(input ? input.value : '');
+}
+
+function clearCustomWorse() {
+  filterState.worseCustom = '';
+  const inW = document.getElementById('inputWorseCustom');
+  if (inW) inW.value = '';
+  updateFiltersBadge();
+  updateActiveFiltersStrip();
+  const input = document.getElementById('searchInput');
+  runSearch(input ? input.value : '');
+}
+
+function clearCustomBetter() {
+  filterState.betterCustom = '';
+  const inB = document.getElementById('inputBetterCustom');
+  if (inB) inB.value = '';
+  updateFiltersBadge();
+  updateActiveFiltersStrip();
+  const input = document.getElementById('searchInput');
+  runSearch(input ? input.value : '');
+}
+
+function clearSectionFilter() {
+  filterState.section = '';
+  const selectSec = document.getElementById('selectSection');
+  if (selectSec) selectSec.value = '';
+  updateFiltersBadge();
+  updateActiveFiltersStrip();
+  const input = document.getElementById('searchInput');
+  runSearch(input ? input.value : '');
+}
+
+function resetAllFilters() {
+  filterState.worseChips.clear();
+  filterState.betterChips.clear();
+  filterState.worseCustom = '';
+  filterState.betterCustom = '';
+  filterState.section = '';
+
+  const inW = document.getElementById('inputWorseCustom');
+  if (inW) inW.value = '';
+  const inB = document.getElementById('inputBetterCustom');
+  if (inB) inB.value = '';
+  const selectSec = document.getElementById('selectSection');
+  if (selectSec) selectSec.value = '';
+
+  renderModalityChips();
+  updateFiltersBadge();
+  updateActiveFiltersStrip();
+  const input = document.getElementById('searchInput');
+  runSearch(input ? input.value : '');
+}
+
+// ==========================================
+// TOAST & DOWNLOAD MODAL HELPERS
+// ==========================================
+function showToast(message, duration = 2500) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerText = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('toast-out');
+    setTimeout(() => toast.remove(), 200);
+  }, duration);
+}
+
+function openDownloadModal() {
+  const modal = document.getElementById('downloadModal');
+  if (!modal) return;
+  downloadModalLang = currentLang;
+  updateDownloadModalTexts();
+  updateDownloadModalFiles(downloadModalLang);
+  modal.classList.add('open');
+  if (typeof document !== 'undefined' && document.body) {
+    document.body.classList.add('modal-open');
+  }
+}
+
+function closeDownloadModal() {
+  const modal = document.getElementById('downloadModal');
+  if (modal) modal.classList.remove('open');
+  const remedyModal = document.getElementById('remedyModal');
+  if ((!remedyModal || !remedyModal.classList.contains('open')) && typeof document !== 'undefined' && document.body) {
+    document.body.classList.remove('modal-open');
+  }
+}
+
+function updateDownloadModalTexts() {
+  const t = I18N[currentLang];
+  const title = document.getElementById('dlModalTitle');
+  if (title) title.innerText = t.dlModalTitle;
+  const sub = document.getElementById('dlModalSubtitle');
+  if (sub) sub.innerText = t.dlModalSubtitle;
+  const lblLang = document.getElementById('lblDlDbLang');
+  if (lblLang) lblLang.innerText = t.lblDlDbLang;
+
+  const uaTitle = document.getElementById('txtDlLangUaTitle');
+  if (uaTitle) uaTitle.innerText = t.dlLangUaTitle;
+  const uaDesc = document.getElementById('txtDlLangUaDesc');
+  if (uaDesc) uaDesc.innerText = t.dlLangUaDesc;
+
+  const ruTitle = document.getElementById('txtDlLangRuTitle');
+  if (ruTitle) ruTitle.innerText = t.dlLangRuTitle;
+  const ruDesc = document.getElementById('txtDlLangRuDesc');
+  if (ruDesc) ruDesc.innerText = t.dlLangRuDesc;
+
+  const cardSqlite = document.getElementById('dlCardTitleSqlite');
+  if (cardSqlite) cardSqlite.innerText = t.dlCardTitleSqlite;
+  const descSqlite = document.getElementById('dlCardDescSqlite');
+  if (descSqlite) descSqlite.innerText = t.dlCardDescSqlite;
+  const btnSqlite = document.getElementById('txtBtnDlSqlite');
+  if (btnSqlite) btnSqlite.innerText = t.txtBtnDlSqlite;
+
+  const cardJson = document.getElementById('dlCardTitleJson');
+  if (cardJson) cardJson.innerText = t.dlCardTitleJson;
+  const descJson = document.getElementById('dlCardDescJson');
+  if (descJson) descJson.innerText = t.dlCardDescJson;
+  const btnJson = document.getElementById('txtBtnDlJson');
+  if (btnJson) btnJson.innerText = t.txtBtnDlJson;
+
+  const cardCsv = document.getElementById('dlCardTitleCsv');
+  if (cardCsv) cardCsv.innerText = t.dlCardTitleCsv;
+  const descCsv = document.getElementById('dlCardDescCsv');
+  if (descCsv) descCsv.innerText = t.dlCardDescCsv;
+  const btnCsv = document.getElementById('txtBtnDlCsv');
+  if (btnCsv) btnCsv.innerText = t.txtBtnDlCsv;
+
+  const cliTitle = document.getElementById('txtDlCliTitle');
+  if (cliTitle) cliTitle.innerText = t.txtDlCliTitle;
+  const footnote = document.getElementById('dlFootnote');
+  if (footnote) footnote.innerText = t.dlFootnote;
+
+  const dlCloseBtn = document.getElementById('dlModalCloseBtn');
+  if (dlCloseBtn && t.modalClose) {
+    dlCloseBtn.setAttribute('aria-label', t.modalClose);
+    dlCloseBtn.title = t.modalClose;
+  }
+}
+
+function updateDownloadModalFiles(lang) {
+  downloadModalLang = lang;
+  if (typeof document === 'undefined') return;
+
+  const btnUa = document.getElementById('btnDlLangUa');
+  const btnRu = document.getElementById('btnDlLangRu');
+  if (btnUa) btnUa.classList.toggle('active', lang === 'ua');
+  if (btnRu) btnRu.classList.toggle('active', lang === 'ru');
+
+  const linkSqlite = document.getElementById('dlLinkSqlite');
+  const linkJson = document.getElementById('dlLinkJson');
+  const linkCsv = document.getElementById('dlLinkCsv');
+
+  const sizeSqlite = document.getElementById('dlSizeSqlite');
+  const sizeJson = document.getElementById('dlSizeJson');
+  const sizeCsv = document.getElementById('dlSizeCsv');
+
+  const isUa = (lang === 'ua');
+  const suffix = isUa ? 'ua' : 'ru';
+
+  if (linkSqlite) {
+    linkSqlite.href = `materia_medica_${suffix}.db`;
+    linkSqlite.setAttribute('download', `materia_medica_${suffix}.db`);
+  }
+  if (linkJson) {
+    linkJson.href = `materia_medica_${suffix}.json`;
+    linkJson.setAttribute('download', `materia_medica_${suffix}.json`);
+  }
+  if (linkCsv) {
+    linkCsv.href = `materia_medica_${suffix}.csv`;
+    linkCsv.setAttribute('download', `materia_medica_${suffix}.csv`);
+  }
+
+  if (sizeSqlite) sizeSqlite.innerText = isUa ? '~73 MB' : '~78 MB';
+  if (sizeJson) sizeJson.innerText = isUa ? '~22 MB' : '~26 MB';
+  if (sizeCsv) sizeCsv.innerText = isUa ? '~10 MB' : '~11 MB';
 }
 
 // ==========================================
@@ -1120,6 +1453,7 @@ function runSearch(query) {
     return;
   }
 
+  lastSearchResults = results;
   statusBar.innerHTML = t.statusFound.replace('{count}', results.length).replace('{time}', elapsed);
 
   const cardsHtml = results.map((item, index) => {
@@ -1147,7 +1481,7 @@ function runSearch(query) {
               ${isTop ? `<span class="badge-exact">${t.cardExactMatch}</span>` : ''}
             </div>
             <div>
-              <span class="card-latin">${r.latin}</span>
+              <span class="card-latin" onclick="openRemedyModal(${r.id})" style="cursor: pointer;" title="${t.cardBtnDetails}">${r.latin}</span>
               ${r.cyr ? `<span class="card-cyr">(${r.cyr})</span>` : ''}
             </div>
             ${r.common ? `<div class="card-common">🌿 ${r.common}</div>` : ''}
@@ -1164,9 +1498,14 @@ function runSearch(query) {
         ${modHtml}
 
         <div class="card-actions">
-          <button class="btn-details" onclick="openRemedyModal(${r.id})">
-            ${t.cardBtnDetails}
-          </button>
+          <div class="card-actions-left">
+            <button type="button" class="btn-details" onclick="openRemedyModal(${r.id})">
+              ${t.cardBtnDetails}
+            </button>
+            <button type="button" class="btn-copy-quote" onclick="copySnippetQuote(${index})" title="${t.copyQuoteBtn}">
+              ${t.copyQuoteBtn}
+            </button>
+          </div>
           <span class="remedy-id-text">ID: ${r.id}</span>
         </div>
       </article>
@@ -1177,8 +1516,146 @@ function runSearch(query) {
 }
 
 // ==========================================
-// 10. DETAILED MODAL VIEW
+// 10. DETAILED MODAL VIEW & UX ENHANCEMENTS
 // ==========================================
+function copySnippetQuote(index) {
+  const item = lastSearchResults[index];
+  if (!item) return;
+  const r = item.remedy;
+  const t = I18N[currentLang];
+  const quoteText = `«${item.sentence.trim()}» — ${r.latin}${r.cyr ? ` (${r.cyr})` : ''} [${t.cardRubric} ${item.section}]`;
+
+  if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(quoteText).then(() => {
+      showToast(t.toastQuoteCopied || '✓ Цитату скопійовано в буфер обміну!');
+    }).catch(() => {
+      showToast(t.toastQuoteCopied || '✓ Цитату скопійовано в буфер обміну!');
+    });
+  } else {
+    showToast(t.toastQuoteCopied || '✓ Цитату скопійовано в буфер обміну!');
+  }
+}
+
+function copyRemedyDetails() {
+  if (!currentModalRemedy) return;
+  const t = I18N[currentLang];
+  const r = currentModalRemedy;
+
+  let text = `${r.latin_name || ''}${r.cyrillic_name ? ` (${r.cyrillic_name})` : ''}\n`;
+  if (r.common_name) text += `${t.modalCommonName} ${r.common_name}\n`;
+  if (r.synonyms) text += `${t.modalSynonyms} ${r.synonyms}\n`;
+  if (r.intro) text += `\n${r.intro}\n`;
+
+  if (r.sections) {
+    text += '\n';
+    for (const [sName, sText] of Object.entries(r.sections)) {
+      text += `--- ${sName} ---\n${sText}\n\n`;
+    }
+  }
+
+  if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast(t.toastRemedyCopied || '✓ Назву та опис скопійовано!');
+    }).catch(() => {
+      showToast(t.toastRemedyCopied || '✓ Назву та опис скопійовано!');
+    });
+  } else {
+    showToast(t.toastRemedyCopied || '✓ Назву та опис скопійовано!');
+  }
+}
+
+function getSectionIcon(secName) {
+  const u = (secName || '').toUpperCase();
+  if (/ОЧІ|ГЛАЗА|ЗІР|ЗРЕНИЕ/.test(u)) return '👁️';
+  if (/ГОЛОВА|МОЗОК|ГОЛОВОКРУЖЕНИЕ|ЗАПАМОРОЧЕННЯ/.test(u)) return '🧠';
+  if (/ДИХА|ДЫХА|КАШЕЛ|ГРУД/.test(u)) return '🫁';
+  if (/СЕРЦ|СЕРД/.test(u)) return '❤️';
+  if (/ШЛУНОК|ЖЕЛУДОК|ЖИВОТ|КИШК|ПЕЧІНК|ПЕЧЕНЬ|СТУЛ|ВИПРАВН/.test(u)) return '🥣';
+  if (/СПИН|ПОПЕРЕК|ПОЯСНИЦ|ХРЕБЕТ|ПОЗВОНОЧНИК/.test(u)) return '🦴';
+  if (/СУГЛОБ|СУСТАВ|М'ЯЗ|МЫШЦ|КІНЦІВК|КОНЕЧНОСТ|ШИЯ|ШЕЯ/.test(u)) return '💪';
+  if (/ШКІР|КОЖА|ВИСИП|СВЕРБІЖ|ЗУД/.test(u)) return '🩹';
+  if (/МОДАЛЬН|ПОГІРШ|УХУДШ|ПОКРАЩ|УЛУЧШ/.test(u)) return '⚖️';
+  if (/КЛІНІК|КЛИНИК|ЕТІОЛОГ|ЭТИОЛОГ|ХАРАКТЕРИСТИК|ТИП/.test(u)) return '📋';
+  if (/ПСИХІК|ПСИХИК/.test(u)) return '🧘';
+  if (/ЛИХОМАН|ЛИХОРАД|ЖАР|ПОТ|ПІТ/.test(u)) return '🌡️';
+  if (/ВУХА|УШИ|СЛУХ/.test(u)) return '👂';
+  if (/НІС|НОС/.test(u)) return '👃';
+  if (/РОТ|ЗУБ|ЯЗИК|ЯЗЫК/.test(u)) return '👄';
+  if (/ГОРЛО|ГЛОТК/.test(u)) return '🧣';
+  if (/СЕЧ|МОЧ|НИРК|ПОЧК/.test(u)) return '💧';
+  if (/СОН|СНОВ/.test(u)) return '💤';
+  return '🔹';
+}
+
+function getSectionCategory(secName) {
+  const u = (secName || '').toUpperCase();
+  if (/МОДАЛЬН|ПОГІРШ|УХУДШ|ПОКРАЩ|УЛУЧШ/.test(u)) return 'mod';
+  if (/КЛІНІ[КЧ]|КЛИНИ[КЧ]|ЕТІОЛОГ|ЭТИОЛОГ|ХАРАКТЕРИСТИК|ТИП|ДОЗИ/.test(u)) return 'clin';
+  if (/ПСИХІК|ПСИХИК/.test(u)) return 'mind';
+  if (/ДИХА|ДЫХА|КАШЕЛ|ГРУД|СЕРЦ|СЕРД/.test(u)) return 'resp';
+  if (/ШЛУНОК|ЖЕЛУДОК|ЖИВОТ|КИШК|ПЕЧІНК|ПЕЧЕНЬ|СТУЛ|ВИПРАВН|АПЕТИТ|ЖАЖДА|СПРАГА/.test(u)) return 'digest';
+  if (/СПИН|ПОПЕРЕК|ПОЯСНИЦ|ХРЕБЕТ|ПОЗВОНОЧНИК|СУГЛОБ|СУСТАВ|КІНЦІВК|КОНЕЧНОСТ|М'ЯЗ|МЫШЦ|ШИЯ|ШЕЯ/.test(u)) return 'back';
+  if (/ШКІР|КОЖА|ВИСИП|СВЕРБІЖ|ЗУД/.test(u)) return 'skin';
+  if (/ОЧІ|ГЛАЗА|ГОЛОВА|МОЗОК|ГОЛОВОКРУЖЕНИЕ|ЗАПАМОРОЧЕННЯ|ВУХА|УШИ|СЛУХ|ЯЗИК|ЯЗЫК|ГОРЛО|ГЛОТК/.test(u) ||
+      /(^|[^А-ЯЁЇІЄҐ])(НІС|НОС|РОТ|ЗУБ)([^А-ЯЁЇІЄҐ]|$)/.test(u)) {
+    return 'head';
+  }
+  return 'other';
+}
+
+function renderModalSections(remedy, category = 'all', query = '') {
+  const container = document.getElementById('modalSectionsContainer');
+  if (!container || !remedy || !remedy.sections) return;
+  const t = I18N[currentLang];
+  const qTrim = (query || '').trim().toLowerCase();
+
+  let html = '';
+  let matchCount = 0;
+
+  for (const [sName, sText] of Object.entries(remedy.sections)) {
+    const cat = getSectionCategory(sName);
+    if (category !== 'all' && cat !== category) continue;
+
+    if (qTrim) {
+      const matchInName = sName.toLowerCase().includes(qTrim);
+      const matchInText = sText.toLowerCase().includes(qTrim);
+      if (!matchInName && !matchInText) continue;
+    }
+
+    matchCount++;
+    const icon = getSectionIcon(sName);
+
+    let formattedText = escapeHtml(sText);
+    if (qTrim) {
+      const escapedQ = qTrim.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const reg = new RegExp(`(?<=^|[^а-яёїієґa-z0-9])(${escapedQ})[а-яёїієґa-z0-9'’]*`, 'gi');
+      formattedText = formattedText.replace(reg, m => `<mark>${m}</mark>`);
+    }
+
+    html += `
+      <div class="modal-sec-card" data-sname="${escapeHtml(sName)}">
+        <div class="modal-sec-card-header">
+          <span class="modal-sec-card-icon">${icon}</span>
+          <span class="modal-sec-card-name">${escapeHtml(sName)}</span>
+        </div>
+        <div class="modal-sec-card-body">${formattedText}</div>
+      </div>
+    `;
+  }
+
+  if (matchCount === 0) {
+    html = `
+      <div style="text-align: center; padding: 2.5rem 1rem; background: #f8fafc; border-radius: 8px; border: 1px dashed var(--border); color: #64748b;">
+        <p style="font-size: 1rem;">${t.statusNotFound}</p>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+}
+
+let activeModalCat = 'all';
+
 async function openRemedyModal(remedyId) {
   const modal = document.getElementById('remedyModal');
   const modalTitle = document.getElementById('modalTitle');
@@ -1200,46 +1677,119 @@ async function openRemedyModal(remedyId) {
       if (!res.ok) throw new Error(currentLang === 'ua' ? 'Помилка завантаження файлу препарату' : 'Ошибка загрузки файла препарата');
     }
     const full = await res.json();
+    currentModalRemedy = full;
+    activeModalCat = 'all';
 
-    modalTitle.innerHTML = `${full.latin_name} <span style="font-size: 1rem; color: #64748b;">(${full.cyrillic_name || ''})</span>`;
+    modalTitle.innerHTML = `${escapeHtml(full.latin_name)} <span style="font-size: 1rem; color: #64748b; font-weight: 500;">(${escapeHtml(full.cyrillic_name || '')})</span>`;
 
-    let html = '';
-    if (full.image_url) {
-      html += `<div class="modal-img-wrap"><img src="${full.image_url}" alt="${full.latin_name}" onerror="this.parentElement ? this.parentElement.remove() : (this.style.display='none')"></div>`;
-    }
-
-    if (full.common_name) {
-      html += `<p style="margin-bottom: 0.5rem;"><strong>${t.modalCommonName}</strong> ${escapeHtml(full.common_name)}</p>`;
-    }
-    if (full.synonyms) {
-      html += `<p style="margin-bottom: 0.5rem;"><strong>${t.modalSynonyms}</strong> ${escapeHtml(full.synonyms)}</p>`;
-    }
-    if (full.intro) {
-      html += `<div class="modal-sec-title">${t.modalIntro}</div>`;
-      html += `<div class="modal-sec-text">${escapeHtml(full.intro)}</div>`;
-    }
-
+    // Calculate category counts
+    const counts = { all: 0, mind: 0, head: 0, resp: 0, digest: 0, back: 0, skin: 0, mod: 0, clin: 0 };
     if (full.sections) {
-      for (const [sName, sText] of Object.entries(full.sections)) {
-        html += `<div class="modal-sec-title">${escapeHtml(sName)}</div>`;
-        html += `<div class="modal-sec-text">${escapeHtml(sText)}</div>`;
+      for (const sName of Object.keys(full.sections)) {
+        counts.all++;
+        const cat = getSectionCategory(sName);
+        if (counts[cat] !== undefined) counts[cat]++;
       }
     }
 
-    if (full.source) {
-      html += `<div class="modal-source">${t.modalSource} ${escapeHtml(full.source)}</div>`;
+    let metaHtml = '';
+    if (full.image_url) {
+      metaHtml += `<div class="modal-img-wrap"><img src="${full.image_url}" alt="${escapeHtml(full.latin_name)}" onerror="this.parentElement ? this.parentElement.remove() : (this.style.display='none')"></div>`;
     }
 
-    modalBody.innerHTML = html;
+    metaHtml += '<div class="modal-meta-box">';
+    if (full.common_name) {
+      metaHtml += `<div class="modal-meta-row"><strong>${t.modalCommonName}</strong> 🌿 ${escapeHtml(full.common_name)}</div>`;
+    }
+    if (full.synonyms) {
+      metaHtml += `<div class="modal-meta-row"><strong>${t.modalSynonyms}</strong> ${escapeHtml(full.synonyms)}</div>`;
+    }
+    if (full.intro) {
+      metaHtml += `<div class="modal-meta-row" style="margin-top: 0.5rem; color: #475569; font-style: italic;">${escapeHtml(full.intro)}</div>`;
+    }
+    metaHtml += '</div>';
+
+    // Toolbar with search and category pills
+    const catDefs = [
+      { id: 'all', label: t.modalCatAll || 'Всі рубрики', count: counts.all },
+      { id: 'mind', label: t.modalCatMind || '🧘 Психіка', count: counts.mind },
+      { id: 'head', label: t.modalCatHead || '🧠 Голова & Очі', count: counts.head },
+      { id: 'resp', label: t.modalCatResp || '🫁 Дихання', count: counts.resp },
+      { id: 'digest', label: t.modalCatDigest || '🥣 Травлення', count: counts.digest },
+      { id: 'back', label: t.modalCatBack || '🦴 Спина & Суглоби', count: counts.back },
+      { id: 'skin', label: t.modalCatSkin || '🩹 Шкіра', count: counts.skin },
+      { id: 'mod', label: t.modalCatMod || '⚖️ Модальності', count: counts.mod },
+      { id: 'clin', label: t.modalCatClin || '📋 Клініка', count: counts.clin }
+    ].filter(c => c.id === 'all' || c.count > 0);
+
+    const toolbarHtml = `
+      <div class="modal-toolbar">
+        <div class="modal-search-wrap">
+          <span class="modal-search-icon">🔍</span>
+          <input 
+            type="text" 
+            id="modalSearchInput" 
+            class="modal-search-input" 
+            placeholder="${t.modalSearchPlaceholder || '🔍 Шукати симптоми у цьому описі...'}"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+        <div class="modal-cat-bar" id="modalCatBar">
+          ${catDefs.map(c => `
+            <button type="button" class="modal-cat-btn ${c.id === 'all' ? 'active' : ''}" data-cat="${c.id}">
+              ${c.label} <span style="opacity: 0.75; font-size: 0.72rem;">(${c.count})</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    let bodyContent = metaHtml + toolbarHtml + '<div id="modalSectionsContainer"></div>';
+
+    if (full.source) {
+      bodyContent += `<div class="modal-source">${t.modalSource} ${escapeHtml(full.source)}</div>`;
+    }
+
+    modalBody.innerHTML = bodyContent;
+
+    // Render initial sections
+    renderModalSections(full, 'all', '');
+
+    // Setup in-modal search input
+    const mInput = document.getElementById('modalSearchInput');
+    let mTimer;
+    if (mInput) {
+      mInput.addEventListener('input', (e) => {
+        clearTimeout(mTimer);
+        mTimer = setTimeout(() => {
+          renderModalSections(full, activeModalCat, e.target.value);
+        }, 120);
+      });
+    }
+
+    // Setup category buttons
+    const catBtns = modalBody.querySelectorAll('.modal-cat-btn');
+    catBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        catBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeModalCat = btn.getAttribute('data-cat');
+        renderModalSections(full, activeModalCat, mInput ? mInput.value : '');
+      });
+    });
+
   } catch (err) {
-    modalBody.innerHTML = `<p style="color: #dc2626;">${t.modalError || 'Не вдалося відкрити опис:'} ${escapeHtml(err.message)}</p>`;
+    modalBody.innerHTML = `<p style="color: #dc2626; padding: 2rem;">${t.modalError || 'Не вдалося відкрити опис:'} ${escapeHtml(err.message)}</p>`;
   }
 }
 
 function closeModal() {
   const modal = document.getElementById('remedyModal');
   if (modal) modal.classList.remove('open');
-  if (typeof document !== 'undefined' && document.body) {
+  currentModalRemedy = null;
+  const dlModal = document.getElementById('downloadModal');
+  if ((!dlModal || !dlModal.classList.contains('open')) && typeof document !== 'undefined' && document.body) {
     document.body.classList.remove('modal-open');
   }
 }
@@ -1284,6 +1834,32 @@ if (typeof document !== 'undefined') {
     if (btnUa) btnUa.addEventListener('click', () => switchLanguage('ua'));
     if (btnRu) btnRu.addEventListener('click', () => switchLanguage('ru'));
 
+    // Download menu modal wiring
+    const btnOpenDownloads = document.getElementById('btnOpenDownloads');
+    if (btnOpenDownloads) btnOpenDownloads.addEventListener('click', openDownloadModal);
+
+    const dlModalCloseBtn = document.getElementById('dlModalCloseBtn');
+    if (dlModalCloseBtn) dlModalCloseBtn.addEventListener('click', closeDownloadModal);
+
+    const downloadModal = document.getElementById('downloadModal');
+    if (downloadModal) {
+      downloadModal.addEventListener('click', (e) => {
+        if (e.target.id === 'downloadModal') closeDownloadModal();
+      });
+    }
+
+    const btnDlLangUa = document.getElementById('btnDlLangUa');
+    const btnDlLangRu = document.getElementById('btnDlLangRu');
+    if (btnDlLangUa) btnDlLangUa.addEventListener('click', () => updateDownloadModalFiles('ua'));
+    if (btnDlLangRu) btnDlLangRu.addEventListener('click', () => updateDownloadModalFiles('ru'));
+
+    // Remedy modal header tools wiring
+    const btnModalCopyText = document.getElementById('btnModalCopyText');
+    if (btnModalCopyText) btnModalCopyText.addEventListener('click', copyRemedyDetails);
+
+    const btnModalPrint = document.getElementById('btnModalPrint');
+    if (btnModalPrint) btnModalPrint.addEventListener('click', () => window.print());
+
     const toggleBtn = document.getElementById('btnToggleAdvanced');
     const advPanel = document.getElementById('advancedPanel');
     if (toggleBtn && advPanel) {
@@ -1299,6 +1875,7 @@ if (typeof document !== 'undefined') {
       inWorse.addEventListener('input', (e) => {
         filterState.worseCustom = e.target.value;
         updateFiltersBadge();
+        updateActiveFiltersStrip();
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
           runSearch(input ? input.value : '');
@@ -1311,6 +1888,7 @@ if (typeof document !== 'undefined') {
       inBetter.addEventListener('input', (e) => {
         filterState.betterCustom = e.target.value;
         updateFiltersBadge();
+        updateActiveFiltersStrip();
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
           runSearch(input ? input.value : '');
@@ -1323,27 +1901,14 @@ if (typeof document !== 'undefined') {
       selectSec.addEventListener('change', (e) => {
         filterState.section = e.target.value;
         updateFiltersBadge();
+        updateActiveFiltersStrip();
         runSearch(input ? input.value : '');
       });
     }
 
     const btnReset = document.getElementById('btnResetFilters');
     if (btnReset) {
-      btnReset.addEventListener('click', () => {
-        filterState.worseChips.clear();
-        filterState.betterChips.clear();
-        filterState.worseCustom = '';
-        filterState.betterCustom = '';
-        filterState.section = '';
-
-        if (inWorse) inWorse.value = '';
-        if (inBetter) inBetter.value = '';
-        if (selectSec) selectSec.value = '';
-
-        renderModalityChips();
-        updateFiltersBadge();
-        runSearch(input ? input.value : '');
-      });
+      btnReset.addEventListener('click', resetAllFilters);
     }
 
     const modalCloseBtn = document.getElementById('modalCloseBtn');
@@ -1356,12 +1921,19 @@ if (typeof document !== 'undefined') {
     }
 
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') {
+        closeModal();
+        closeDownloadModal();
+      }
       if (e.key === '/' && document.activeElement !== input) {
-        const modal = document.getElementById('remedyModal');
-        if (modal && modal.classList.contains('open')) return;
+        const rModal = document.getElementById('remedyModal');
+        const dModal = document.getElementById('downloadModal');
+        if ((rModal && rModal.classList.contains('open')) || (dModal && dModal.classList.contains('open'))) return;
         e.preventDefault();
-        if (input) input.focus();
+        if (input) {
+          input.focus();
+          input.select();
+        }
       }
     });
   });
@@ -1373,5 +1945,17 @@ if (typeof window !== 'undefined') {
   window.closeModal = closeModal;
   window.switchLanguage = switchLanguage;
   window.runSearch = runSearch;
+  window.copySnippetQuote = copySnippetQuote;
+  window.copyRemedyDetails = copyRemedyDetails;
+  window.openDownloadModal = openDownloadModal;
+  window.closeDownloadModal = closeDownloadModal;
+  window.updateDownloadModalFiles = updateDownloadModalFiles;
+  window.toggleWorseChip = toggleWorseChip;
+  window.toggleBetterChip = toggleBetterChip;
+  window.clearCustomWorse = clearCustomWorse;
+  window.clearCustomBetter = clearCustomBetter;
+  window.clearSectionFilter = clearSectionFilter;
+  window.resetAllFilters = resetAllFilters;
+  window.showToast = showToast;
 }
 
