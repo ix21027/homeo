@@ -55,11 +55,11 @@
           autocomplete="off"
           spellcheck="false"
         />
-        <button id="btnClear" class="btn-clear" title="Очистити">✕</button>
+        <button type="button" id="btnClear" class="btn-clear" title="Очистити" aria-label="Очистити">✕</button>
       </div>
 
       <div class="search-toggle-bar">
-        <button type="button" id="btnToggleAdvanced" class="btn-toggle-advanced" aria-expanded="false">
+        <button type="button" id="btnToggleAdvanced" class="btn-toggle-advanced" aria-expanded="false" aria-controls="advancedPanel">
           <span class="adv-icon">⚙️</span>
           <span id="txtAdvToggle">Розширений пошук та модальності</span>
           <span class="adv-badge" id="advFiltersBadge" style="display: none;">0</span>
@@ -136,11 +136,11 @@
   </main>
 
   <!-- Detailed Remedy Modal -->
-  <div class="modal-overlay" id="remedyModal" role="dialog" aria-modal="true">
+  <div class="modal-overlay" id="remedyModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-title" id="modalTitle">Препарат</div>
-        <button class="modal-close" id="modalCloseBtn" aria-label="Закрити">✕</button>
+        <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Закрити" title="Закрити">✕</button>
       </div>
       <div class="modal-body" id="modalBody">
         <!-- Injected via JavaScript -->

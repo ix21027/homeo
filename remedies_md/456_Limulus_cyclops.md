@@ -1,4 +1,4 @@
-# Limulus cycloрs
+# Limulus cyclops
 
 **Українська назва:** Лімулюс циклопс
 

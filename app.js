@@ -7,9 +7,17 @@
 
 let currentLang = 'ua';
 try {
-  const savedLang = localStorage.getItem('homeo_lang');
-  if (savedLang === 'ru' || savedLang === 'ua') {
-    currentLang = savedLang;
+  if (typeof window !== 'undefined' && window.location) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlLang = urlParams.get('lang');
+    if (urlLang === 'ru' || urlLang === 'ua') {
+      currentLang = urlLang;
+    } else {
+      const savedLang = localStorage.getItem('homeo_lang');
+      if (savedLang === 'ru' || savedLang === 'ua') {
+        currentLang = savedLang;
+      }
+    }
   }
 } catch (e) {}
 
@@ -37,15 +45,20 @@ const filterState = {
 const I18N = {
   ua: {
     pageTitle: 'Materia Medica — Пошуковий Реперторій (Джон Генрі Кларк)',
+    pageDescription: 'База даних гомеопатичних препаратів Materia Medica з повнотекстовим розумним пошуком симптомів та модальностей. Працює на GitHub Pages.',
     headerTitle: '🌿 Materia Medica',
     headerSubtitle: 'Пошуковий гомеопатичний реперторій: 341 препарат, 11 770+ симптомів за капітальною працею <em>Джона Генрі Кларка</em>.',
     dlDb: 'База SQLite (.db)',
     dlJson: 'Дані JSON (.json)',
     dlCsv: 'Таблиця CSV (.csv)',
+    dlDbTitle: 'Завантажити базу даних SQLite',
+    dlJsonTitle: 'Завантажити повний файл JSON',
+    dlCsvTitle: 'Завантажити таблицю CSV для Excel',
     dlDbFile: 'materia_medica_ua.db',
     dlJsonFile: 'materia_medica_ua.json',
     dlCsvFile: 'materia_medica_ua.csv',
     searchPlaceholder: 'Введіть симптом, наприклад: ячмінь на правій нижній повіці, біль у попереку...',
+    btnClearTitle: 'Очистити',
     advToggle: 'Розширений пошук та модальності',
     lblWorse: 'Погіршення (гірше від):',
     lblBetter: 'Покращення (краще від):',
@@ -116,19 +129,26 @@ const I18N = {
     modalSynonyms: 'Синоніми:',
     modalIntro: 'Опис і технологія приготування',
     modalSource: 'Джерело:',
+    modalClose: 'Закрити',
+    modalError: 'Не вдалося відкрити опис:',
     footerText: 'База даних створена на основі архіву <strong>homeopat-sam.com</strong> (Materia Medica, 2018). Повністю автономний клієнтський застосунок для <strong>GitHub Pages</strong>.'
   },
   ru: {
     pageTitle: 'Materia Medica — Поисковый Реперторий (Джон Генри Кларк)',
+    pageDescription: 'База данных гомеопатических препаратов Materia Medica с полнотекстовым умным поиском симптомов и модальностей. Работает на GitHub Pages.',
     headerTitle: '🌿 Materia Medica',
     headerSubtitle: 'Поисковый гомеопатический реперторий: 341 препарат, 11 770+ симптомов по фундаментальному труду <em>Джона Генри Кларка</em>.',
     dlDb: 'База SQLite (.db)',
     dlJson: 'Данные JSON (.json)',
     dlCsv: 'Таблица CSV (.csv)',
+    dlDbTitle: 'Скачать базу данных SQLite',
+    dlJsonTitle: 'Скачать полный файл JSON',
+    dlCsvTitle: 'Скачать таблицу CSV для Excel',
     dlDbFile: 'materia_medica_ru.db',
     dlJsonFile: 'materia_medica_ru.json',
     dlCsvFile: 'materia_medica_ru.csv',
     searchPlaceholder: 'Введите симптом, например: ячмень на правом нижнем веке, боль в пояснице...',
+    btnClearTitle: 'Очистить',
     advToggle: 'Расширенный поиск и модальности',
     lblWorse: 'Ухудшение (хуже от):',
     lblBetter: 'Улучшение (лучше от):',
@@ -199,6 +219,8 @@ const I18N = {
     modalSynonyms: 'Синонимы:',
     modalIntro: 'Описание и технология приготовления',
     modalSource: 'Источник:',
+    modalClose: 'Закрыть',
+    modalError: 'Не удалось открыть описание:',
     footerText: 'База данных создана на основе архива <strong>homeopat-sam.com</strong> (Materia Medica, 2018). Полностью автономное клиентское приложение для <strong>GitHub Pages</strong>.'
   }
 };
@@ -217,12 +239,15 @@ function normalizeCyrillic(str) {
 }
 
 function stemUkrainian(word) {
-  let w = word.toLowerCase().trim();
+  let w = word.toLowerCase().trim().replace(/[’ʼ]/g, "'");
   if (w.length <= 2) return w;
 
   // Alternations
   w = w.replace(/мінь$/g, 'мен');
   w = w.replace(/біль$/g, 'бол');
+  w = w.replace(/кашель$/g, 'кашл');
+  w = w.replace(/палець$/g, 'пальц');
+  w = w.replace(/живіт$/g, 'живот');
   w = w.replace(/очі$/g, 'оч');
   w = w.replace(/око$/g, 'ок');
   w = w.replace(/вусі$/g, 'вух');
@@ -233,7 +258,7 @@ function stemUkrainian(word) {
   w = w.replace(/печінці$/g, 'печінк');
   w = w.replace(/нирці$/g, 'нирк');
 
-  w = w.replace(/(ому|ими|ого|ою|ею|ям|ами|ях|ах|ів|ей|ий|ій|им|ім|ати|яти|увати|ювати|ються|тися|лося|лася|лось|лись|уть|ють|ять|ить|ешь|ете|имо|емо|ємо|ння|ення|ість|ості|івна|ович|а|я|у|ю|е|є|і|и|о|й)$/g, '');
+  w = w.replace(/(увального|увальному|увальний|увальна|увальне|увальні|увальних|увальними|увальник|ування|уванні|увань|уючий|уюча|уюче|уючі|уючих|уючими|уючим|ючий|юча|юче|ючі|ючих|ючими|ючим|ячий|яча|яче|ячі|ячих|ячими|ячим|ачий|ача|аче|ачі|ачих|ачими|ачим|ому|ими|ого|ою|ею|ям|ами|ях|ах|ів|ей|ий|ій|им|ім|ати|яти|увати|ювати|ються|ється|тися|лося|лася|лось|лись|уть|ють|ять|ить|ешь|ете|имо|емо|ємо|ння|ення|ість|ості|істю|івна|ович|а|я|у|ю|е|є|і|и|о|й)$/g, '');
   if (w.endsWith('ц') && w.length > 3) {
     w = w.slice(0, -1) + 'к';
   }
@@ -243,7 +268,11 @@ function stemUkrainian(word) {
 function stemRussian(word) {
   let w = word.toLowerCase().trim();
   if (w.length <= 2) return w;
-  w = w.replace(/(ому|ыми|ими|ого|его|ому|ему|ых|их|ую|юю|ою|ею|ям|ами|ях|ах|ов|ев|ей|ий|ый|ой|ем|им|ам|ать|ять|еть|ить|уть|ишь|ешь|ете|ите|ут|ют|ат|ят|ся|сь|ло|ла|ли|лось|лась|лись|ение|ения|ением|ость|ости|а|я|у|ю|е|и|ы|о)$/g, '');
+
+  w = w.replace(/кашель$/g, 'кашл');
+  w = w.replace(/палец$/g, 'пальц');
+
+  w = w.replace(/(ующего|ующему|ующим|ующих|ующем|ующая|ующее|ующие|ующей|ующею|ующую|ующий|ющего|ющему|ющим|ющих|ющем|ющая|ющее|щие|щей|щею|щую|щий|ящего|ящему|ящим|ящих|ящем|ящая|ящее|ящие|ящей|ящею|ящую|ящий|ащего|ащему|ащим|ащих|ащем|ащая|ащее|ащие|ащей|ащею|ащую|ащий|ившего|ившему|ившим|ивших|ившем|ившая|ившее|ившие|ившей|ившею|ившую|ивший|авшего|авшему|авшим|авших|авшем|авшая|авшее|авшие|авшей|авшею|авшую|авший|явшего|явшему|явшим|явших|явшем|явшая|явшее|явшие|явшей|явшею|явшую|явший|ому|ыми|ими|ого|его|ему|ых|их|ую|юю|ою|ею|ям|ами|ях|ах|ов|ев|ей|ий|ый|ой|ем|им|ам|ать|ять|еть|ить|уть|ишь|ешь|ете|ите|ут|ют|ат|ят|ет|ит|ся|сь|ло|ла|ли|лось|лась|лись|ение|ения|ением|ость|ости|остью|а|я|у|ю|е|и|ы|о)$/g, '');
   return w;
 }
 
@@ -260,14 +289,19 @@ const THESAURUS = {
   'ячмін': ['ячмен', 'ячмін'],
   'повік': ['повік', 'повіц', 'век'],
   'повіц': ['повік', 'повіц', 'век'],
+  'век': ['век', 'повік', 'повіц'],
   'оч': ['оч', 'ок', 'глаз'],
   'ок': ['оч', 'ок', 'глаз'],
   'глаз': ['глаз', 'оч', 'ок'],
-  'век': ['век', 'повік', 'повіц'],
   'зіниц': ['зрачок', 'зрачк'],
   'сльозотеч': ['слезотечен', 'слез'],
   'світлобоязн': ['светобоязн', 'свет'],
   'халязіон': ['халазион'],
+  'прав': ['прав'],
+  'лів': ['лів', 'лев'],
+  'лев': ['лев', 'лів'],
+  'верхн': ['верхн'],
+  'нижн': ['нижн'],
 
   // Head, Brain & Senses
   'головн': ['головн', 'голов'],
@@ -283,13 +317,22 @@ const THESAURUS = {
   // Pain & Sensations
   'бол': ['бол', 'біль', 'болезнен'],
   'біль': ['бол', 'біль'],
-  'колюч': ['колющ', 'кол'],
+  'колюч': ['колющ', 'кол', 'коле', 'колюч'],
+  'колющ': ['колющ', 'колюч', 'кол', 'коле'],
+  'кол': ['кол', 'колюч', 'колющ', 'коле'],
   'пекуч': ['жгуч', 'жжен'],
   'ніюч': ['ноющ', 'ной'],
-  'стріляюч': ['стреляющ', 'стрел'],
+  'стріл': ['стріл', 'стрел', 'стріля', 'стреля', 'стріляюч', 'стреляющ'],
+  'стрел': ['стрел', 'стріл', 'стреля', 'стріля', 'стреляющ', 'стріляюч'],
+  'стріля': ['стріля', 'стреля', 'стріл', 'стрел', 'стріляюч', 'стреляющ'],
+  'стреля': ['стреля', 'стріля', 'стрел', 'стріл', 'стреляющ', 'стріляюч'],
+  'стріляюч': ['стреляющ', 'стрел', 'стріл', 'стріля'],
   'стискаюч': ['сжимающ', 'сжим'],
   'розпираюч': ['распирающ', 'распир'],
-  'тягнуч': ['тянущ', 'тян'],
+  'тягнуч': ['тянущ', 'тян', 'тягн'],
+  'тян': ['тян', 'тягн', 'тянущ', 'тягнуч'],
+  'тягн': ['тягн', 'тян', 'тягнуч', 'тянущ'],
+  'дав': ['дав', 'давит', 'тиск', 'давлен', 'надавл'],
   'онімін': ['онеменен', 'неме'],
   'поколюван': ['покалыван', 'кол'],
   'свербіж': ['зуд', 'чес'],
@@ -299,16 +342,27 @@ const THESAURUS = {
   'слабк': ['слабост', 'слаб', 'упадок'],
   'виснажен': ['истощен'],
   'втом': ['усталост', 'утомлен'],
+  'відда': ['відда', 'отда', 'ірраді', 'ирради'],
+  'отда': ['отда', 'відда', 'ирради', 'ірраді'],
 
   // Respiratory & Throat
-  'задишк': ['одышк', 'удушь', 'дыхан'],
-  'задух': ['удушь', 'одышк', 'дыхан'],
-  'одышк': ['одышк', 'удушь', 'задишк'],
-  'кашл': ['кашл'],
+  'задишк': ['одышк', 'удушь', 'дыхан', 'дихан'],
+  'задух': ['удушь', 'одышк', 'дыхан', 'дихан'],
+  'одышк': ['одышк', 'удушь', 'задишк', 'дыхан', 'дихан'],
+  'кашл': ['кашл', 'кашел'],
+  'кашел': ['кашл', 'кашел'],
+  'гавк': ['гавк', 'лающ', 'лаю'],
+  'лающ': ['лающ', 'гавк', 'лаю'],
+  'лаю': ['лаю', 'лающ', 'гавк'],
+  'хрип': ['хрип', 'охрип', 'сип', 'осип', 'хрипл', 'хриплы'],
+  'сип': ['сип', 'осип', 'хрип', 'охрип'],
+  'мокрот': ['мокрот', 'харкотин'],
+  'харкотин': ['харкотин', 'мокрот'],
   'горл': ['горл', 'глотк', 'гортан'],
   'мигдалик': ['миндалин'],
   'леген': ['легк'],
   'груд': ['груд'],
+  'сух': ['сух'],
 
   // Digestive & Abdominal
   'шлунк': ['желудок', 'желудочн'],
@@ -338,13 +392,15 @@ const THESAURUS = {
   // Back & Musculoskeletal
   'спин': ['спин'],
   'поперек': ['поперек', 'поясниц', 'поясничн', 'крестц'],
-  'поясниц': ['поясниц', 'поперек'],
-  'хребет': ['позвоночник', 'позвоноч'],
+  'поясниц': ['поясниц', 'поперек', 'крестц'],
+  'хребет': ['позвоночник', 'позвоноч', 'хребт'],
+  'позвоноч': ['позвоноч', 'хребет', 'хребт'],
   'куприк': ['копчик'],
   'суглоб': ['сустав'],
   'сустав': ['сустав', 'суглоб'],
-  'м яз': ['мышц'],
-  'мышц': ['мышц', 'м яз'],
+  "м'яз": ["м'яз", 'мяз', 'мышц', 'м яз'],
+  'мяз': ['мяз', "м'яз", 'мышц', 'м яз'],
+  'мышц': ['мышц', "м'яз", 'мяз', 'м яз'],
   'кістк': ['кост'],
   'кост': ['кост', 'кістк'],
   'стегн': ['стегн', 'бедр'],
@@ -352,10 +408,18 @@ const THESAURUS = {
   'колін': ['колен'],
   'литок': ['икр'],
   'стоп': ['стоп'],
-  'п ят': ['пятк'],
+  "п'ят": ["п'ят", 'пят', 'пятк'],
+  'пят': ['пят', "п'ят", 'пятк'],
+  'пятк': ['пятк', "п'ят", 'пят'],
   'кінцівк': ['конечност'],
   'рук': ['рук'],
   'пальц': ['пальц'],
+
+  // Kidneys & Urinary
+  'нирк': ['нирк', 'почк'],
+  'почк': ['почк', 'нирк'],
+  'сеч': ['сеч', 'моч'],
+  'моч': ['моч', 'сеч'],
 
   // Modalities terms
   'холод': ['холод'],
@@ -374,18 +438,29 @@ const THESAURUS = {
   'прикосновен': ['дотик', 'прикосновен'],
   'повітр': ['воздух', 'повітр'],
   'воздух': ['повітр', 'воздух'],
-  'тиск': ['давлен', 'надавл', 'тиск'],
-  'давлен': ['тиск', 'надавл', 'давлен']
+  'тиск': ['давлен', 'надавл', 'тиск', 'дав'],
+  'давлен': ['тиск', 'надавл', 'давлен', 'дав']
 };
 
 function expandWordToPatterns(word) {
-  const wLower = word.toLowerCase().trim();
+  const wLower = word.toLowerCase().trim().replace(/[’ʼ]/g, "'");
+  if (wLower.length <= 1) return [];
+
   const stUa = stemUkrainian(wLower);
   const stRu = stemRussian(wLower);
   const st = stUa.length <= stRu.length ? stUa : stRu;
 
   const stNorm = normalizeCyrillic(st);
   const equivs = new Set([wLower, st, stNorm, stUa, stRu]);
+
+  if (wLower.includes("'")) {
+    equivs.add(wLower.replace(/'/g, ''));
+    equivs.add(wLower.replace(/'/g, ' '));
+  }
+  if (st.includes("'")) {
+    equivs.add(st.replace(/'/g, ''));
+    equivs.add(st.replace(/'/g, ' '));
+  }
 
   // Ukrainian vowel & consonant palatalization
   if (st.includes('повік')) equivs.add('повіц');
@@ -402,7 +477,10 @@ function expandWordToPatterns(word) {
   if (st.includes('вус')) { equivs.add('вух'); equivs.add('вуш'); }
 
   for (const [key, list] of Object.entries(THESAURUS)) {
-    if (st === key || st.startsWith(key) || key.startsWith(st)) {
+    const keyMatch = st === key || stUa === key || stRu === key ||
+                     st.startsWith(key) ||
+                     (st.length >= 3 && key.startsWith(st));
+    if (keyMatch) {
       list.forEach(item => {
         equivs.add(item);
         equivs.add(normalizeCyrillic(item));
@@ -414,11 +492,14 @@ function expandWordToPatterns(word) {
 }
 
 function expandQueryToConcepts(query) {
-  const words = query.match(/[A-Za-zА-Яа-яІіЇїЄєҐґ0-9]+/g) || [];
+  const normalizedQuery = (query || '').replace(/[’ʼ]/g, "'");
+  const words = normalizedQuery.match(/[A-Za-zА-Яа-яІіЇїЄєҐґ0-9']+/g) || [];
   const concepts = [];
-  const stopWords = new Set(['в', 'у', 'на', 'та', 'і', 'й', 'до', 'від', 'при', 'що', 'як', 'під', 'час', 'для', 'по', 'за', 'над', 'из', 'от', 'к', 'с', 'со']);
+  const stopWords = new Set(['в', 'у', 'на', 'та', 'і', 'й', 'до', 'від', 'при', 'що', 'як', 'під', 'час', 'для', 'по', 'за', 'над', 'из', 'от', 'к', 'с', 'со', 'о', 'об']);
 
-  for (const w of words) {
+  for (const rawW of words) {
+    const w = rawW.replace(/^'+|'+$/g, '');
+    if (w.length <= 1) continue;
     if (stopWords.has(w.toLowerCase())) continue;
     const patterns = expandWordToPatterns(w);
     if (patterns.length > 0) {
@@ -637,7 +718,10 @@ function searchRemedies(query) {
             }
 
             const sUpper = secName.toUpperCase();
-            if ((sUpper.includes('ОЧ') || sUpper.includes('ГЛАЗ')) && (qTrim.includes('оч') || qTrim.includes('повік') || qTrim.includes('повіц') || qTrim.includes('ячм') || qTrim.includes('век') || qTrim.includes('ячмен'))) {
+            const matchesSecConcept = concepts.some(c =>
+              c.patterns.some(p => p.length >= 3 && sUpper.includes(p.toUpperCase()))
+            );
+            if (matchesSecConcept || ((sUpper.includes('ОЧ') || sUpper.includes('ГЛАЗ')) && (qTrim.includes('оч') || qTrim.includes('повік') || qTrim.includes('повіц') || qTrim.includes('ячм') || qTrim.includes('век') || qTrim.includes('ячмен')))) {
               score += 500;
             }
 
@@ -652,7 +736,7 @@ function searchRemedies(query) {
       }
     }
 
-    if (hasQuery && bestScore === 0 && remedy.clin) {
+    if (hasQuery && bestScore === 0 && remedy.clin && (!sectionFilterRegex || sectionFilterRegex.test('КЛІНІКА') || sectionFilterRegex.test('КЛИНИКА'))) {
       const cLower = remedy.clin.toLowerCase();
       let clinMatches = 0;
       for (const c of concepts) {
@@ -714,15 +798,15 @@ function highlightSnippet(sentence, matchedPatterns) {
   if (!sentence) return '';
   let safe = sentence.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-  const sorted = [...new Set(matchedPatterns || [])].sort((a, b) => b.length - a.length);
+  const sorted = [...new Set(matchedPatterns || [])]
+    .filter(p => p && p.length >= 2)
+    .sort((a, b) => b.length - a.length);
 
-  for (const pat of sorted) {
-    if (pat.length < 2) continue;
-    const regex = new RegExp(`(${pat}[а-яёїіє]*)`, 'gi');
-    safe = safe.replace(regex, '<mark class="hl-primary">$1</mark>');
-  }
+  if (sorted.length === 0) return safe;
 
-  return safe;
+  const escaped = sorted.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const regex = new RegExp(`(?<=^|[^а-яёїієґa-z0-9])(${escaped.join('|')})[а-яёїієґa-z0-9'’]*`, 'gi');
+  return safe.replace(regex, (match) => `<mark class="hl-primary">${match}</mark>`);
 }
 
 // ==========================================
@@ -731,7 +815,12 @@ function highlightSnippet(sentence, matchedPatterns) {
 function updateUILanguage() {
   const t = I18N[currentLang];
   document.title = t.pageTitle;
-  document.documentElement.lang = currentLang;
+  document.documentElement.lang = currentLang === 'ua' ? 'uk' : 'ru';
+
+  const metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc && t.pageDescription) {
+    metaDesc.setAttribute('content', t.pageDescription);
+  }
 
   const titleEl = document.getElementById('headerTitle');
   if (titleEl) titleEl.innerHTML = t.headerTitle;
@@ -742,6 +831,7 @@ function updateUILanguage() {
   if (dlDb) {
     dlDb.href = t.dlDbFile;
     dlDb.setAttribute('download', t.dlDbFile);
+    if (t.dlDbTitle) dlDb.title = t.dlDbTitle;
     const txtDb = document.getElementById('txtDlDb');
     if (txtDb) txtDb.innerText = t.dlDb;
   }
@@ -749,6 +839,7 @@ function updateUILanguage() {
   if (dlJson) {
     dlJson.href = t.dlJsonFile;
     dlJson.setAttribute('download', t.dlJsonFile);
+    if (t.dlJsonTitle) dlJson.title = t.dlJsonTitle;
     const txtJson = document.getElementById('txtDlJson');
     if (txtJson) txtJson.innerText = t.dlJson;
   }
@@ -756,12 +847,20 @@ function updateUILanguage() {
   if (dlCsv) {
     dlCsv.href = t.dlCsvFile;
     dlCsv.setAttribute('download', t.dlCsvFile);
+    if (t.dlCsvTitle) dlCsv.title = t.dlCsvTitle;
     const txtCsv = document.getElementById('txtDlCsv');
     if (txtCsv) txtCsv.innerText = t.dlCsv;
   }
 
   const searchInput = document.getElementById('searchInput');
   if (searchInput) searchInput.placeholder = t.searchPlaceholder;
+
+  const btnClear = document.getElementById('btnClear');
+  if (btnClear && t.btnClearTitle) {
+    btnClear.title = t.btnClearTitle;
+    btnClear.setAttribute('aria-label', t.btnClearTitle);
+  }
+
   const txtAdvToggle = document.getElementById('txtAdvToggle');
   if (txtAdvToggle) txtAdvToggle.innerText = t.advToggle;
 
@@ -796,6 +895,13 @@ function updateUILanguage() {
   }
 
   renderModalityChips();
+  updateFiltersBadge();
+
+  const modalCloseBtn = document.getElementById('modalCloseBtn');
+  if (modalCloseBtn && t.modalClose) {
+    modalCloseBtn.setAttribute('aria-label', t.modalClose);
+    modalCloseBtn.title = t.modalClose;
+  }
 
   const qLabel = document.getElementById('txtQuickLabel');
   if (qLabel) qLabel.innerText = t.quickLabel;
@@ -915,6 +1021,8 @@ async function loadDataset(lang) {
 
 async function switchLanguage(newLang) {
   if (newLang !== 'ua' && newLang !== 'ru') return;
+  if (newLang === currentLang && DATA_CACHE[currentLang]) return;
+  const oldLang = currentLang;
   currentLang = newLang;
   try {
     localStorage.setItem('homeo_lang', currentLang);
@@ -927,7 +1035,18 @@ async function switchLanguage(newLang) {
     await loadDataset(currentLang);
     updateUILanguage();
     const input = document.getElementById('searchInput');
-    const q = input ? input.value : '';
+    let q = input ? input.value.trim() : '';
+
+    // Smart query translation on language switch
+    if (q) {
+      const oldQueries = I18N[oldLang]?.quickQueries || [];
+      const newQueries = I18N[currentLang]?.quickQueries || [];
+      const matchIdx = oldQueries.findIndex(item => item.q.toLowerCase() === q.toLowerCase());
+      if (matchIdx !== -1 && newQueries[matchIdx]) {
+        q = newQueries[matchIdx].q;
+        if (input) input.value = q;
+      }
+    }
     runSearch(q);
   } catch (err) {
     console.error('Error switching language:', err);
@@ -956,7 +1075,10 @@ async function initApp() {
     }
   } catch (err) {
     if (loading) {
-      loading.innerHTML = `<p style="color: #dc2626; padding: 2rem;">Помилка завантаження бази даних: ${err.message}</p>`;
+      const errMsg = currentLang === 'ua'
+        ? `Помилка завантаження бази даних: ${err.message}`
+        : `Ошибка загрузки базы данных: ${err.message}`;
+      loading.innerHTML = `<p style="color: #dc2626; padding: 2rem;">${errMsg}</p>`;
     }
   }
 }
@@ -1066,13 +1188,16 @@ async function openRemedyModal(remedyId) {
   modalTitle.innerText = t.modalLoading;
   modalBody.innerHTML = '<div class="spinner"></div>';
   modal.classList.add('open');
+  if (typeof document !== 'undefined' && document.body) {
+    document.body.classList.add('modal-open');
+  }
 
   try {
     const filename = `data/remedies_${currentLang}/${remedyId}.json`;
     let res = await fetch(filename);
     if (!res.ok) {
       res = await fetch(`data/remedies/${remedyId}.json`);
-      if (!res.ok) throw new Error('Помилка завантаження файлу препарату');
+      if (!res.ok) throw new Error(currentLang === 'ua' ? 'Помилка завантаження файлу препарату' : 'Ошибка загрузки файла препарата');
     }
     const full = await res.json();
 
@@ -1080,7 +1205,7 @@ async function openRemedyModal(remedyId) {
 
     let html = '';
     if (full.image_url) {
-      html += `<div class="modal-img-wrap"><img src="${full.image_url}" alt="${full.latin_name}" onerror="this.style.display='none'"></div>`;
+      html += `<div class="modal-img-wrap"><img src="${full.image_url}" alt="${full.latin_name}" onerror="this.parentElement ? this.parentElement.remove() : (this.style.display='none')"></div>`;
     }
 
     if (full.common_name) {
@@ -1107,13 +1232,16 @@ async function openRemedyModal(remedyId) {
 
     modalBody.innerHTML = html;
   } catch (err) {
-    modalBody.innerHTML = `<p style="color: #dc2626;">Не вдалося відкрити опис: ${err.message}</p>`;
+    modalBody.innerHTML = `<p style="color: #dc2626;">${t.modalError || 'Не вдалося відкрити опис:'} ${escapeHtml(err.message)}</p>`;
   }
 }
 
 function closeModal() {
   const modal = document.getElementById('remedyModal');
   if (modal) modal.classList.remove('open');
+  if (typeof document !== 'undefined' && document.body) {
+    document.body.classList.remove('modal-open');
+  }
 }
 
 function escapeHtml(str) {
@@ -1230,9 +1358,20 @@ if (typeof document !== 'undefined') {
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeModal();
       if (e.key === '/' && document.activeElement !== input) {
+        const modal = document.getElementById('remedyModal');
+        if (modal && modal.classList.contains('open')) return;
         e.preventDefault();
         if (input) input.focus();
       }
     });
   });
 }
+
+// Global scope exports
+if (typeof window !== 'undefined') {
+  window.openRemedyModal = openRemedyModal;
+  window.closeModal = closeModal;
+  window.switchLanguage = switchLanguage;
+  window.runSearch = runSearch;
+}
+

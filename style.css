@@ -660,6 +660,10 @@ mark.hl-modifier {
 }
 
 /* Modal */
+body.modal-open {
+  overflow: hidden;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
