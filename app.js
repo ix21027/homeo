@@ -153,6 +153,9 @@ const I18N = {
     menuDlDb: 'Завантажити базу даних',
     menuDlDbSub: 'SQLite, JSON, CSV (UA / RU)',
     menuInfo: '🌿 <strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Працює автономно на GitHub Pages.',
+    remedyPickerLabel: 'Каталог препаратів (341):',
+    remedySelectPlaceholder: '— Оберіть препарат зі списку (341) щоб відкрити опис —',
+    btnReadRemedy: 'Читати опис',
     downloadMenuBtn: 'Завантажити БД',
     downloadMenuBadge: 'SQLite • JSON • CSV',
     dlModalTitle: '📥 Завантаження бази даних',
@@ -290,6 +293,9 @@ const I18N = {
     menuDlDb: 'Скачать базу данных',
     menuDlDbSub: 'SQLite, JSON, CSV (UA / RU)',
     menuInfo: '🌿 <strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Работает автономно на GitHub Pages.',
+    remedyPickerLabel: 'Каталог препаратов (341):',
+    remedySelectPlaceholder: '— Выберите препарат из списка (341) чтобы открыть описание —',
+    btnReadRemedy: 'Читать описание',
     downloadMenuBtn: 'Скачать БД',
     downloadMenuBadge: 'SQLite • JSON • CSV',
     dlModalTitle: '📥 Скачивание базы данных',
@@ -950,6 +956,13 @@ function updateUILanguage() {
   const txtMenuInfo = document.getElementById('txtMenuInfo');
   if (txtMenuInfo && t.menuInfo) txtMenuInfo.innerHTML = t.menuInfo;
 
+  // Remedy Quick Selector localization
+  const lblRemedySelect = document.getElementById('lblRemedySelect');
+  if (lblRemedySelect && t.remedyPickerLabel) lblRemedySelect.innerText = t.remedyPickerLabel;
+  const txtBtnReadRemedy = document.getElementById('txtBtnReadRemedy');
+  if (txtBtnReadRemedy && t.btnReadRemedy) txtBtnReadRemedy.innerText = t.btnReadRemedy;
+  populateRemedySelector();
+
   updateDownloadModalTexts();
   updateDownloadModalFiles(downloadModalLang);
 
@@ -1409,10 +1422,39 @@ async function switchLanguage(newLang) {
   }
 }
 
+function populateRemedySelector() {
+  const select = document.getElementById('selectRemedy');
+  if (!select || !remediesData || remediesData.length === 0) return;
+
+  const t = I18N[currentLang];
+  const sorted = [...remediesData].sort((a, b) => (a.latin || '').localeCompare(b.latin || ''));
+
+  const groups = {};
+  for (const r of sorted) {
+    const letter = (r.latin || '?')[0].toUpperCase();
+    if (!groups[letter]) groups[letter] = [];
+    groups[letter].push(r);
+  }
+
+  let html = `<option value="">${t.remedySelectPlaceholder || '— Оберіть препарат зі списку (341) щоб відкрити опис —'}</option>`;
+  for (const letter of Object.keys(groups).sort()) {
+    html += `<optgroup label="— ${letter} —">`;
+    for (const r of groups[letter]) {
+      const cyrText = r.cyr ? ` (${r.cyr})` : '';
+      const commonText = r.common ? ` — ${r.common}` : '';
+      html += `<option value="${r.id}">${escapeHtml(r.latin)}${escapeHtml(cyrText)}${escapeHtml(commonText)}</option>`;
+    }
+    html += `</optgroup>`;
+  }
+
+  select.innerHTML = html;
+}
+
 async function initApp() {
   const loading = document.getElementById('loadingIndicator');
   try {
     await loadDataset(currentLang);
+    populateRemedySelector();
     updateUILanguage();
     if (loading) loading.style.display = 'none';
 
@@ -1420,12 +1462,12 @@ async function initApp() {
     const urlParams = new URLSearchParams(window.location.search);
     const qParam = urlParams.get('q');
 
-    if (qParam) {
+    if (qParam && input) {
       input.value = qParam;
       runSearch(qParam);
     } else {
-      input.value = currentLang === 'ua' ? 'ячмінь на правій нижній повіці' : 'ячмень на правом нижнем веке';
-      runSearch(input.value);
+      if (input) input.value = '';
+      runSearch('');
     }
   } catch (err) {
     if (loading) {
@@ -1498,13 +1540,10 @@ function runSearch(query) {
     }
 
     return `
-      <article class="card ${isTop ? 'is-top-match' : ''}" data-id="${r.id}">
+      <article class="card ${isTop ? 'is-top-match' : ''}">
         <div class="card-header">
           <div class="card-title-group">
-            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-              <span class="rank-badge">${isTop ? t.cardRankTop : '#' + rank}</span>
-              ${isTop ? `<span class="badge-exact">${t.cardExactMatch}</span>` : ''}
-            </div>
+            ${isTop ? `<div style="margin-bottom: 0.35rem;"><span class="badge-exact">${t.cardExactMatch}</span></div>` : ''}
             <div>
               <span class="card-latin" onclick="openRemedyModal(${r.id})" style="cursor: pointer;" title="${t.cardBtnDetails}">${r.latin}</span>
               ${r.cyr ? `<span class="card-cyr">(${r.cyr})</span>` : ''}
@@ -1848,6 +1887,25 @@ if (typeof document !== 'undefined') {
           input.focus();
         }
         runSearch('');
+      });
+    }
+
+    // Direct Remedy Quick Selector wiring
+    const selectRemedy = document.getElementById('selectRemedy');
+    const btnOpenRemedy = document.getElementById('btnOpenSelectedRemedy');
+    if (selectRemedy) {
+      selectRemedy.addEventListener('change', (e) => {
+        const id = parseInt(e.target.value, 10);
+        if (btnOpenRemedy) btnOpenRemedy.disabled = !id;
+        if (id) {
+          openRemedyModal(id);
+        }
+      });
+    }
+    if (btnOpenRemedy) {
+      btnOpenRemedy.addEventListener('click', () => {
+        const id = parseInt(selectRemedy ? selectRemedy.value : 0, 10);
+        if (id) openRemedyModal(id);
       });
     }
 

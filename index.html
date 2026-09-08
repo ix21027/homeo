@@ -8,25 +8,15 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Materia Medica — Пошуковий Реперторій (Джон Генрі Кларк)</title>
   <meta name="description" content="База даних гомеопатичних препаратів Materia Medica з повнотекстовим розумним пошуком симптомів та модальностей. Працює на GitHub Pages.">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=3.2">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
 </head>
 <body>
 
   <header>
     <div class="header-inner">
-      <div class="header-title-row">
-        <div>
-          <h1 id="headerTitle">🌿 Materia Medica</h1>
-          <p class="header-subtitle" id="headerSubtitle">
-            Пошуковий гомеопатичний реперторій: 341 препарат, 11 770+ симптомів за капітальною працею <em>Джона Генрі Кларка</em>.
-          </p>
-          <div class="header-badges">
-            <span class="h-badge" id="hBadgeRemedies">🌿 341 препарат</span>
-            <span class="h-badge" id="hBadgeSymptoms">📖 11 771 симптом</span>
-            <span class="h-badge" id="hBadgeOffline">⚡ 100% Офлайн</span>
-          </div>
-        </div>
+      <div class="header-nav-bar">
+        <h1 id="headerTitle">🌿 Materia Medica</h1>
         <div class="header-right">
           <div class="top-menu-dropdown-wrapper" id="topMenuWrapper">
             <button type="button" class="btn-header-menu" id="btnHeaderMenu" aria-expanded="false" aria-haspopup="true" title="Меню та налаштування">
@@ -87,10 +77,37 @@
           </div>
         </div>
       </div>
+
+      <p class="header-subtitle" id="headerSubtitle">
+        Пошуковий гомеопатичний реперторій: 341 препарат, 11 770+ симптомів за капітальною працею <em>Джона Генрі Кларка</em>.
+      </p>
+      <div class="header-badges">
+        <span class="h-badge" id="hBadgeRemedies">🌿 341 препарат</span>
+        <span class="h-badge" id="hBadgeSymptoms">📖 11 771 симптом</span>
+        <span class="h-badge" id="hBadgeOffline">⚡ 100% Офлайн</span>
+      </div>
     </div>
   </header>
 
   <main>
+    <!-- Direct Remedy Quick Selector (341 remedies) -->
+    <div class="remedy-picker-card" id="remedyPickerCard">
+      <div class="remedy-picker-header">
+        <span class="remedy-picker-icon">📖</span>
+        <label for="selectRemedy" class="remedy-picker-title" id="lblRemedySelect">Каталог препаратів (341):</label>
+      </div>
+      <div class="remedy-picker-body">
+        <div class="remedy-select-wrapper">
+          <select id="selectRemedy" class="remedy-select" aria-label="Оберіть конкретний препарат">
+            <option value="">— Оберіть препарат зі списку (341) щоб відкрити опис —</option>
+          </select>
+        </div>
+        <button type="button" id="btnOpenSelectedRemedy" class="btn-read-remedy" disabled title="Читати опис обраного препарату">
+          <span id="txtBtnReadRemedy">Читати опис</span> ➔
+        </button>
+      </div>
+    </div>
+
     <div class="search-box-card">
       <div class="search-input-wrapper">
         <span class="search-icon">🔍</span>
@@ -335,6 +352,6 @@ python3 search.py --id 18</code></pre>
     </p>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=3.2"></script>
 </body>
 </html>
