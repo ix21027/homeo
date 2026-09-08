@@ -2030,10 +2030,8 @@ function runSearch(query) {
     statusBar.innerHTML = t.statusFound.replace('{count}', results.length).replace('{time}', elapsed);
   }
 
-  const cardsHtml = results.map((item, index) => {
+  const cardsHtml = results.map((item) => {
     const r = item.remedy;
-    const rank = index + 1;
-    const isTop = (rank === 1 && item.score >= 1500);
     const highlighted = highlightSnippet(item.sentence, item.matchedPatterns);
 
     let modHtml = '';
@@ -2047,10 +2045,9 @@ function runSearch(query) {
     }
 
     return `
-      <article class="card ${isTop ? 'is-top-match' : ''}">
+      <article class="card">
         <div class="card-header">
           <div class="card-title-group">
-            ${isTop ? `<div style="margin-bottom: 0.35rem;"><span class="badge-exact">${t.cardExactMatch}</span></div>` : ''}
             <div>
               <span class="card-latin" onclick="openRemedyModal(${r.id})" style="cursor: pointer;" title="${t.cardBtnDetails}">${r.latin}</span>
               ${r.cyr ? `<span class="card-cyr">(${r.cyr})</span>` : ''}

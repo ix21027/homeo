@@ -997,11 +997,6 @@ main {
   border-color: #cbd5e1;
 }
 
-.card.is-top-match {
-  border: 2px solid #22c55e;
-  background: linear-gradient(to right, #f0fdf4, #ffffff);
-}
-
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -1024,11 +1019,6 @@ main {
   background: #e2e8f0;
   color: #475569;
   margin-bottom: 0.35rem;
-}
-
-.is-top-match .rank-badge {
-  background: #22c55e;
-  color: white;
 }
 
 .card-latin {
@@ -1057,19 +1047,6 @@ main {
   gap: 0.35rem;
 }
 
-.badge-exact {
-  background: #dcfce7;
-  color: #15803d;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.25rem 0.6rem;
-  border-radius: 20px;
-  border: 1px solid #86efac;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
 .badge-section {
   background: #f1f5f9;
   color: #475569;
@@ -1089,11 +1066,6 @@ main {
   font-size: 0.95rem;
   color: #334155;
   line-height: 1.5;
-}
-
-.is-top-match .snippet-box {
-  border-left-color: #22c55e;
-  background: #ffffff;
 }
 
 mark.hl-primary {
@@ -2049,11 +2021,6 @@ footer {
   .rank-badge {
     font-size: 0.72rem;
     padding: 0.18rem 0.45rem;
-  }
-
-  .badge-exact {
-    font-size: 0.72rem;
-    padding: 0.18rem 0.5rem;
   }
 
   .card-latin {
