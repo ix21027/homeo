@@ -780,22 +780,28 @@ header {
 }
 
 /* Language Selection Options */
+.menu-lang-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.25rem;
+}
+
 .menu-lang-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  display: flex;
+  gap: 5px;
 }
 
 .menu-lang-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.55rem 0.75rem;
-  border-radius: 8px;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
   border: 1px solid #e2e8f0;
   background: #f8fafc;
   color: #475569;
-  font-size: 0.95rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   cursor: pointer;
