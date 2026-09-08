@@ -21,6 +21,33 @@ try {
   }
 } catch (e) {}
 
+// ===== DARK THEME =====
+(function initTheme() {
+  try {
+    const saved = localStorage.getItem('homeo_theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && prefersDark)) {
+      document.body.classList.add('dark');
+    }
+  } catch (e) {}
+})();
+
+function toggleTheme() {
+  const isDark = document.body.classList.toggle('dark');
+  try { localStorage.setItem('homeo_theme', isDark ? 'dark' : 'light'); } catch (e) {}
+  const btn = document.getElementById('btnThemeToggle');
+  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  const btn = document.getElementById('btnThemeToggle');
+  if (btn) {
+    // Sync icon on load
+    btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+    btn.addEventListener('click', toggleTheme);
+  }
+});
+
 const DATA_CACHE = {
   ua: null,
   ru: null
