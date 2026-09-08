@@ -22,12 +22,24 @@ try {
 } catch (e) {}
 
 // ===== DARK THEME =====
+function applyTheme(isDark) {
+  document.body.classList.toggle('dark', isDark);
+  const btn = document.getElementById('btnThemeToggle');
+  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+}
+
 (function initTheme() {
   try {
     const saved = localStorage.getItem('homeo_theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (saved === 'dark' || (!saved && prefersDark)) {
-      document.body.classList.add('dark');
+    const mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+    // Apply: saved override wins, otherwise follow system
+    applyTheme(saved === 'dark' || (saved !== 'light' && mq && mq.matches));
+    // React to system theme changes in real-time (if no manual override)
+    if (mq && mq.addEventListener) {
+      mq.addEventListener('change', function (e) {
+        const manualOverride = localStorage.getItem('homeo_theme');
+        if (!manualOverride) applyTheme(e.matches);
+      });
     }
   } catch (e) {}
 })();
@@ -42,11 +54,11 @@ function toggleTheme() {
 document.addEventListener('DOMContentLoaded', function () {
   const btn = document.getElementById('btnThemeToggle');
   if (btn) {
-    // Sync icon on load
     btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
     btn.addEventListener('click', toggleTheme);
   }
 });
+
 
 const DATA_CACHE = {
   ua: null,
