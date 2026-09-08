@@ -1484,6 +1484,7 @@ let selectedRemedyId = null;
 let activeSuggestionIndex = -1;
 let currentRemedySuggestions = [];
 let remedyAutocompleteInitialized = false;
+let unifiedSearchInitialized = false;
 
 function normalizeRemedyKey(str) {
   if (!str) return '';
