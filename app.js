@@ -25,7 +25,7 @@ try {
 function applyTheme(isDark) {
   document.body.classList.toggle('dark', isDark);
   const btn = document.getElementById('btnThemeToggle');
-  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+  if (btn) btn.textContent = isDark ? '🌙' : '☀️';
 }
 
 (function initTheme() {
@@ -48,13 +48,13 @@ function toggleTheme() {
   const isDark = document.body.classList.toggle('dark');
   try { localStorage.setItem('homeo_theme', isDark ? 'dark' : 'light'); } catch (e) {}
   const btn = document.getElementById('btnThemeToggle');
-  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+  if (btn) btn.textContent = isDark ? '🌙' : '☀️';
 }
 
 document.addEventListener('DOMContentLoaded', function () {
   const btn = document.getElementById('btnThemeToggle');
   if (btn) {
-    btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+    btn.textContent = document.body.classList.contains('dark') ? '🌙' : '☀️';
     btn.addEventListener('click', toggleTheme);
   }
 });
