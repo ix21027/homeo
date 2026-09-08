@@ -2194,8 +2194,8 @@ function runSearch(query) {
     if (statusBar) statusBar.innerHTML = t.statusNotFound;
     if (container) {
       container.innerHTML = `
-      <div style="text-align: center; padding: 3rem; background: white; border-radius: 12px; border: 1px solid #e2e8f0;">
-        <p style="font-size: 1.1rem; color: #64748b;">${t.statusNotFound}</p>
+      <div style="text-align: center; padding: 3rem; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border);">
+        <p style="font-size: 1.1rem; color: var(--text-muted);">${t.statusNotFound}</p>
       </div>`;
     }
     return;
@@ -2337,7 +2337,7 @@ function renderModalSections(remedy, category = 'all', query = '') {
 
   if (matchCount === 0) {
     html = `
-      <div style="text-align: center; padding: 2.5rem 1rem; background: #f8fafc; border-radius: 8px; border: 1px dashed var(--border); color: #64748b;">
+      <div style="text-align: center; padding: 2.5rem 1rem; background: var(--card-bg); border-radius: 8px; border: 1px dashed var(--border); color: var(--text-muted);">
         <p style="font-size: 1rem;">${t.statusNotFound}</p>
       </div>
     `;
