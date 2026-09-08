@@ -53,13 +53,15 @@ function stemUkrainian(word) {
 // ==========================================
 const THESAURUS = {
   // Eye & Eyelid
-  'ячмінь': ['ячмен'],
-  'ячмен': ['ячмен'],
-  'повік': ['век'],
-  'оч': ['глаз'],
-  'ок': ['глаз'],
-  'глаз': ['глаз', 'оч'],
-  'век': ['век', 'повік'],
+  'ячмінь': ['ячмен', 'ячмін'],
+  'ячмен': ['ячмен', 'ячмін'],
+  'ячмін': ['ячмен', 'ячмін'],
+  'повік': ['повік', 'повіц', 'век'],
+  'повіц': ['повік', 'повіц', 'век'],
+  'оч': ['оч', 'ок', 'глаз'],
+  'ок': ['оч', 'ок', 'глаз'],
+  'глаз': ['глаз', 'оч', 'ок'],
+  'век': ['век', 'повік', 'повіц'],
   'зіниц': ['зрачок', 'зрачк'],
   'сльозотеч': ['слезотечен', 'слез'],
   'світлобоязн': ['светобоязн', 'свет'],
@@ -268,17 +270,35 @@ function expandQueryToConcepts(query) {
   const stopWords = new Set(['в', 'у', 'на', 'та', 'і', 'й', 'до', 'від', 'при', 'що', 'як', 'під', 'час', 'для', 'по', 'за', 'над', 'из', 'от', 'к', 'с', 'со']);
 
   for (const w of words) {
-    if (stopWords.has(w.toLowerCase())) continue;
+    const wLower = w.toLowerCase();
+    if (stopWords.has(wLower)) continue;
     const st = stemUkrainian(w);
     if (st.length < 2) continue;
     const stNorm = normalizeCyrillic(st);
 
-    const equivs = new Set([st, stNorm]);
+    const equivs = new Set([st, stNorm, wLower]);
+
+    // Ukrainian consonant/vowel palatalization & root alternations
+    if (st.includes('повік')) equivs.add('повіц');
+    if (st.includes('повіц')) equivs.add('повік');
+    if (st.includes('ячмен')) equivs.add('ячмін');
+    if (st.includes('ячмін')) equivs.add('ячмен');
+    if (st.includes('бол')) equivs.add('біль');
+    if (st.includes('біль')) equivs.add('бол');
+    if (st.includes('рук')) { equivs.add('руц'); equivs.add('руч'); }
+    if (st.includes('руц')) { equivs.add('рук'); equivs.add('руч'); }
+    if (st.includes('ног')) { equivs.add('ноз'); equivs.add('нож'); }
+    if (st.includes('ноз')) { equivs.add('ног'); equivs.add('нож'); }
+    if (st.includes('вух')) { equivs.add('вус'); equivs.add('вуш'); }
+    if (st.includes('вус')) { equivs.add('вух'); equivs.add('вуш'); }
 
     // Check direct match in thesaurus
     for (const [tUkr, tRuList] of Object.entries(THESAURUS)) {
       if (st === tUkr || st.startsWith(tUkr) || tUkr.startsWith(st)) {
-        tRuList.forEach(item => equivs.add(item));
+        tRuList.forEach(item => {
+          equivs.add(item);
+          equivs.add(normalizeCyrillic(item));
+        });
       }
     }
 
@@ -372,7 +392,8 @@ function searchRemedies(query) {
             }
 
             // Section relevance bonus (e.g. eye terms in eye section)
-            if (secName.toUpperCase().includes('ГЛАЗ') && (qTrim.includes('оч') || qTrim.includes('повік') || qTrim.includes('ячм') || qTrim.includes('век') || qTrim.includes('ячмен'))) {
+            const sUpper = secName.toUpperCase();
+            if ((sUpper.includes('ОЧ') || sUpper.includes('ГЛАЗ')) && (qTrim.includes('оч') || qTrim.includes('повік') || qTrim.includes('ячм') || qTrim.includes('век') || qTrim.includes('ячмен'))) {
               score += 500;
             }
 
@@ -461,7 +482,7 @@ async function initApp() {
       input.value = qParam;
       runSearch(qParam);
     } else {
-      input.value = 'ячмінь на правому нижньому повіку';
+      input.value = 'ячмінь на правій нижній повіці';
       runSearch(input.value);
     }
   } catch (err) {

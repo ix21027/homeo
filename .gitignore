@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 *.log
 materia_medica_index.html
+cache_ua/
+ct2_ru_uk/
+

@@ -20,14 +20,14 @@
           </p>
         </div>
         <div class="downloads-bar">
-          <a href="materia_medica.db" class="btn-download" download title="Завантажити SQLite базу даних">
-            💾 SQLite DB (53 MB)
+          <a href="materia_medica_ua.db" class="btn-download" download="materia_medica_ua.db" title="Завантажити базу даних SQLite українською">
+            💾 База SQLite (.db)
           </a>
-          <a href="materia_medica.json" class="btn-download" download title="Завантажити повний JSON">
-            📄 JSON (26 MB)
+          <a href="materia_medica_ua.json" class="btn-download" download="materia_medica_ua.json" title="Завантажити повний файл JSON українською">
+            📄 Дані JSON (.json)
           </a>
-          <a href="materia_medica.csv" class="btn-download" download title="Завантажити CSV для Excel">
-            📊 CSV (6.5 MB)
+          <a href="materia_medica_ua.csv" class="btn-download" download="materia_medica_ua.csv" title="Завантажити таблицю CSV для Excel українською">
+            📊 Таблиця CSV (.csv)
           </a>
         </div>
       </div>
@@ -41,7 +41,7 @@
         <input 
           type="text" 
           id="searchInput" 
-          placeholder="Введіть симптом, наприклад: ячмень на правом нижнем веке..."
+          placeholder="Введіть симптом, наприклад: ячмінь на правій нижній повіці, біль у попереку..."
           autocomplete="off"
           spellcheck="false"
         />
@@ -50,23 +50,26 @@
 
       <div class="quick-queries">
         <span class="quick-label">Швидкі запити:</span>
-        <button class="chip chip-priority" data-query="ячмень на правом нижнем веке">
-          👁️ Ячмінь на правому нижньому повіку
+        <button class="chip chip-priority" data-query="ячмінь на правій нижній повіці">
+          👁️ Ячмінь на правій нижній повіці
         </button>
-        <button class="chip" data-query="ячмень на левом нижнем веке">
-          👁️ Ячмінь на лівому нижньому повіку
+        <button class="chip" data-query="ячмінь на лівій нижній повіці">
+          👁️ Ячмінь на лівій нижній повіці
         </button>
-        <button class="chip" data-query="ячмень на верхнем веке">
-          👁️ Ячмінь на верхньому повіку
+        <button class="chip" data-query="ячмінь на верхній повіці">
+          👁️ Ячмінь на верхній повіці
         </button>
-        <button class="chip" data-query="ячмень">
+        <button class="chip" data-query="ячмінь">
           💊 Всі згадки про ячмінь
         </button>
-        <button class="chip" data-query="мигрень">
-          ⚡ Мігрень
+        <button class="chip" data-query="біль у попереку що віддає в стегно">
+          ⚡ Біль у попереку що віддає в стегно
         </button>
-        <button class="chip" data-query="бронхит">
-          🫁 Бронхіт
+        <button class="chip" data-query="сухий гавкаючий кашель">
+          🫁 Сухий гавкаючий кашель
+        </button>
+        <button class="chip" data-query="запаморочення при вставанні">
+          🌀 Запаморочення при вставанні
         </button>
         <button class="chip" data-query="ревматизм">
           🦴 Ревматизм
