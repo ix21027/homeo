@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Materia Medica — Пошуковий Реперторій (Джон Генрі Кларк)</title>
+  <meta name="description" content="База даних гомеопатичних препаратів Materia Medica з повнотекстовим розумним пошуком симптомів та модальностей. Працює на GitHub Pages.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="header-title-row">
+        <div>
+          <h1>🌿 Materia Medica</h1>
+          <p class="header-subtitle">
+            Пошуковий гомеопатичний реперторій: 341 препарат, 11 770+ симптомів за капітальною працею <em>Джона Генрі Кларка</em>.
+          </p>
+        </div>
+        <div class="downloads-bar">
+          <a href="materia_medica.db" class="btn-download" download title="Завантажити SQLite базу даних">
+            💾 SQLite DB (53 MB)
+          </a>
+          <a href="materia_medica.json" class="btn-download" download title="Завантажити повний JSON">
+            📄 JSON (26 MB)
+          </a>
+          <a href="materia_medica.csv" class="btn-download" download title="Завантажити CSV для Excel">
+            📊 CSV (6.5 MB)
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="search-box-card">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Введіть симптом, наприклад: ячмень на правом нижнем веке..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button id="btnClear" class="btn-clear" title="Очистити">✕</button>
+      </div>
+
+      <div class="quick-queries">
+        <span class="quick-label">Швидкі запити:</span>
+        <button class="chip chip-priority" data-query="ячмень на правом нижнем веке">
+          👁️ Ячмінь на правому нижньому повіку
+        </button>
+        <button class="chip" data-query="ячмень на левом нижнем веке">
+          👁️ Ячмінь на лівому нижньому повіку
+        </button>
+        <button class="chip" data-query="ячмень на верхнем веке">
+          👁️ Ячмінь на верхньому повіку
+        </button>
+        <button class="chip" data-query="ячмень">
+          💊 Всі згадки про ячмінь
+        </button>
+        <button class="chip" data-query="мигрень">
+          ⚡ Мігрень
+        </button>
+        <button class="chip" data-query="бронхит">
+          🫁 Бронхіт
+        </button>
+        <button class="chip" data-query="ревматизм">
+          🦴 Ревматизм
+        </button>
+      </div>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+      Завантаження бази даних...
+    </div>
+
+    <div id="loadingIndicator" class="loading-indicator">
+      <div class="spinner"></div>
+      Ініціалізація гомеопатичної бази даних...
+    </div>
+
+    <div class="cards-list" id="cardsList"></div>
+  </main>
+
+  <!-- Detailed Remedy Modal -->
+  <div class="modal-overlay" id="remedyModal" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Препарат</div>
+        <button class="modal-close" id="modalCloseBtn" aria-label="Закрити">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      База даних створена на основі архіву <strong>homeopat-sam.com</strong> (Materia Medica, 2018).
+      Повністю автономний клієнтський застосунок для <strong>GitHub Pages</strong>.
+    </p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
