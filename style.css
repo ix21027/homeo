@@ -249,8 +249,14 @@ header {
   border-color: #a7f3d0;
 }
 
-.menu-flag {
-  font-size: 1.15rem;
+.menu-flag,
+.menu-flag-text {
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: #e2e8f0;
+  color: #334155;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
   line-height: 1;
 }
 
@@ -1482,9 +1488,20 @@ body.modal-open {
   box-shadow: 0 0 0 2px rgba(30, 96, 145, 0.2);
 }
 
-.dl-lang-flag {
-  font-size: 1.5rem;
+.dl-lang-flag,
+.dl-lang-badge {
+  font-size: 0.78rem;
+  font-weight: 800;
+  background: #e2e8f0;
+  color: #334155;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
   line-height: 1;
+}
+
+.dl-lang-card.active .dl-lang-badge {
+  background: var(--primary);
+  color: white;
 }
 
 .dl-lang-info {
@@ -1544,16 +1561,21 @@ body.modal-open {
   transform: translateY(-1px);
 }
 
-.dl-card-icon {
-  font-size: 2rem;
-  width: 48px;
-  height: 48px;
+.dl-card-icon,
+.dl-card-tag {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--primary);
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f1f5f9;
-  border-radius: 10px;
   flex-shrink: 0;
+  letter-spacing: 0.05em;
+  min-width: 52px;
 }
 
 .dl-card-info {

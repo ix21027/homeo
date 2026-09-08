@@ -49,7 +49,7 @@ const I18N = {
   ua: {
     pageTitle: 'Materia Medica — Пошуковий Реперторій (Джон Генрі Кларк)',
     pageDescription: 'База даних гомеопатичних препаратів Materia Medica з повнотекстовим розумним пошуком симптомів та модальностей. Працює на GitHub Pages.',
-    headerTitle: '🌿 Materia Medica',
+    headerTitle: 'Materia Medica',
     headerSubtitle: 'Пошуковий гомеопатичний реперторій: 341 препарат, 11 770+ симптомів за капітальною працею <em>Джона Генрі Кларка</em>.',
     dlDb: 'База SQLite (.db)',
     dlJson: 'Дані JSON (.json)',
@@ -66,84 +66,84 @@ const I18N = {
     lblWorse: 'Погіршення (гірше від):',
     lblBetter: 'Покращення (краще від):',
     worseChips: [
-      { id: 'холод', label: '❄️ Холоду', stem: 'холод' },
-      { id: 'тепло', label: '🔥 Тепла', stem: 'тепл' },
-      { id: 'сирість', label: '🌧️ Сирості', stem: 'сир' },
-      { id: 'протяг', label: '💨 Протягу / вітру', stem: 'протяг' },
-      { id: 'сонце', label: '☀️ Сонця / спеки', stem: 'сонц' },
-      { id: 'рух', label: '🏃 Руху', stem: 'рух' },
-      { id: 'ходьба', label: '🚶 При ходьбі', stem: 'ходьб' },
-      { id: 'спокій', label: '🛋️ Спокою', stem: 'спок' },
-      { id: 'лежачи', label: '🛏️ Лежачи', stem: 'лежа' },
-      { id: 'сидячи', label: '🪑 Сидячи', stem: 'сидя' },
-      { id: 'ніч', label: '🌙 Ночі', stem: 'ніч' },
-      { id: 'ранок', label: '🌅 Вранці', stem: 'ран' },
-      { id: 'вечір', label: '🌆 Увечері', stem: 'веч' },
-      { id: 'дотик', label: '👆 Дотику', stem: 'дотик' },
-      { id: 'їжа', label: '🍽️ Після їжі', stem: 'їж' },
-      { id: 'кава', label: '☕ Кави', stem: 'кав' },
-      { id: 'алкоголь', label: '🍷 Алкоголю', stem: 'вин' },
-      { id: 'купання', label: '🚿 Купання / води', stem: 'купан' },
-      { id: 'гроза', label: '⚡ Перед грозою', stem: 'гроз' },
-      { id: 'розмова', label: '💬 Розмови', stem: 'розмов' }
+      { id: 'холод', label: 'Холоду', stem: 'холод' },
+      { id: 'тепло', label: 'Тепла', stem: 'тепл' },
+      { id: 'сирість', label: 'Сирості', stem: 'сир' },
+      { id: 'протяг', label: 'Протягу / вітру', stem: 'протяг' },
+      { id: 'сонце', label: 'Сонця / спеки', stem: 'сонц' },
+      { id: 'рух', label: 'Руху', stem: 'рух' },
+      { id: 'ходьба', label: 'При ходьбі', stem: 'ходьб' },
+      { id: 'спокій', label: 'Спокою', stem: 'спок' },
+      { id: 'лежачи', label: 'Лежачи', stem: 'лежа' },
+      { id: 'сидячи', label: 'Сидячи', stem: 'сидя' },
+      { id: 'ніч', label: 'Ночі', stem: 'ніч' },
+      { id: 'ранок', label: 'Вранці', stem: 'ран' },
+      { id: 'вечір', label: 'Увечері', stem: 'веч' },
+      { id: 'дотик', label: 'Дотику', stem: 'дотик' },
+      { id: 'їжа', label: 'Після їжі', stem: 'їж' },
+      { id: 'кава', label: 'Кави', stem: 'кав' },
+      { id: 'алкоголь', label: 'Алкоголю', stem: 'вин' },
+      { id: 'купання', label: 'Купання / води', stem: 'купан' },
+      { id: 'гроза', label: 'Перед грозою', stem: 'гроз' },
+      { id: 'розмова', label: 'Розмови', stem: 'розмов' }
     ],
     betterChips: [
-      { id: 'тепло', label: '🔥 Тепла', stem: 'тепл' },
-      { id: 'холод', label: '❄️ Холоду', stem: 'холод' },
-      { id: 'повітря', label: '🍃 Свіжого повітря', stem: 'повітр' },
-      { id: 'спокій', label: '🛋️ Спокою', stem: 'спок' },
-      { id: 'рух', label: '🏃 Руху', stem: 'рух' },
-      { id: 'ходьба', label: '🚶 При ходьбі', stem: 'ходьб' },
-      { id: 'лежачи', label: '🛏️ Лежачи', stem: 'лежа' },
-      { id: 'тиск', label: '💆 Натискання / тиску', stem: 'тиск' },
-      { id: 'розтирання', label: '🤲 Розтирання / масажу', stem: 'розтиран' },
-      { id: 'сон', label: '💤 Після сну', stem: 'сон' },
-      { id: 'їжа', label: '🍲 Після їжі', stem: 'їж' },
-      { id: 'холодне_пиття', label: '🥤 Холодного пиття', stem: 'холодн' },
-      { id: 'піт', label: '💧 Виділення поту', stem: 'пот' },
-      { id: 'відрижка', label: '💨 Відходження газів', stem: 'відрижк' }
+      { id: 'тепло', label: 'Тепла', stem: 'тепл' },
+      { id: 'холод', label: 'Холоду', stem: 'холод' },
+      { id: 'повітря', label: 'Свіжого повітря', stem: 'повітр' },
+      { id: 'спокій', label: 'Спокою', stem: 'спок' },
+      { id: 'рух', label: 'Руху', stem: 'рух' },
+      { id: 'ходьба', label: 'При ходьбі', stem: 'ходьб' },
+      { id: 'лежачи', label: 'Лежачи', stem: 'лежа' },
+      { id: 'тиск', label: 'Натискання / тиску', stem: 'тиск' },
+      { id: 'розтирання', label: 'Розтирання / масажу', stem: 'розтиран' },
+      { id: 'сон', label: 'Після сну', stem: 'сон' },
+      { id: 'їжа', label: 'Після їжі', stem: 'їж' },
+      { id: 'холодне_пиття', label: 'Холодного пиття', stem: 'холодн' },
+      { id: 'піт', label: 'Виділення поту', stem: 'пот' },
+      { id: 'відрижка', label: 'Відходження газів', stem: 'відрижк' }
     ],
     inputWorsePlaceholder: 'Власне погіршення (напр. протяг, о 3 ночі, купання)...',
     inputBetterPlaceholder: 'Власне покращення (напр. гарячий чай, лежачи на боці)...',
-    lblSection: '📍 Рубрика / Орган:',
+    lblSection: 'Рубрика / Орган:',
     sections: [
       { val: '', text: 'Усі органи та розділи' },
-      { val: 'ОЧІ|ГЛАЗА', text: '👁️ Очі та зір' },
-      { val: 'ГОЛОВА', text: '🧠 Голова, мозок, запаморочення' },
-      { val: 'ДИХАЛЬНА|ДЫХАТЕЛЬНАЯ|КАШЕЛЬ', text: '🫁 Дихальна система, кашель, груди' },
-      { val: 'СЕРЦЕ|СЕРДЦЕ', text: '❤️ Серце та кровообіг' },
-      { val: 'ЖЕЛУДОК|ШЛУНОК|ЖКТ|ЖИВОТ', text: '🥣 Шлунок, живіт, травлення' },
-      { val: 'СПИНА|ПОЗВОНОЧНИК|ХРЕБЕТ', text: '🦴 Спина, хребет, поперек' },
-      { val: "СУСТАВЫ|СУГЛОБИ|МЫШЦЫ|М'ЯЗИ|КОНЕЧНОСТИ|КІНЦІВКИ", text: '💪 М\'язи, суглоби, кінцівки' },
-      { val: 'КОЖА|ШКІРА', text: '🩹 Шкіра, висипання, свербіж' },
-      { val: 'МОЧЕВЫДЕЛИТЕЛЬНАЯ|СЕЧОВИВІДНА', text: '💧 Сечовидільна система та нирки' },
-      { val: 'ПСИХИКА|ПСИХІКА', text: '🧘 Психіка, емоції, страхи' },
-      { val: 'ЛИХОРАДКА|ЛИХОМАНКА|ПОТ|ПІТ', text: '🌡️ Лихоманка, жар, піт' },
-      { val: 'КЛИНИКА|КЛІНІКА', text: '📋 Клінічні діагнози / нозології' }
+      { val: 'ОЧІ|ГЛАЗА', text: 'Очі та зір' },
+      { val: 'ГОЛОВА', text: 'Голова, мозок, запаморочення' },
+      { val: 'ДИХАЛЬНА|ДЫХАТЕЛЬНАЯ|КАШЕЛЬ', text: 'Дихальна система, кашель, груди' },
+      { val: 'СЕРЦЕ|СЕРДЦЕ', text: 'Серце та кровообіг' },
+      { val: 'ЖЕЛУДОК|ШЛУНОК|ЖКТ|ЖИВОТ', text: 'Шлунок, живіт, травлення' },
+      { val: 'СПИНА|ПОЗВОНОЧНИК|ХРЕБЕТ', text: 'Спина, хребет, поперек' },
+      { val: "СУСТАВЫ|СУГЛОБИ|МЫШЦЫ|М'ЯЗИ|КОНЕЧНОСТИ|КІНЦІВКИ", text: 'М\'язи, суглоби, кінцівки' },
+      { val: 'КОЖА|ШКІРА', text: 'Шкіра, висипання, свербіж' },
+      { val: 'МОЧЕВЫДЕЛИТЕЛЬНАЯ|СЕЧОВИВІДНА', text: 'Сечовидільна система та нирки' },
+      { val: 'ПСИХИКА|ПСИХІКА', text: 'Психіка, емоції, страхи' },
+      { val: 'ЛИХОРАДКА|ЛИХОМАНКА|ПОТ|ПІТ', text: 'Лихоманка, жар, піт' },
+      { val: 'КЛИНИКА|КЛІНІКА', text: 'Клінічні діагнози / нозології' }
     ],
     resetFilters: 'Скинути фільтри',
     quickLabel: 'Швидкі запити:',
     quickQueries: [
-      { q: 'ячмінь на правій нижній повіці', text: '👁️ Ячмінь на правій нижній повіці', priority: true },
-      { q: 'ячмінь на лівій нижній повіці', text: '👁️ Ячмінь на лівій нижній повіці' },
-      { q: 'ячмінь на верхній повіці', text: '👁️ Ячмінь на верхній повіці' },
-      { q: 'ячмінь', text: '💊 Всі згадки про ячмінь' },
-      { q: 'біль у попереку що віддає в стегно', text: '⚡ Біль у попереку що віддає в стегно' },
-      { q: 'сухий гавкаючий кашель', text: '🫁 Сухий гавкаючий кашель' },
-      { q: 'запаморочення при вставанні', text: '🌀 Запаморочення при вставанні' },
-      { q: 'ревматизм', text: '🦴 Ревматизм' }
+      { q: 'ячмінь на правій нижній повіці', text: 'Ячмінь на правій нижній повіці', priority: true },
+      { q: 'ячмінь на лівій нижній повіці', text: 'Ячмінь на лівій нижній повіці' },
+      { q: 'ячмінь на верхній повіці', text: 'Ячмінь на верхній повіці' },
+      { q: 'ячмінь', text: 'Всі згадки про ячмінь' },
+      { q: 'біль у попереку що віддає в стегно', text: 'Біль у попереку що віддає в стегно' },
+      { q: 'сухий гавкаючий кашель', text: 'Сухий гавкаючий кашель' },
+      { q: 'запаморочення при вставанні', text: 'Запаморочення при вставанні' },
+      { q: 'ревматизм', text: 'Ревматизм' }
     ],
     statusLoading: 'Завантаження бази даних...',
     statusInit: 'Ініціалізація гомеопатичної бази даних...',
     statusEmpty: 'Введіть будь-який симптом, орган чи виберіть модальності для пошуку...',
     statusNotFound: 'За вашим запитом нічого не знайдено. Спробуйте змінити модальності або слова.',
     statusFound: 'Знайдено <span class="results-count">{count}</span> препаратів ({time} мс). Перші позиції — найбільш релевантні:',
-    cardRankTop: '⭐ #1 ТОЧНИЙ ЗБІГ',
-    cardExactMatch: '✓ Найвища відповідність симптому',
+    cardRankTop: '#1 ТОЧНИЙ ЗБІГ',
+    cardExactMatch: 'Найвища відповідність симптому',
     cardRubric: 'Рубрика:',
-    cardBtnDetails: '📖 Повний опис препарату',
-    cardWorseTag: '🔴 Гірше:',
-    cardBetterTag: '🟢 Краще:',
+    cardBtnDetails: 'Повний опис препарату',
+    cardWorseTag: 'Гірше:',
+    cardBetterTag: 'Краще:',
     modalLoading: 'Завантаження...',
     modalCommonName: 'Народна / ботанічна назва:',
     modalSynonyms: 'Синоніми:',
@@ -151,27 +151,27 @@ const I18N = {
     modalSource: 'Джерело:',
     modalClose: 'Закрити',
     modalError: 'Не вдалося відкрити опис:',
-    modalSearchPlaceholder: '🔍 Шукати симптоми у цьому описі...',
+    modalSearchPlaceholder: 'Шукати симптоми у цьому описі...',
     modalCatAll: 'Всі рубрики',
-    modalCatMind: '🧘 Психіка',
-    modalCatHead: '🧠 Голова & Очі',
-    modalCatResp: '🫁 Дихання',
-    modalCatDigest: '🥣 Травлення',
-    modalCatBack: '🦴 Спина & Суглоби',
-    modalCatSkin: '🩹 Шкіра',
-    modalCatMod: '⚖️ Модальності',
-    modalCatClin: '📋 Клініка',
+    modalCatMind: 'Психіка',
+    modalCatHead: 'Голова & Очі',
+    modalCatResp: 'Дихання',
+    modalCatDigest: 'Травлення',
+    modalCatBack: 'Спина & Суглоби',
+    modalCatSkin: 'Шкіра',
+    modalCatMod: 'Модальності',
+    modalCatClin: 'Клініка',
     menuBtn: 'Меню',
     menuBtnTitle: 'Меню та налаштування',
     menuLangTitle: 'Мова сайту',
     menuDlTitle: 'База даних',
     menuDlDb: 'Завантажити базу даних',
     menuDlDbSub: 'SQLite, JSON, CSV (UA / RU)',
-    menuInfo: '🌿 <strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Працює автономно на GitHub Pages.',
+    menuInfo: '<strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Працює автономно на GitHub Pages.',
     searchPlaceholder: 'Введіть симптом або назву препарату (напр. ячмінь, Aconitum, Арніка)...',
-    suggHeaderRemedies: '💊 Препарати за запитом "{q}" ({n}):',
-    suggCatalogTitle: '📖 Каталог усіх препаратів (341):',
-    suggReadRemedy: 'Читати опис ➔',
+    suggHeaderRemedies: 'Препарати за запитом "{q}" ({n}):',
+    suggCatalogTitle: 'Каталог усіх препаратів (341):',
+    suggReadRemedy: 'Читати опис →',
     suggFooterHint: 'Натисніть на препарат для опису, або Enter для пошуку симптомів',
     btnCatalogTitle: 'Каталог усіх 341 препаратів',
     btnCatalogTextFull: 'Препарати',
@@ -180,7 +180,7 @@ const I18N = {
     menuCatalogSub: 'Швидкий вибір та опис за назвою',
     downloadMenuBtn: 'Завантажити БД',
     downloadMenuBadge: 'SQLite • JSON • CSV',
-    dlModalTitle: '📥 Завантаження бази даних',
+    dlModalTitle: 'Завантаження бази даних',
     dlModalSubtitle: 'Оберіть мову вмісту та необхідний формат бази даних для автономної роботи:',
     lblDlDbLang: 'Мова даних у базі:',
     dlLangUaTitle: 'Українська версія',
@@ -197,9 +197,9 @@ const I18N = {
     txtBtnDlJson: 'Завантажити .json',
     txtBtnDlCsv: 'Завантажити .csv',
     txtDlCliTitle: 'Швидкий пошук у терміналі (CLI):',
-    dlFootnote: '💡 Усі файли відкриті для некомерційного використання. Джерело: архів Materia Medica Джона Генрі Кларка (homeopat-sam.com).',
-    copyQuoteBtn: '📋 Цитата',
-    toastQuoteCopied: '✓ Цитату симптому скопійовано!',
+    dlFootnote: 'Усі файли відкриті для некомерційного використання. Джерело: архів Materia Medica Джона Генрі Кларка (homeopat-sam.com).',
+    copyQuoteBtn: 'Цитата',
+    toastQuoteCopied: 'Цитату симптому скопійовано!',
     activeFiltersTitle: 'Активні фільтри:',
     activeFilterReset: 'Скинути все',
     btnSearchSubmit: 'Знайти',
@@ -208,7 +208,7 @@ const I18N = {
   ru: {
     pageTitle: 'Materia Medica — Поисковый Реперторий (Джон Генри Кларк)',
     pageDescription: 'База данных гомеопатических препаратов Materia Medica с полнотекстовым умным поиском симптомов и модальностей. Работает на GitHub Pages.',
-    headerTitle: '🌿 Materia Medica',
+    headerTitle: 'Materia Medica',
     headerSubtitle: 'Поисковый гомеопатический реперторий: 341 препарат, 11 770+ симптомов по фундаментальному труду <em>Джона Генри Кларка</em>.',
     dlDb: 'База SQLite (.db)',
     dlJson: 'Данные JSON (.json)',
@@ -225,84 +225,84 @@ const I18N = {
     lblWorse: 'Ухудшение (хуже от):',
     lblBetter: 'Улучшение (лучше от):',
     worseChips: [
-      { id: 'холод', label: '❄️ Холода', stem: 'холод' },
-      { id: 'тепло', label: '🔥 Тепла', stem: 'тепл' },
-      { id: 'сирість', label: '🌧️ Сырости', stem: 'сырост' },
-      { id: 'протяг', label: '💨 Сквозняка / ветра', stem: 'сквозняк' },
-      { id: 'сонце', label: '☀️ Солнца / жары', stem: 'солн' },
-      { id: 'рух', label: '🏃 Движения', stem: 'движен' },
-      { id: 'ходьба', label: '🚶 При ходьбе', stem: 'ходьб' },
-      { id: 'спокій', label: '🛋️ Покоя', stem: 'поко' },
-      { id: 'лежачи', label: '🛏️ Лежа', stem: 'лежа' },
-      { id: 'сидячи', label: '🪑 Сидя', stem: 'сидя' },
-      { id: 'ніч', label: '🌙 Ночью', stem: 'ноч' },
-      { id: 'ранок', label: '🌅 Утром', stem: 'утр' },
-      { id: 'вечір', label: '🌆 Вечером', stem: 'вечер' },
-      { id: 'дотик', label: '👆 Прикосновения', stem: 'прикосновен' },
-      { id: 'їжа', label: '🍽️ После еды', stem: 'ед' },
-      { id: 'кава', label: '☕ Кофе', stem: 'кофе' },
-      { id: 'алкоголь', label: '🍷 Алкоголя / вина', stem: 'вин' },
-      { id: 'купання', label: '🚿 Купания / воды', stem: 'купан' },
-      { id: 'гроза', label: '⚡ Перед грозой', stem: 'гроз' },
-      { id: 'розмова', label: '💬 Разговора', stem: 'разговор' }
+      { id: 'холод', label: 'Холода', stem: 'холод' },
+      { id: 'тепло', label: 'Тепла', stem: 'тепл' },
+      { id: 'сирість', label: 'Сырости', stem: 'сырост' },
+      { id: 'протяг', label: 'Сквозняка / ветра', stem: 'сквозняк' },
+      { id: 'сонце', label: 'Солнца / жары', stem: 'солн' },
+      { id: 'рух', label: 'Движения', stem: 'движен' },
+      { id: 'ходьба', label: 'При ходьбе', stem: 'ходьб' },
+      { id: 'спокій', label: 'Покоя', stem: 'поко' },
+      { id: 'лежачи', label: 'Лежа', stem: 'лежа' },
+      { id: 'сидячи', label: 'Сидя', stem: 'сидя' },
+      { id: 'ніч', label: 'Ночью', stem: 'ноч' },
+      { id: 'ранок', label: 'Утром', stem: 'утр' },
+      { id: 'вечір', label: 'Вечером', stem: 'вечер' },
+      { id: 'дотик', label: 'Прикосновения', stem: 'прикосновен' },
+      { id: 'їжа', label: 'После еды', stem: 'ед' },
+      { id: 'кава', label: 'Кофе', stem: 'кофе' },
+      { id: 'алкоголь', label: 'Алкоголя / вина', stem: 'вин' },
+      { id: 'купання', label: 'Купания / воды', stem: 'купан' },
+      { id: 'гроза', label: 'Перед грозой', stem: 'гроз' },
+      { id: 'розмова', label: 'Разговора', stem: 'разговор' }
     ],
     betterChips: [
-      { id: 'тепло', label: '🔥 Тепла', stem: 'тепл' },
-      { id: 'холод', label: '❄️ Холода', stem: 'холод' },
-      { id: 'повітря', label: '🍃 Свежего воздуха', stem: 'воздух' },
-      { id: 'спокій', label: '🛋️ Покоя', stem: 'поко' },
-      { id: 'рух', label: '🏃 Движения', stem: 'движен' },
-      { id: 'ходьба', label: '🚶 При ходьбе', stem: 'ходьб' },
-      { id: 'лежачи', label: '🛏️ Лежа', stem: 'лежа' },
-      { id: 'тиск', label: '💆 Надавливания / давления', stem: 'давлен' },
-      { id: 'розтирання', label: '🤲 Растирания / массажа', stem: 'растиран' },
-      { id: 'сон', label: '💤 После сна', stem: 'сна' },
-      { id: 'їжа', label: '🍲 После еды', stem: 'ед' },
-      { id: 'холодне_пиття', label: '🥤 Холодного питья', stem: 'холодн' },
-      { id: 'піт', label: '💧 Выделения пота', stem: 'пот' },
-      { id: 'відрижка', label: '💨 Отхождения газов', stem: 'отрыжк' }
+      { id: 'тепло', label: 'Тепла', stem: 'тепл' },
+      { id: 'холод', label: 'Холода', stem: 'холод' },
+      { id: 'повітря', label: 'Свежего воздуха', stem: 'воздух' },
+      { id: 'спокій', label: 'Покоя', stem: 'поко' },
+      { id: 'рух', label: 'Движения', stem: 'движен' },
+      { id: 'ходьба', label: 'При ходьбе', stem: 'ходьб' },
+      { id: 'лежачи', label: 'Лежа', stem: 'лежа' },
+      { id: 'тиск', label: 'Надавливания / давления', stem: 'давлен' },
+      { id: 'розтирання', label: 'Растирания / массажа', stem: 'растиран' },
+      { id: 'сон', label: 'После сна', stem: 'сна' },
+      { id: 'їжа', label: 'После еды', stem: 'ед' },
+      { id: 'холодне_пиття', label: 'Холодного питья', stem: 'холодн' },
+      { id: 'піт', label: 'Выделения пота', stem: 'пот' },
+      { id: 'відрижка', label: 'Отхождения газов', stem: 'отрыжк' }
     ],
     inputWorsePlaceholder: 'Свое ухудшение (напр. сквозняк, в 3 ночи, купание)...',
     inputBetterPlaceholder: 'Свое улучшение (напр. горячий чай, лежа на боку)...',
-    lblSection: '📍 Рубрика / Орган:',
+    lblSection: 'Рубрика / Орган:',
     sections: [
       { val: '', text: 'Все органы и разделы' },
-      { val: 'ОЧІ|ГЛАЗА', text: '👁️ Глаза и зрение' },
-      { val: 'ГОЛОВА', text: '🧠 Голова, мозг, головокружение' },
-      { val: 'ДИХАЛЬНА|ДЫХАТЕЛЬНАЯ|КАШЕЛЬ', text: '🫁 Дыхательная система, кашель, грудь' },
-      { val: 'СЕРЦЕ|СЕРДЦЕ', text: '❤️ Сердце и кровообращение' },
-      { val: 'ЖЕЛУДОК|ШЛУНОК|ЖКТ|ЖИВОТ', text: '🥣 Желудок, живот, пищеварение' },
-      { val: 'СПИНА|ПОЗВОНОЧНИК|ХРЕБЕТ', text: '🦴 Спина, позвоночник, поясница' },
-      { val: "СУСТАВЫ|СУГЛОБИ|МЫШЦЫ|М'ЯЗИ|КОНЕЧНОСТИ|КІНЦІВКИ", text: '💪 Мышцы, суставы, конечности' },
-      { val: 'КОЖА|ШКІРА', text: '🩹 Кожа, высыпания, зуд' },
-      { val: 'МОЧЕВЫДЕЛИТЕЛЬНАЯ|СЕЧОВИВІДНА', text: '💧 Мочевыделительная система и почки' },
-      { val: 'ПСИХИКА|ПСИХІКА', text: '🧘 Психика, эмоции, страхи' },
-      { val: 'ЛИХОРАДКА|ЛИХОМАНКА|ПОТ|ПІТ', text: '🌡️ Лихорадка, жар, пот' },
-      { val: 'КЛИНИКА|КЛІНІКА', text: '📋 Клинические диагнозы / нозологии' }
+      { val: 'ОЧІ|ГЛАЗА', text: 'Глаза и зрение' },
+      { val: 'ГОЛОВА', text: 'Голова, мозг, головокружение' },
+      { val: 'ДИХАЛЬНА|ДЫХАТЕЛЬНАЯ|КАШЕЛЬ', text: 'Дыхательная система, кашель, грудь' },
+      { val: 'СЕРЦЕ|СЕРДЦЕ', text: 'Сердце и кровообращение' },
+      { val: 'ЖЕЛУДОК|ШЛУНОК|ЖКТ|ЖИВОТ', text: 'Желудок, живот, пищеварение' },
+      { val: 'СПИНА|ПОЗВОНОЧНИК|ХРЕБЕТ', text: 'Спина, позвоночник, поясница' },
+      { val: "СУСТАВЫ|СУГЛОБИ|МЫШЦЫ|М'ЯЗИ|КОНЕЧНОСТИ|КІНЦІВКИ", text: 'Мышцы, суставы, конечности' },
+      { val: 'КОЖА|ШКІРА', text: 'Кожа, высыпания, зуд' },
+      { val: 'МОЧЕВЫДЕЛИТЕЛЬНАЯ|СЕЧОВИВІДНА', text: 'Мочевыделительная система и почки' },
+      { val: 'ПСИХИКА|ПСИХІКА', text: 'Психика, эмоции, страхи' },
+      { val: 'ЛИХОРАДКА|ЛИХОМАНКА|ПОТ|ПІТ', text: 'Лихорадка, жар, пот' },
+      { val: 'КЛИНИКА|КЛІНІКА', text: 'Клинические диагнозы / нозологии' }
     ],
     resetFilters: 'Сбросить фильтры',
     quickLabel: 'Быстрые запросы:',
     quickQueries: [
-      { q: 'ячмень на правом нижнем веке', text: '👁️ Ячмень на правом нижнем веке', priority: true },
-      { q: 'ячмень на левом нижнем веке', text: '👁️ Ячмень на левом нижнем веке' },
-      { q: 'ячмень на верхнем веке', text: '👁️ Ячмень на верхнем веке' },
-      { q: 'ячмень', text: '💊 Все упоминания о ячмене' },
-      { q: 'боль в пояснице отдающая в бедро', text: '⚡ Боль в пояснице отдающая в бедро' },
-      { q: 'сухой лающий кашель', text: '🫁 Сухой лающий кашель' },
-      { q: 'головокружение при вставании', text: '🌀 Головокружение при вставании' },
-      { q: 'ревматизм', text: '🦴 Ревматизм' }
+      { q: 'ячмень на правом нижнем веке', text: 'Ячмень на правом нижнем веке', priority: true },
+      { q: 'ячмень на левом нижнем веке', text: 'Ячмень на левом нижнем веке' },
+      { q: 'ячмень на верхнем веке', text: 'Ячмень на верхнем веке' },
+      { q: 'ячмень', text: 'Все упоминания о ячмене' },
+      { q: 'боль в пояснице отдающая в бедро', text: 'Боль в пояснице отдающая в бедро' },
+      { q: 'сухой лающий кашель', text: 'Сухой лающий кашель' },
+      { q: 'головокружение при вставании', text: 'Головокружение при вставании' },
+      { q: 'ревматизм', text: 'Ревматизм' }
     ],
     statusLoading: 'Загрузка базы данных...',
     statusInit: 'Инициализация гомеопатической базы данных...',
     statusEmpty: 'Введите любой симптом, орган или выберите модальности для поиска...',
     statusNotFound: 'По вашему запросу ничего не найдено. Попробуйте изменить модальности или слова.',
     statusFound: 'Найдено <span class="results-count">{count}</span> препаратов ({time} мс). Первые позиции — наиболее релевантные:',
-    cardRankTop: '⭐ #1 ТОЧНОЕ СОВПАДЕНИЕ',
-    cardExactMatch: '✓ Наивысшее соответствие симптому',
+    cardRankTop: '#1 ТОЧНОЕ СОВПАДЕНИЕ',
+    cardExactMatch: 'Наивысшее соответствие симптому',
     cardRubric: 'Рубрика:',
-    cardBtnDetails: '📖 Полное описание препарата',
-    cardWorseTag: '🔴 Хуже:',
-    cardBetterTag: '🟢 Лучше:',
+    cardBtnDetails: 'Полное описание препарата',
+    cardWorseTag: 'Хуже:',
+    cardBetterTag: 'Лучше:',
     modalLoading: 'Загрузка...',
     modalCommonName: 'Народное / ботаническое название:',
     modalSynonyms: 'Синонимы:',
@@ -310,27 +310,27 @@ const I18N = {
     modalSource: 'Источник:',
     modalClose: 'Закрыть',
     modalError: 'Не удалось открыть описание:',
-    modalSearchPlaceholder: '🔍 Искать симптомы в этом описании...',
+    modalSearchPlaceholder: 'Искать симптомы в этом описании...',
     modalCatAll: 'Все рубрики',
-    modalCatMind: '🧘 Психика',
-    modalCatHead: '🧠 Голова и Глаза',
-    modalCatResp: '🫁 Дыхание',
-    modalCatDigest: '🥣 Пищеварение',
-    modalCatBack: '🦴 Спина и Суставы',
-    modalCatSkin: '🩹 Кожа',
-    modalCatMod: '⚖️ Модальности',
-    modalCatClin: '📋 Клиника',
+    modalCatMind: 'Психика',
+    modalCatHead: 'Голова и Глаза',
+    modalCatResp: 'Дыхание',
+    modalCatDigest: 'Пищеварение',
+    modalCatBack: 'Спина и Суставы',
+    modalCatSkin: 'Кожа',
+    modalCatMod: 'Модальности',
+    modalCatClin: 'Клиника',
     menuBtn: 'Меню',
     menuBtnTitle: 'Меню и настройки',
     menuLangTitle: 'Язык сайта',
     menuDlTitle: 'База данных',
     menuDlDb: 'Скачать базу данных',
     menuDlDbSub: 'SQLite, JSON, CSV (UA / RU)',
-    menuInfo: '🌿 <strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Работает автономно на GitHub Pages.',
+    menuInfo: '<strong>Materia Medica</strong> — 341 препарат, 11 771 симптом. Работает автономно на GitHub Pages.',
     searchPlaceholder: 'Введите симптом или название препарата (напр. ячмень, Aconitum, Арника)...',
-    suggHeaderRemedies: '💊 Препараты по запросу "{q}" ({n}):',
-    suggCatalogTitle: '📖 Каталог всех препаратов (341):',
-    suggReadRemedy: 'Читать описание ➔',
+    suggHeaderRemedies: 'Препараты по запросу "{q}" ({n}):',
+    suggCatalogTitle: 'Каталог всех препаратов (341):',
+    suggReadRemedy: 'Читать описание →',
     suggFooterHint: 'Нажмите на препарат для описания, или Enter для поиска симптомов',
     btnCatalogTitle: 'Каталог всех 341 препаратов',
     btnCatalogTextFull: 'Препараты',
@@ -339,7 +339,7 @@ const I18N = {
     menuCatalogSub: 'Быстрый выбор и описание по названию',
     downloadMenuBtn: 'Скачать БД',
     downloadMenuBadge: 'SQLite • JSON • CSV',
-    dlModalTitle: '📥 Скачивание базы данных',
+    dlModalTitle: 'Скачивание базы данных',
     dlModalSubtitle: 'Выберите язык содержимого и необходимый формат базы данных для автономной работы:',
     lblDlDbLang: 'Язык данных в базе:',
     dlLangUaTitle: 'Украинская версия',
@@ -356,9 +356,9 @@ const I18N = {
     txtBtnDlJson: 'Скачать .json',
     txtBtnDlCsv: 'Скачать .csv',
     txtDlCliTitle: 'Быстрый поиск в терминале (CLI):',
-    dlFootnote: '💡 Все файлы открыты для некоммерческого использования. Источник: архив Materia Medica Джона Генри Кларка (homeopat-sam.com).',
-    copyQuoteBtn: '📋 Цитата',
-    toastQuoteCopied: '✓ Цитата скопирована в буфер обмена!',
+    dlFootnote: 'Все файлы открыты для некоммерческого использования. Источник: архив Materia Medica Джона Генри Кларка (homeopat-sam.com).',
+    copyQuoteBtn: 'Цитата',
+    toastQuoteCopied: 'Цитата скопирована в буфер обмена!',
     activeFiltersTitle: 'Активные фильтры:',
     activeFilterReset: 'Сбросить все',
     btnSearchSubmit: 'Найти',
@@ -1181,27 +1181,27 @@ function updateActiveFiltersStrip() {
   for (const cid of filterState.worseChips) {
     const chipDef = t.worseChips.find(c => c.id === cid);
     const label = chipDef ? chipDef.label : cid;
-    html += `<button type="button" class="active-filter-pill is-worse" onclick="toggleWorseChip('${escapeHtml(cid)}')">🔴 ${escapeHtml(label)} <span class="pill-remove">✕</span></button>`;
+    html += `<button type="button" class="active-filter-pill is-worse" onclick="toggleWorseChip('${escapeHtml(cid)}')">${escapeHtml(label)} <span class="pill-remove">✕</span></button>`;
   }
 
   for (const cid of filterState.betterChips) {
     const chipDef = t.betterChips.find(c => c.id === cid);
     const label = chipDef ? chipDef.label : cid;
-    html += `<button type="button" class="active-filter-pill is-better" onclick="toggleBetterChip('${escapeHtml(cid)}')">🟢 ${escapeHtml(label)} <span class="pill-remove">✕</span></button>`;
+    html += `<button type="button" class="active-filter-pill is-better" onclick="toggleBetterChip('${escapeHtml(cid)}')">${escapeHtml(label)} <span class="pill-remove">✕</span></button>`;
   }
 
   if (filterState.worseCustom.trim()) {
-    html += `<button type="button" class="active-filter-pill is-worse" onclick="clearCustomWorse()">🔴 ${escapeHtml(filterState.worseCustom.trim())} <span class="pill-remove">✕</span></button>`;
+    html += `<button type="button" class="active-filter-pill is-worse" onclick="clearCustomWorse()">${escapeHtml(filterState.worseCustom.trim())} <span class="pill-remove">✕</span></button>`;
   }
 
   if (filterState.betterCustom.trim()) {
-    html += `<button type="button" class="active-filter-pill is-better" onclick="clearCustomBetter()">🟢 ${escapeHtml(filterState.betterCustom.trim())} <span class="pill-remove">✕</span></button>`;
+    html += `<button type="button" class="active-filter-pill is-better" onclick="clearCustomBetter()">${escapeHtml(filterState.betterCustom.trim())} <span class="pill-remove">✕</span></button>`;
   }
 
   if (filterState.section) {
     const secDef = t.sections.find(s => s.val === filterState.section);
     const label = secDef ? secDef.text : filterState.section;
-    html += `<button type="button" class="active-filter-pill is-sec" onclick="clearSectionFilter()">📍 ${escapeHtml(label)} <span class="pill-remove">✕</span></button>`;
+    html += `<button type="button" class="active-filter-pill is-sec" onclick="clearSectionFilter()">${escapeHtml(label)} <span class="pill-remove">✕</span></button>`;
   }
 
   html += `<button type="button" class="active-filter-pill" onclick="resetAllFilters()">${t.activeFilterReset || 'Скинути все'} ✕</button>`;
@@ -1642,7 +1642,7 @@ function openSearchSuggestions(matches, query, isCatalog = false) {
       // Full catalog of 341 remedies A-Z
       html += `
         <div class="sugg-header">
-          <strong>${escapeHtml(t.suggCatalogTitle || '📖 Каталог усіх препаратів (341):')}</strong>
+          <strong>${escapeHtml(t.suggCatalogTitle || 'Каталог усіх препаратів (341):')}</strong>
           <span style="font-size: 0.74rem; color: #64748b;">Оберіть для відкриття опису</span>
         </div>
       `;
@@ -1661,9 +1661,9 @@ function openSearchSuggestions(matches, query, isCatalog = false) {
                 <span class="sugg-latin">${escapeHtml(r.latin)}</span>
                 ${r.cyr ? `<span class="sugg-cyr">(${escapeHtml(r.cyr)})</span>` : ''}
               </div>
-              ${r.common ? `<div class="sugg-common">🌿 ${escapeHtml(r.common)}</div>` : ''}
+              ${r.common ? `<div class="sugg-common">${escapeHtml(r.common)}</div>` : ''}
             </div>
-            <span class="sugg-action-badge">${escapeHtml(t.suggReadRemedy || 'Читати опис ➔')}</span>
+            <span class="sugg-action-badge">${escapeHtml(t.suggReadRemedy || 'Читати опис →')}</span>
           </div>
         `;
       }
@@ -1671,7 +1671,7 @@ function openSearchSuggestions(matches, query, isCatalog = false) {
     } else {
       // Live search suggestions
       const displayMatches = matches.slice(0, 15);
-      const headerTpl = t.suggHeaderRemedies || '💊 Препарати за запитом "{q}" ({n}):';
+      const headerTpl = t.suggHeaderRemedies || 'Препарати за запитом "{q}" ({n}):';
       const headerText = headerTpl.replace('{q}', escapeHtml(query)).replace('{n}', matches.length);
       html += `
         <div class="sugg-header">
@@ -1688,9 +1688,9 @@ function openSearchSuggestions(matches, query, isCatalog = false) {
                 <span class="sugg-latin">${highlightRemedyMatch(r.latin, query)}</span>
                 ${r.cyr ? `<span class="sugg-cyr">(${highlightRemedyMatch(r.cyr, query)})</span>` : ''}
               </div>
-              ${r.common ? `<div class="sugg-common">🌿 ${highlightRemedyMatch(r.common, query)}</div>` : ''}
+              ${r.common ? `<div class="sugg-common">${highlightRemedyMatch(r.common, query)}</div>` : ''}
             </div>
-            <span class="sugg-action-badge">${escapeHtml(t.suggReadRemedy || 'Читати опис ➔')}</span>
+            <span class="sugg-action-badge">${escapeHtml(t.suggReadRemedy || 'Читати опис →')}</span>
           </div>
         `;
       }
@@ -1793,7 +1793,7 @@ function initUnifiedSearch() {
     });
   }
 
-  // Search icon button (🔍)
+  // Search icon button
   if (btnSearchIcon) {
     btnSearchIcon.addEventListener('click', (e) => {
       e.preventDefault();
@@ -1922,7 +1922,7 @@ function initUnifiedSearch() {
     });
   }
 
-  // Catalog dropdown button (📖 341 ▼)
+  // Catalog dropdown button
   if (btnCatalog) {
     btnCatalog.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -2047,7 +2047,7 @@ function runSearch(query) {
               <span class="card-latin" onclick="openRemedyModal(${r.id})" style="cursor: pointer;" title="${t.cardBtnDetails}">${r.latin}</span>
               ${r.cyr ? `<span class="card-cyr">(${r.cyr})</span>` : ''}
             </div>
-            ${r.common ? `<div class="card-common">🌿 ${r.common}</div>` : ''}
+            ${r.common ? `<div class="card-common">${r.common}</div>` : ''}
           </div>
           <div class="card-badge-side">
             <span class="badge-section">${t.cardRubric} ${item.section}</span>
@@ -2084,36 +2084,17 @@ function copySnippetQuote(index) {
 
   if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(quoteText).then(() => {
-      showToast(t.toastQuoteCopied || '✓ Цитату скопійовано в буфер обміну!');
+      showToast(t.toastQuoteCopied || 'Цитату скопійовано в буфер обміну!');
     }).catch(() => {
-      showToast(t.toastQuoteCopied || '✓ Цитату скопійовано в буфер обміну!');
+      showToast(t.toastQuoteCopied || 'Цитату скопійовано в буфер обміну!');
     });
   } else {
-    showToast(t.toastQuoteCopied || '✓ Цитату скопійовано в буфер обміну!');
+    showToast(t.toastQuoteCopied || 'Цитату скопійовано в буфер обміну!');
   }
 }
 
 function getSectionIcon(secName) {
-  const u = (secName || '').toUpperCase();
-  if (/ОЧІ|ГЛАЗА|ЗІР|ЗРЕНИЕ/.test(u)) return '👁️';
-  if (/ГОЛОВА|МОЗОК|ГОЛОВОКРУЖЕНИЕ|ЗАПАМОРОЧЕННЯ/.test(u)) return '🧠';
-  if (/ДИХА|ДЫХА|КАШЕЛ|ГРУД/.test(u)) return '🫁';
-  if (/СЕРЦ|СЕРД/.test(u)) return '❤️';
-  if (/ШЛУНОК|ЖЕЛУДОК|ЖИВОТ|КИШК|ПЕЧІНК|ПЕЧЕНЬ|СТУЛ|ВИПРАВН/.test(u)) return '🥣';
-  if (/СПИН|ПОПЕРЕК|ПОЯСНИЦ|ХРЕБЕТ|ПОЗВОНОЧНИК/.test(u)) return '🦴';
-  if (/СУГЛОБ|СУСТАВ|М'ЯЗ|МЫШЦ|КІНЦІВК|КОНЕЧНОСТ|ШИЯ|ШЕЯ/.test(u)) return '💪';
-  if (/ШКІР|КОЖА|ВИСИП|СВЕРБІЖ|ЗУД/.test(u)) return '🩹';
-  if (/МОДАЛЬН|ПОГІРШ|УХУДШ|ПОКРАЩ|УЛУЧШ/.test(u)) return '⚖️';
-  if (/КЛІНІК|КЛИНИК|ЕТІОЛОГ|ЭТИОЛОГ|ХАРАКТЕРИСТИК|ТИП/.test(u)) return '📋';
-  if (/ПСИХІК|ПСИХИК/.test(u)) return '🧘';
-  if (/ЛИХОМАН|ЛИХОРАД|ЖАР|ПОТ|ПІТ/.test(u)) return '🌡️';
-  if (/ВУХА|УШИ|СЛУХ/.test(u)) return '👂';
-  if (/НІС|НОС/.test(u)) return '👃';
-  if (/РОТ|ЗУБ|ЯЗИК|ЯЗЫК/.test(u)) return '👄';
-  if (/ГОРЛО|ГЛОТК/.test(u)) return '🧣';
-  if (/СЕЧ|МОЧ|НИРК|ПОЧК/.test(u)) return '💧';
-  if (/СОН|СНОВ/.test(u)) return '💤';
-  return '🔹';
+  return '';
 }
 
 function getSectionCategory(secName) {
@@ -2165,7 +2146,7 @@ function renderModalSections(remedy, category = 'all', query = '') {
     html += `
       <div class="modal-sec-card" data-sname="${escapeHtml(sName)}">
         <div class="modal-sec-card-header">
-          <span class="modal-sec-card-icon">${icon}</span>
+          ${icon ? `<span class="modal-sec-card-icon">${icon}</span>` : ''}
           <span class="modal-sec-card-name">${escapeHtml(sName)}</span>
         </div>
         <div class="modal-sec-card-body">${formattedText}</div>
@@ -2229,7 +2210,7 @@ async function openRemedyModal(remedyId) {
 
     metaHtml += '<div class="modal-meta-box">';
     if (full.common_name) {
-      metaHtml += `<div class="modal-meta-row"><strong>${t.modalCommonName}</strong> 🌿 ${escapeHtml(full.common_name)}</div>`;
+      metaHtml += `<div class="modal-meta-row"><strong>${t.modalCommonName}</strong> ${escapeHtml(full.common_name)}</div>`;
     }
     if (full.synonyms) {
       metaHtml += `<div class="modal-meta-row"><strong>${t.modalSynonyms}</strong> ${escapeHtml(full.synonyms)}</div>`;
@@ -2242,25 +2223,25 @@ async function openRemedyModal(remedyId) {
     // Toolbar with search and category pills
     const catDefs = [
       { id: 'all', label: t.modalCatAll || 'Всі рубрики', count: counts.all },
-      { id: 'mind', label: t.modalCatMind || '🧘 Психіка', count: counts.mind },
-      { id: 'head', label: t.modalCatHead || '🧠 Голова & Очі', count: counts.head },
-      { id: 'resp', label: t.modalCatResp || '🫁 Дихання', count: counts.resp },
-      { id: 'digest', label: t.modalCatDigest || '🥣 Травлення', count: counts.digest },
-      { id: 'back', label: t.modalCatBack || '🦴 Спина & Суглоби', count: counts.back },
-      { id: 'skin', label: t.modalCatSkin || '🩹 Шкіра', count: counts.skin },
-      { id: 'mod', label: t.modalCatMod || '⚖️ Модальності', count: counts.mod },
-      { id: 'clin', label: t.modalCatClin || '📋 Клініка', count: counts.clin }
+      { id: 'mind', label: t.modalCatMind || 'Психіка', count: counts.mind },
+      { id: 'head', label: t.modalCatHead || 'Голова & Очі', count: counts.head },
+      { id: 'resp', label: t.modalCatResp || 'Дихання', count: counts.resp },
+      { id: 'digest', label: t.modalCatDigest || 'Травлення', count: counts.digest },
+      { id: 'back', label: t.modalCatBack || 'Спина & Суглоби', count: counts.back },
+      { id: 'skin', label: t.modalCatSkin || 'Шкіра', count: counts.skin },
+      { id: 'mod', label: t.modalCatMod || 'Модальності', count: counts.mod },
+      { id: 'clin', label: t.modalCatClin || 'Клініка', count: counts.clin }
     ].filter(c => c.id === 'all' || c.count > 0);
 
     const toolbarHtml = `
       <div class="modal-toolbar">
         <div class="modal-search-wrap">
-          <span class="modal-search-icon">🔍</span>
+          <span class="modal-search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
           <input 
             type="text" 
             id="modalSearchInput" 
             class="modal-search-input" 
-            placeholder="${t.modalSearchPlaceholder || '🔍 Шукати симптоми у цьому описі...'}"
+            placeholder="${t.modalSearchPlaceholder || 'Шукати симптоми у цьому описі...'}"
             autocomplete="off"
             autocorrect="off"
             autocapitalize="off"
