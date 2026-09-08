@@ -57,7 +57,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="style.css?v=4.9">
+  <link rel="stylesheet" href="style.css?v=5.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%231e6091%22/><path d=%22M50 25 v50 M25 50 h50%22 stroke=%22white%22 stroke-width=%2212%22 stroke-linecap=%22round%22/></svg>">
 </head>
 <body>
@@ -79,16 +79,8 @@
                   <span class="menu-section-title" id="txtMenuLangTitle">Мова сайту</span>
                 </div>
                 <div class="menu-lang-options" role="group" aria-label="Вибір мови">
-                  <button type="button" class="menu-lang-btn active" data-lang="ua" id="langBtnUa" title="Українська версія">
-                    <span class="menu-flag-text">UA</span>
-                    <span class="menu-lang-name">Українська</span>
-                    <span class="menu-check">✓</span>
-                  </button>
-                  <button type="button" class="menu-lang-btn" data-lang="ru" id="langBtnRu" title="Русская версия">
-                    <span class="menu-flag-text">RU</span>
-                    <span class="menu-lang-name">Русский</span>
-                    <span class="menu-check">✓</span>
-                  </button>
+                  <button type="button" class="menu-lang-btn active" data-lang="ua" id="langBtnUa" title="Українська версія (UA)" aria-pressed="true">UA</button>
+                  <button type="button" class="menu-lang-btn" data-lang="ru" id="langBtnRu" title="Русская версия (RU)" aria-pressed="false">RU</button>
                 </div>
               </div>
 
@@ -352,6 +344,6 @@
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
-  <script src="app.js?v=4.9"></script>
+  <script src="app.js?v=5.0"></script>
 </body>
 </html>

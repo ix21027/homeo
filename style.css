@@ -216,64 +216,39 @@ header {
 
 /* Language Selection Options */
 .menu-lang-options {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
 
 .menu-lang-btn {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  width: 100%;
+  justify-content: center;
   padding: 0.55rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: #334155;
-  font-size: 0.875rem;
-  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  text-align: left;
+  text-align: center;
   transition: all 0.15s ease;
 }
 
 .menu-lang-btn:hover {
-  background: #f8fafc;
-  color: var(--primary, #1e5e3a);
+  background: #f1f5f9;
+  color: #1e293b;
+  border-color: #cbd5e1;
 }
 
 .menu-lang-btn.active {
   background: #ecfdf5;
   color: #065f46;
-  border-color: #a7f3d0;
-}
-
-.menu-flag,
-.menu-flag-text {
-  font-size: 0.72rem;
-  font-weight: 800;
-  background: #e2e8f0;
-  color: #334155;
-  padding: 0.15rem 0.4rem;
-  border-radius: 4px;
-  line-height: 1;
-}
-
-.menu-lang-name {
-  flex: 1;
-}
-
-.menu-check {
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: #059669;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-.menu-lang-btn.active .menu-check {
-  opacity: 1;
+  border-color: #059669;
+  box-shadow: 0 1px 3px rgba(5, 150, 105, 0.15);
 }
 
 /* Download Action Button in Menu */

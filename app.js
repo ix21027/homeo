@@ -1072,6 +1072,8 @@ function updateUILanguage() {
   if (btnUa && btnRu) {
     btnUa.classList.toggle('active', currentLang === 'ua');
     btnRu.classList.toggle('active', currentLang === 'ru');
+    btnUa.setAttribute('aria-pressed', currentLang === 'ua' ? 'true' : 'false');
+    btnRu.setAttribute('aria-pressed', currentLang === 'ru' ? 'true' : 'false');
   }
 
   const selectSection = document.getElementById('selectSection');
