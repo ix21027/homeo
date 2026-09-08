@@ -1515,12 +1515,7 @@ main {
 }
 
 .status-bar {
-  margin: 1.25rem 0 0.75rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-  color: var(--text-muted);
+  display: none;
 }
 
 .results-count {
