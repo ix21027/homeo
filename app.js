@@ -134,8 +134,6 @@ const I18N = {
     modalSource: 'Джерело:',
     modalClose: 'Закрити',
     modalError: 'Не вдалося відкрити опис:',
-    txtModalCopy: 'Копіювати',
-    txtModalPrint: 'Друк',
     modalSearchPlaceholder: '🔍 Шукати симптоми у цьому описі...',
     modalCatAll: 'Всі рубрики',
     modalCatMind: '🧘 Психіка',
@@ -185,12 +183,8 @@ const I18N = {
     dlFootnote: '💡 Усі файли відкриті для некомерційного використання. Джерело: архів Materia Medica Джона Генрі Кларка (homeopat-sam.com).',
     copyQuoteBtn: '📋 Цитата',
     toastQuoteCopied: '✓ Цитату симптому скопійовано!',
-    toastRemedyCopied: '✓ Назву та опис скопійовано!',
     activeFiltersTitle: 'Активні фільтри:',
-    activeFilterReset: 'Скинути все',
-    hBadgeRemedies: '🌿 341 препарат',
-    hBadgeSymptoms: '📖 11 771 симптом',
-    hBadgeOffline: '⚡ 100% Офлайн'
+    activeFilterReset: 'Скинути все'
   },
   ru: {
     pageTitle: 'Materia Medica — Поисковый Реперторий (Джон Генри Кларк)',
@@ -280,8 +274,6 @@ const I18N = {
     modalSource: 'Источник:',
     modalClose: 'Закрыть',
     modalError: 'Не удалось открыть описание:',
-    txtModalCopy: 'Копировать',
-    txtModalPrint: 'Печать',
     modalSearchPlaceholder: '🔍 Искать симптомы в этом описании...',
     modalCatAll: 'Все рубрики',
     modalCatMind: '🧘 Психика',
@@ -331,12 +323,8 @@ const I18N = {
     dlFootnote: '💡 Все файлы открыты для некоммерческого использования. Источник: архив Materia Medica Джона Генри Кларка (homeopat-sam.com).',
     copyQuoteBtn: '📋 Цитата',
     toastQuoteCopied: '✓ Цитата скопирована в буфер обмена!',
-    toastRemedyCopied: '✓ Название и описание скопированы!',
     activeFiltersTitle: 'Активные фильтры:',
-    activeFilterReset: 'Сбросить все',
-    hBadgeRemedies: '🌿 341 препарат',
-    hBadgeSymptoms: '📖 11 771 симптом',
-    hBadgeOffline: '⚡ 100% Офлайн'
+    activeFilterReset: 'Сбросить все'
   }
 };
 
@@ -942,15 +930,6 @@ function updateUILanguage() {
   const subEl = document.getElementById('headerSubtitle');
   if (subEl) subEl.innerHTML = t.headerSubtitle;
 
-  const bRemedies = document.getElementById('hBadgeRemedies');
-  if (bRemedies) bRemedies.innerText = t.hBadgeRemedies;
-  const bSymptoms = document.getElementById('hBadgeSymptoms');
-  if (bSymptoms) bSymptoms.innerText = t.hBadgeSymptoms;
-  const bOffline = document.getElementById('hBadgeOffline');
-  if (bOffline) bOffline.innerText = t.hBadgeOffline;
-
-  const txtDlMenuBtn = document.getElementById('txtDownloadMenuBtn');
-  if (txtDlMenuBtn) txtDlMenuBtn.innerText = t.downloadMenuBtn;
 
   // Header Dropdown Menu Localization
   const txtMenuBtn = document.getElementById('txtMenuBtn');
@@ -1039,10 +1018,6 @@ function updateUILanguage() {
     modalCloseBtn.setAttribute('aria-label', t.modalClose);
     modalCloseBtn.title = t.modalClose;
   }
-  const txtModalCopy = document.getElementById('txtModalCopy');
-  if (txtModalCopy) txtModalCopy.innerText = t.txtModalCopy;
-  const txtModalPrint = document.getElementById('txtModalPrint');
-  if (txtModalPrint) txtModalPrint.innerText = t.txtModalPrint;
 
   updateActiveFiltersStrip();
 }
@@ -2021,34 +1996,6 @@ function copySnippetQuote(index) {
   }
 }
 
-function copyRemedyDetails() {
-  if (!currentModalRemedy) return;
-  const t = I18N[currentLang];
-  const r = currentModalRemedy;
-
-  let text = `${r.latin_name || ''}${r.cyrillic_name ? ` (${r.cyrillic_name})` : ''}\n`;
-  if (r.common_name) text += `${t.modalCommonName} ${r.common_name}\n`;
-  if (r.synonyms) text += `${t.modalSynonyms} ${r.synonyms}\n`;
-  if (r.intro) text += `\n${r.intro}\n`;
-
-  if (r.sections) {
-    text += '\n';
-    for (const [sName, sText] of Object.entries(r.sections)) {
-      text += `--- ${sName} ---\n${sText}\n\n`;
-    }
-  }
-
-  if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      showToast(t.toastRemedyCopied || '✓ Назву та опис скопійовано!');
-    }).catch(() => {
-      showToast(t.toastRemedyCopied || '✓ Назву та опис скопійовано!');
-    });
-  } else {
-    showToast(t.toastRemedyCopied || '✓ Назву та опис скопійовано!');
-  }
-}
-
 function getSectionIcon(secName) {
   const u = (secName || '').toUpperCase();
   if (/ОЧІ|ГЛАЗА|ЗІР|ЗРЕНИЕ/.test(u)) return '👁️';
@@ -2351,13 +2298,6 @@ if (typeof document !== 'undefined') {
     if (btnDlLangUa) btnDlLangUa.addEventListener('click', () => updateDownloadModalFiles('ua'));
     if (btnDlLangRu) btnDlLangRu.addEventListener('click', () => updateDownloadModalFiles('ru'));
 
-    // Remedy modal header tools wiring
-    const btnModalCopyText = document.getElementById('btnModalCopyText');
-    if (btnModalCopyText) btnModalCopyText.addEventListener('click', copyRemedyDetails);
-
-    const btnModalPrint = document.getElementById('btnModalPrint');
-    if (btnModalPrint) btnModalPrint.addEventListener('click', () => window.print());
-
     const toggleBtn = document.getElementById('btnToggleAdvanced');
     const advPanel = document.getElementById('advancedPanel');
     if (toggleBtn && advPanel) {
@@ -2447,7 +2387,6 @@ if (typeof window !== 'undefined') {
   window.switchLanguage = switchLanguage;
   window.runSearch = runSearch;
   window.copySnippetQuote = copySnippetQuote;
-  window.copyRemedyDetails = copyRemedyDetails;
   window.openDownloadModal = openDownloadModal;
   window.closeDownloadModal = closeDownloadModal;
   window.updateDownloadModalFiles = updateDownloadModalFiles;
