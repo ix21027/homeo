@@ -16,6 +16,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { MOD_CATS, ETIO_CATS, parseModalities, parseEtiology, parseRelations, splitClauses, mineModalities } from './modalities.mjs';
+import { PLACES, compileFacets, matchSentence } from './facets.mjs';
 
 const require = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -34,6 +35,7 @@ const ETIO_LABEL = { ru: 'После', ua: 'Після' };
 // («Лучше цветет на влажной почве»).
 const MINE_SKIP = new Set(['Модальности', 'Этиология', 'Взаимосвязи', 'Клиника', 'Характеристика', 'Тип', 'Рекомендации', 'Общее']);
 const MINE_STRIP = /\*\*|_/g;
+const FACETS = compileFacets();
 
 // ---------------------------------------------------------------------------
 // Markdown → структура
@@ -339,6 +341,8 @@ function buildLang(lang, ruBuilt) {
   const mineStats = { sentences: 0, marked: 0, items: 0, remedies: 0, newCats: 0, aligned: 0, total: 0 };
   let relNames = 0, relResolved = 0;
   let clauseAligned = 0, clauseTotal = 0;
+  const facetById = new Map();    // id препарату → Map(ключ ознаки → { n: речень, pos: [абзац, речення, …] })
+  const facetRubrics = new Map(); // 'nose.thin' → Map(remedy → { n, pos })
   const modRubrics = new Map();   // 'w.motion' → Map(remedy → ступінь: 2 секційна, 1 видобута)
   const modSecs = new Map();      // 'w.motion' → Map(remedy → Set(розділ, з якого видобуто; канонічна назва — російська))
   const secTitle = new Map();     // канонічна (російська) назва розділу → назва мовою збірки
@@ -402,6 +406,52 @@ function buildLang(lang, ruBuilt) {
         }
         return { d: m.d, c: m.c, t, src: 'text', sec: (okFlat && uaSecOf[m.flat]) || m.sec, sk: m.sec };
       });
+    }
+    // ознаки покрокового підбору (tools/facets.mjs): рахуються на російському тексті, для ua переносяться
+    // за id препарату, а позиції речень — тим самим вирівнюванням абзац/речення, що й видобуті модальності
+    if (lang === 'ru') {
+      let flat = 0;
+      const hits = new Map();
+      for (const s of doc.sections) {
+        s.paras.forEach((p, pi) => {
+          const sents = SC.splitSentences(p.replace(MINE_STRIP, ''));
+          sents.forEach((sent, si) => {
+            for (const f of FACETS) {
+              if (!f.place.secs.includes(s.title) || !matchSentence(f, sent, s.title)) continue;
+              let h = hits.get(f.key);
+              if (!h) hits.set(f.key, h = { n: 0, pos: [] });
+              h.n++;
+              if (h.pos.length < 16) h.pos.push(flat + pi, si);
+            }
+          });
+        });
+        flat += s.paras.length;
+      }
+      facetById.set(doc.id, hits);
+    } else {
+      const ruHits = ruBuilt.facetById.get(doc.id);
+      const hits = new Map();
+      if (ruHits) {
+        const ruFlat = ruBuilt.paras.get('r:' + doc.id) || [];
+        const uaFlat = doc.sections.flatMap(s => s.paras);
+        const okFlat = ruFlat.length === uaFlat.length;
+        for (const [key, h] of ruHits) {
+          const pos = [];
+          for (let k = 0; k < h.pos.length; k += 2) {
+            const fp = h.pos[k], si = h.pos[k + 1];
+            if (!okFlat || uaFlat[fp] == null) continue;
+            const uaS = SC.splitSentences(uaFlat[fp].replace(MINE_STRIP, ''));
+            const ruS = SC.splitSentences(ruFlat[fp].replace(MINE_STRIP, ''));
+            pos.push(fp, uaS.length === ruS.length ? si : Math.min(uaS.length - 1, Math.floor(si * uaS.length / Math.max(ruS.length, 1))));
+          }
+          hits.set(key, { n: h.n, pos });
+        }
+      }
+      facetById.set(doc.id, hits);
+    }
+    for (const [key, h] of facetById.get(doc.id)) {
+      if (!facetRubrics.has(key)) facetRubrics.set(key, new Map());
+      facetRubrics.get(key).set(i, h);
     }
     modsById.set(doc.id, mods); etioById.set(doc.id, etio); relById.set(doc.id, rel); minedById.set(doc.id, mined);
     mods = mods.filter(m => m.c.length);
@@ -561,6 +611,18 @@ function buildLang(lang, ruBuilt) {
     const s = rIdx.map(x => secs && secs.has(x) ? Array.from(secs.get(x), t => msecIdx.get(t)).sort((a, b) => a - b) : 0);
     rubrics.push({ k: 'mod', key: d + '.' + k, t: DIR_LABEL[lang][d] + ': ' + modLabel.get(k), r: rIdx, g: rIdx.map(x => set.get(x)), s });
   }
+  // ознаки підбору: ступінь 2 — ознака в ≥ 2 реченнях місця, 1 — в одному; e — до восьми пар (абзац, речення)
+  // для підстав; places — місця з групами (номери рубрик)
+  const places = PLACES.map(pl => ({
+    key: pl.key, t: pl[lang], secs: pl.secs,
+    groups: pl.groups.map(g => ({ t: g[lang], items: g.items.map(it => {
+      const key = pl.key + '.' + it.key;
+      const m = facetRubrics.get(key) || new Map();
+      const rIdx = Array.from(m.keys()).sort((a, b) => a - b);
+      rubrics.push({ k: 'fac', key, t: pl[lang] + ': ' + it[lang], r: rIdx, g: rIdx.map(x => (m.get(x).n >= 2 ? 2 : 1)), e: rIdx.map(x => m.get(x).pos) });
+      return rubrics.length - 1;
+    }) })),
+  }));
   for (const [k] of ETIO_CATS) {
     const set = etioRubrics.get(k);
     if (!set || !set.size) continue;
@@ -572,7 +634,7 @@ function buildLang(lang, ruBuilt) {
   fs.mkdirSync(path.join(out, 'remedies'), { recursive: true });
   fs.mkdirSync(path.join(out, 'articles'), { recursive: true });
   const catalog = {
-    lang, built: new Date().toISOString().slice(0, 10), remedies, articles, rubrics, msec, msecT: msec.map(x => secTitle.get(x)),
+    lang, built: new Date().toISOString().slice(0, 10), remedies, articles, rubrics, msec, msecT: msec.map(x => secTitle.get(x)), places,
     stats: { remedies: remedies.filter(r => !r.ext).length, ext: remedies.filter(r => r.ext).length, articles: articles.length, rubrics: rubrics.length, units: nUnits, paras: pd.length, vocab: vocab.length },
   };
   fs.writeFileSync(path.join(out, 'catalog.json'), JSON.stringify(catalog));
@@ -603,7 +665,7 @@ function buildLang(lang, ruBuilt) {
   for (const doc of remedyDocs) paras.set('r:' + doc.id, doc.sections.flatMap(s => s.paras));
   for (const doc of articleDocs) paras.set('a:' + doc.id, doc.blocks.flatMap(b => b.paras));
   const topicById = new Map(articles.map(a => [a.id, a.topic]));
-  return { catalog, paras, topicById, nosTermsByRemedy, modsById, etioById, relById, minedById, rep };
+  return { catalog, paras, topicById, nosTermsByRemedy, modsById, etioById, relById, minedById, facetById, rep };
 }
 
 // ---------------------------------------------------------------------------

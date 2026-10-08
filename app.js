@@ -31,7 +31,7 @@
     ua: {
       title: 'Реперторій — гомеопатичні препарати за симптомами', htmlLang: 'uk',
       navRep: 'Симптоми', navRemedies: 'Препарати', navArticles: 'Статті',
-      kind: { free: 'Текст', nos: 'Клініка', art: 'Стаття', line: 'Рубрика', mod: 'Модальність', etio: 'Причина' },
+      kind: { free: 'Текст', nos: 'Клініка', art: 'Стаття', line: 'Рубрика', mod: 'Модальність', etio: 'Причина', fac: 'Ознака' },
       repPlaceholder: 'Симптом, хвороба або рубрика…', allSections: 'Усі розділи', freeSearch: 'Шукати в текстах', freeKind: 'повнотекстово',
       error: 'помилка', clear: 'Очистити', remove: 'Прибрати', removeRubric: 'Прибрати рубрику', loadingIndex: 'Завантаження індексу…',
       nothing: 'Нічого не знайдено. Спробуйте інше формулювання або коротше слово.', found: n => 'Знайдено препаратів: ' + n + '. Натисніть на рядок, щоб побачити підстави.',
@@ -70,11 +70,15 @@
       diffTitle: n => 'Чим відрізняються перші ' + n, diffB: 'краще', diffW: 'гірше', diffBW: 'і так, і так', diffAdd: 'Додати рубрику',
       diffHint: 'Модальності з розділу «Модальності», у яких препарати розходяться. Натисніть «краще» чи «гірше», щоб додати рубрику.',
       artWider: (rub, n) => 'Ширше за статтю: у рубриці «' + rub + '» ще ' + n + ' ' + plural(n, ['препарат', 'препарати', 'препаратів']) + ' — підібрати в реперторії',
+      guide: 'Підбір за кроками', guideWhere: 'Де:', guideNext: 'Уточнення:', yes: 'Так', no: 'Ні', dunno: 'Не знаю',
+      guideOf: (n, c) => 'є у ' + n + ' з ' + c + ' лідерів', guideCnt: 'Скільки препаратів (серед лідерів, коли вже є рубрики)',
+      negWord: 'ні', flagNeg: 'відповідь «ні»', negMark: 'Відповідь «ні»: є в описі — препарат трохи нижче',
+      evFac: 'В описі:', together: n => 'ознак в одному реченні: +' + n,
     },
     ru: {
       title: 'Реперторий — гомеопатические препараты по симптомам', htmlLang: 'ru',
       navRep: 'Симптомы', navRemedies: 'Препараты', navArticles: 'Статьи',
-      kind: { free: 'Текст', nos: 'Клиника', art: 'Статья', line: 'Рубрика', mod: 'Модальность', etio: 'Причина' },
+      kind: { free: 'Текст', nos: 'Клиника', art: 'Статья', line: 'Рубрика', mod: 'Модальность', etio: 'Причина', fac: 'Признак' },
       repPlaceholder: 'Симптом, болезнь или рубрика…', allSections: 'Все разделы', freeSearch: 'Искать в текстах', freeKind: 'полнотекстово',
       error: 'ошибка', clear: 'Очистить', remove: 'Убрать', removeRubric: 'Убрать рубрику', loadingIndex: 'Загрузка индекса…',
       nothing: 'Ничего не найдено. Попробуйте другую формулировку или более короткое слово.', found: n => 'Найдено препаратов: ' + n + '. Нажмите на строку, чтобы увидеть основания.',
@@ -113,12 +117,16 @@
       diffTitle: n => 'Чем отличаются первые ' + n, diffB: 'лучше', diffW: 'хуже', diffBW: 'и так, и так', diffAdd: 'Добавить рубрику',
       diffHint: 'Модальности из раздела «Модальности», в которых препараты расходятся. Нажмите «лучше» или «хуже», чтобы добавить рубрику.',
       artWider: (rub, n) => 'Шире статьи: в рубрике «' + rub + '» ещё ' + n + ' ' + plural(n, ['препарат', 'препарата', 'препаратов']) + ' — подобрать в репертории',
+      guide: 'Подбор по шагам', guideWhere: 'Где:', guideNext: 'Уточнение:', yes: 'Да', no: 'Нет', dunno: 'Не знаю',
+      guideOf: (n, c) => 'есть у ' + n + ' из ' + c + ' лидеров', guideCnt: 'Сколько препаратов (среди лидеров, когда рубрики уже есть)',
+      negWord: 'нет', flagNeg: 'ответ «нет»', negMark: 'Ответ «нет»: есть в описании — препарат немного ниже',
+      evFac: 'В описании:', together: n => 'признаков в одном предложении: +' + n,
     },
   };
-  const KIND_LETTER = { free: 'f', nos: 'n', art: 'a', line: 'l', mod: 'm', etio: 'e' };
-  const LETTER_KIND = { f: 'free', n: 'nos', a: 'art', l: 'line', m: 'mod', e: 'etio' };
+  const KIND_LETTER = { free: 'f', nos: 'n', art: 'a', line: 'l', mod: 'm', etio: 'e', fac: 'p' };
+  const LETTER_KIND = { f: 'free', n: 'nos', a: 'art', l: 'line', m: 'mod', e: 'etio', p: 'fac' };
 
-  const state = { lang: 'ua', cat: {}, idx: {}, idxPromise: {}, docs: new Map(), linker: {}, rubrics: [], shown: 60, open: new Set(), langsAvailable: null, sort: 'cover', cmp: [], cmpOpen: false, articles: true, artShowAll: false, caseId: null };
+  const state = { lang: 'ua', cat: {}, idx: {}, idxPromise: {}, docs: new Map(), linker: {}, rubrics: [], places: [], skip: [], shown: 60, open: new Set(), langsAvailable: null, sort: 'cover', cmp: [], cmpOpen: false, articles: true, artShowAll: false, caseId: null };
   try { if (localStorage.getItem('articles') === '0') state.articles = false; } catch (e) { /* ignore */ }
   const T = () => I18N[state.lang];
   const cat = () => state.cat[state.lang];
@@ -486,6 +494,8 @@
       if (state.sort !== 'cover') q.set('s', state.sort);
       if (state.cmp.length) q.set('c', state.cmp.map(i => cat().remedies[i].id).join(','));
       if (!state.articles) q.set('a', '0');
+      if (state.places.length) q.set('pl', state.places.join(','));
+      if (state.skip.length) q.set('sk', state.skip.join('|'));
       const qs = q.toString();
       path = 'rep' + (qs ? '?' + qs : '');
     } else {
@@ -622,20 +632,21 @@
   }
 
   // ---------------------------------------------------------------- рубрики
-  // Специфікація рубрики в URL: <літера виду><прапорці>:<тіло>; прапорці: ! обов'язкова, - виключна, 2/3 вага.
+  // Специфікація рубрики в URL: <літера виду><прапорці>:<тіло>; прапорці: ! обов'язкова, - виключна,
+  // ~ відповідь «ні» на уточнювальне питання, 2/3 вага.
   function rubricSpec(rb, bodyOverride) {
-    const flags = (rb.elim ? '!' : '') + (rb.excl ? '-' : '') + (rb.weight > 1 ? rb.weight : '');
+    const flags = (rb.elim ? '!' : '') + (rb.excl ? '-' : '') + (rb.neg ? '~' : '') + (rb.weight > 1 ? rb.weight : '');
     let body = bodyOverride;
     if (body == null) {
       if (rb.kind === 'free') body = (rb.section || '') + '~' + rb.text;
       else if (rb.kind === 'art') body = rb.articleId;
-      else if (rb.kind === 'mod' || rb.kind === 'etio') body = rb.key + (rb.sec ? '@' + rb.sec : '');
+      else if (rb.kind === 'mod' || rb.kind === 'etio' || rb.kind === 'fac') body = rb.key + (rb.sec ? '@' + rb.sec : '');
       else body = rb.text;
     }
     return KIND_LETTER[rb.kind] + flags + ':' + body;
   }
   function rubricFromSpec(spec) {
-    const m = spec.match(/^([fnalme])([!\-]*)([23]?):([\s\S]*)$/);
+    const m = spec.match(/^([fnalmep])([!\-~]*)([23]?):([\s\S]*)$/);
     if (!m) return null;
     const kind = LETTER_KIND[m[1]], body = m[4];
     const c = cat();
@@ -657,6 +668,7 @@
     }
     if (!rb) return null;
     rb.elim = m[2].includes('!'); rb.excl = m[2].includes('-'); rb.weight = m[3] ? +m[3] : 1;
+    if (m[2].includes('~')) setNeg(rb);
     return rb;
   }
   // sec — канонічна (російська) назва розділу для модальності, звуженої до одного розділу опису
@@ -665,7 +677,8 @@
     const rb = c.rubrics[i];
     const r = { kind: rb.k, text: rb.t, catIdx: i, remedies: R.rubricRemedies(c, i), label: rb.t, weight: 1, elim: false, excl: false };
     if (rb.k === 'art' || rb.k === 'line') { r.articleIdx = rb.a; r.articleId = c.articles[rb.a].id; }
-    if (rb.k === 'mod' || rb.k === 'etio') r.key = rb.key;
+    if (rb.k === 'mod' || rb.k === 'etio' || rb.k === 'fac') r.key = rb.key;
+    if (rb.k === 'fac') Object.assign(r, R.facetRubric(c, i));
     if (rb.k === 'mod') {
       const si = sec && c.msec ? c.msec.indexOf(sec) : -1;
       if (si >= 0) { r.sec = sec; r.secIdx = si; r.remedies = R.modRemedies(c, i, si); r.label = rb.t + ' · ' + c.msecT[si]; }
@@ -673,6 +686,12 @@
     }
     if (rb.k === 'mod' || rb.k === 'etio') r.rarity = R.rarity(c, r.remedies.size);
     return r;
+  }
+  // Відповідь «ні» на уточнювальне питання: рубрика не входить у покриття, препарати з нею трохи нижче
+  function setNeg(rb) {
+    rb.neg = true; rb.elim = false; rb.excl = false; rb.weight = 1;
+    rb.label = T().negWord + ': ' + rb.text;
+    return rb;
   }
   // Розділ із поля пошуку (назва мовою інтерфейсу) → канонічна назва для модальності, якщо там є видобуті
   function secFromSelect(value) {
@@ -744,6 +763,8 @@
     if (state.sort !== 'cover') q.set('s', state.sort);
     if (state.cmp.length) q.set('c', state.cmp.map(i => cat().remedies[i].id).join(',') + (state.cmpOpen ? '' : '~'));
     if (!state.articles) q.set('a', '0');
+    if (state.places.length) q.set('pl', state.places.join(','));
+    if (state.skip.length) q.set('sk', state.skip.join('|'));
     const qs = q.toString();
     return href('rep') + (qs ? '?' + qs : '');
   }
@@ -800,6 +821,7 @@
         <label class="opt" title="${esc(t.articlesOptTitle)}"><input type="checkbox" id="artOpt"${state.articles ? ' checked' : ''}> ${esc(t.articlesOpt)}</label>
       </form>
       <details class="picker" id="picker"><summary>${esc(t.picker)}</summary><div class="picker-body" id="pickerBody"></div></details>
+      <div id="guide"></div>
       <div class="case-name" id="caseName" hidden></div>
       <div class="chips" id="chips"></div>
       <div id="results"></div>`;
@@ -812,6 +834,9 @@
     const cm = params.get('c');
     state.cmpOpen = !!cm && !cm.endsWith('~');
     state.cmp = cm ? cm.replace(/~$/, '').split(',').map(id => c.remedies.findIndex(r => r.id === id)).filter(i => i >= 0).slice(0, 4) : [];
+    // відкриті місця покрокового підбору і питання з відповіддю «не знаю» (специфікації рубрик)
+    state.places = (params.get('pl') || '').split(',').filter(k => (c.places || []).some(p => p.key === k));
+    state.skip = (params.get('sk') || '').split('|').filter(Boolean);
     if (spec) {
       const specs = spec.split('|');
       const same = specs.length === state.rubrics.length && specs.every((s, i) => rubricSpec(state.rubrics[i]) === s);
@@ -825,6 +850,8 @@
       state.caseId = null;
       state.rubrics = [];
     }
+    // місця з ознаками, що вже стоять у рубриках, відкриті (адреса без pl — напр., зі старого посилання)
+    for (const rb of state.rubrics) if (rb.kind === 'fac') { const pk = rb.key.slice(0, rb.key.indexOf('.')); if (!state.places.includes(pk)) state.places.push(pk); }
     renderPicker();
     renderChips(); renderResults();
 
@@ -914,6 +941,7 @@
     if (rb.weight > 1) f.push('×' + rb.weight);
     if (rb.elim) f.push(t.flagElim);
     if (rb.excl) f.push(t.flagExcl);
+    if (rb.neg) f.push(t.flagNeg);
     return f.length ? ' <span class="chip-flags">(' + esc(f.join(', ')) + ')</span>' : '';
   }
   function renderChips() {
@@ -928,11 +956,11 @@
       const drop = rb.res && rb.res.dropped && rb.res.dropped.length ? ' <span class="maybe">' + esc(t.without) + ' ' + esc(rb.res.dropped.join(', ')) + '</span>' : '';
       // модальність: підпис без розділу + перемикач «усюди / розділ» (у друці — назва розділу текстом)
       const text = rb.kind === 'mod' ? esc(rb.text) + secSelect(rb, k) : esc(rb.label);
-      return '<span class="chip' + (rb.pending ? ' pending' : '') + (rb.excl ? ' excl' : '') + (rb.elim ? ' elim' : '') + (rb.weight > 1 ? ' weighted' : '') + '"><span class="k">' + esc(t.kind[rb.kind]) + '</span> ' + text + corr + drop + flagWords(rb) +
+      return '<span class="chip' + (rb.pending ? ' pending' : '') + (rb.excl ? ' excl' : '') + (rb.elim ? ' elim' : '') + (rb.neg ? ' neg' : '') + (rb.weight > 1 ? ' weighted' : '') + '"><span class="k">' + esc(t.kind[rb.kind]) + '</span> ' + text + corr + drop + flagWords(rb) +
         ' <span class="n">' + n + '</span>' +
-        '<span class="ctl"><button type="button" data-k="' + k + '" data-act="w" class="' + (rb.weight > 1 ? 'on' : '') + '" title="' + esc(t.weight) + '" aria-label="' + esc(t.weight) + '">×' + rb.weight + '</button>' +
+        (rb.neg ? '' : '<span class="ctl"><button type="button" data-k="' + k + '" data-act="w" class="' + (rb.weight > 1 ? 'on' : '') + '" title="' + esc(t.weight) + '" aria-label="' + esc(t.weight) + '">×' + rb.weight + '</button>' +
         '<button type="button" data-k="' + k + '" data-act="e" class="' + (rb.elim ? 'on' : '') + '" title="' + esc(t.elim) + '" aria-label="' + esc(t.elim) + '" aria-pressed="' + rb.elim + '">!</button>' +
-        '<button type="button" data-k="' + k + '" data-act="x" class="' + (rb.excl ? 'on' : '') + '" title="' + esc(t.excl) + '" aria-label="' + esc(t.excl) + '" aria-pressed="' + rb.excl + '">−</button></span>' +
+        '<button type="button" data-k="' + k + '" data-act="x" class="' + (rb.excl ? 'on' : '') + '" title="' + esc(t.excl) + '" aria-label="' + esc(t.excl) + '" aria-pressed="' + rb.excl + '">−</button></span>') +
         '<button type="button" data-k="' + k + '" data-act="rm" title="' + esc(t.remove) + '" aria-label="' + esc(t.removeRubric) + '">×</button></span>';
     }).join('') + (state.rubrics.length > 1 ? ' <button type="button" class="btn secondary small" id="clearAll">' + esc(t.clear) + '</button>' : '');
     box.querySelectorAll('button[data-k]').forEach(b => b.addEventListener('click', () => {
@@ -951,7 +979,7 @@
       state.open.clear();
       rerender();
     }));
-    const c = $('#clearAll'); if (c) c.addEventListener('click', () => { state.rubrics = []; state.open.clear(); state.cmp = []; state.cmpOpen = false; state.caseId = null; rerender(); });
+    const c = $('#clearAll'); if (c) c.addEventListener('click', () => { state.rubrics = []; state.skip = []; state.open.clear(); state.cmp = []; state.cmpOpen = false; state.caseId = null; rerender(); });
   }
   function secSelect(rb, k) {
     const t = T();
@@ -986,7 +1014,83 @@
       (list.length > shown.length ? ' <button type="button" class="btn secondary small" id="artMore">' + esc(t.artMore) + ' ' + (list.length - shown.length) + '</button>' : '') + '</div>';
   }
 
+  // ---------------------------------------------------------------- покроковий підбір
+  // Місця (Ніс, Обличчя…) з групами ознак і одне уточнювальне питання. Ознаки й модальності — звичайні
+  // рубрики реперторію; «Ні» — рубрика з прапорцем ~ (м'який штраф), «Не знаю» — пропуск (sk в адресі).
+  // Кількість біля ознаки — серед близьких до лідера кандидатів, коли рубрики вже є, інакше — усього.
+  function specIdx(sp) {
+    const m = sp.match(/^([pm]):(.+)$/);
+    if (!m) return -1;
+    const kind = LETTER_KIND[m[1]];
+    return cat().rubrics.findIndex(r => r.k === kind && r.key === m[2]);
+  }
+  function renderGuide() {
+    const box = $('#guide');
+    if (!box) return;
+    const t = T(), c = cat();
+    if (!c.places || !c.places.length) { box.innerHTML = ''; return; }
+    if (state.guideOpen == null) state.guideOpen = !window.matchMedia('(max-width: 640px)').matches;
+    const open = c.places.filter(p => state.places.includes(p.key));
+    const ready = state.rubrics.length > 0 && state.rubrics.every(rb => rb.remedies);
+    const rows = ready ? R.repertorize(state.rubrics, {}) : [];
+    const lead = rows.length ? R.nearLeaders(rows, 25).map(x => x.r) : [];
+    const cnt = i => {
+      const m = R.rubricRemedies(c, i);
+      if (!lead.length) return m.size;
+      let n = 0;
+      for (const r of lead) if (m.has(r)) n++;
+      return n;
+    };
+    let html = '<details class="guide"' + (state.guideOpen ? ' open' : '') + '><summary>' + esc(t.guide) + '</summary>' +
+      '<div class="guide-where"><span class="lbl">' + esc(t.guideWhere) + '</span> ' +
+      c.places.map(p => { const on = open.includes(p); return '<button type="button" class="place' + (on ? ' on' : '') + '" data-place="' + p.key + '" aria-pressed="' + on + '">' + esc(p.t) + '</button>'; }).join('') + '</div>';
+    for (const p of open) {
+      html += '<div class="guide-place" data-place="' + p.key + '"><div class="guide-pt">' + esc(p.t) + '</div>' + p.groups.map(g => '<div class="guide-g"><span class="lbl">' + esc(g.t) + '</span> ' + g.items.map(i => {
+        const k = state.rubrics.findIndex(rb => rb.kind === 'fac' && rb.catIdx === i);
+        const on = k >= 0, neg = on && state.rubrics[k].neg;
+        const n = cnt(i);
+        const label = c.rubrics[i].t.slice(c.rubrics[i].t.indexOf(': ') + 2);
+        return '<button type="button" class="fac' + (on ? (neg ? ' neg' : ' on') : '') + (n || on ? '' : ' zero') + '" data-i="' + i + '" aria-pressed="' + on + '" title="' + esc(t.guideCnt) + '">' +
+          (neg ? esc(t.negWord) + ': ' : '') + esc(label) + ' <span class="n">' + n + '</span></button>';
+      }).join('') + '</div>').join('') + '</div>';
+    }
+    let q = null;
+    if (lead.length) {
+      const pool = open.flatMap(p => p.groups.flatMap(g => g.items)).concat(c.rubrics.map((rb, i) => (rb.k === 'mod' ? i : -1)).filter(i => i >= 0));
+      const skip = new Set();
+      for (const rb of state.rubrics) if (rb.catIdx != null) skip.add(rb.catIdx);
+      for (const sp of state.skip) { const i = specIdx(sp); if (i >= 0) skip.add(i); }
+      q = R.nextQuestion(c, rows, pool, skip, 25);
+    }
+    if (q) {
+      html += '<div class="guide-q"><span class="lbl">' + esc(t.guideNext) + '</span> <b>' + esc(c.rubrics[q.i].t) + '?</b> ' +
+        '<button type="button" class="btn small" data-ans="y">' + esc(t.yes) + '</button>' +
+        '<button type="button" class="btn secondary small" data-ans="n">' + esc(t.no) + '</button>' +
+        '<button type="button" class="btn secondary small" data-ans="d">' + esc(t.dunno) + '</button>' +
+        ' <span class="muted small">' + esc(t.guideOf(q.count, q.of)) + '</span></div>';
+    }
+    box.innerHTML = html + '</details>';
+    $('details.guide', box).addEventListener('toggle', e => { state.guideOpen = e.target.open; });
+    box.querySelectorAll('button.place').forEach(b => b.addEventListener('click', () => {
+      const k = b.dataset.place;
+      state.places = state.places.includes(k) ? state.places.filter(x => x !== k) : state.places.concat(k);
+      writeHash(); renderGuide();
+    }));
+    box.querySelectorAll('button.fac').forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.i;
+      const k = state.rubrics.findIndex(rb => rb.kind === 'fac' && rb.catIdx === i);
+      if (k >= 0) removeRubric(k); else addRubric(makeCatRubric(i));
+    }));
+    box.querySelectorAll('button[data-ans]').forEach(b => b.addEventListener('click', () => {
+      const a = b.dataset.ans;
+      if (a === 'y') addRubric(makeCatRubric(q.i));
+      else if (a === 'n') addRubric(setNeg(makeCatRubric(q.i)));
+      else { state.skip.push(KIND_LETTER[c.rubrics[q.i].k === 'fac' ? 'fac' : 'mod'] + ':' + c.rubrics[q.i].key); rerender(); }
+    }));
+  }
+
   function renderResults() {
+    renderGuide();
     const box = $('#results');
     if (!box) return;
     const t = T();
@@ -1006,10 +1110,11 @@
       const r = c.remedies[row.r];
       const cells = cols.map(k => {
         const g = row.grades[k], cf = row.conf[k];
+        if (row.neg[k]) return '<td class="g ng"><i class="negm" title="' + esc(t.negMark) + '" aria-label="' + esc(t.negMark) + '">−</i></td>';
         return '<td class="g g' + g + (cf ? ' cf' : '') + '">' + (g ? '<span title="' + row.hits[k] + ' ' + esc(t.hits) + '">' + (state.rubrics[k].kind === 'free' ? row.hits[k] : '●') + '</span>' : '') +
           (cf ? '<i class="conf" title="' + esc(t.conf(cf)) + '" aria-label="' + esc(t.conf(cf)) + '">✕</i>' : '') + '</td>';
       }).join('');
-      const sum = cols.length > 1 ? '<td class="sum">' + row.cover + '/' + cols.length + (row.conflicts ? ' <i class="conf" title="' + esc(t.confSum(row.conflicts)) + '">−' + row.conflicts + '</i>' : '') +
+      const sum = cols.length > 1 ? '<td class="sum"' + (row.together ? ' title="' + esc(t.together(row.together)) + '"' : '') + '>' + row.cover + '/' + cols.length + (row.together ? '<sup class="tog">+</sup>' : '') + (row.conflicts ? ' <i class="conf" title="' + esc(t.confSum(row.conflicts)) + '">−' + row.conflicts + '</i>' : '') +
         (state.sort === 'total' ? ' <span class="muted small">' + fmtTotal(row.total) + '</span>' : '') + '</td>' : '';
       const checked = state.cmp.includes(row.r);
       const open = state.open.has(row.r);
@@ -1152,6 +1257,22 @@
     return out;
   }
 
+  // Речення опису, де знайдено ознаку підбору (позиції — з каталогу: абзац у плоскому списку, номер речення)
+  function facSentences(doc, rb, rIdx, max) {
+    const crb = cat().rubrics[rb.catIdx];
+    const k = crb.r.indexOf(rIdx);
+    if (k < 0 || !crb.e || !crb.e[k]) return [];
+    const flat = [], secOf = [];
+    doc.sections.forEach(sec => sec.paras.forEach(p => { flat.push(p); secOf.push(sec.title); }));
+    const e = crb.e[k], out = [];
+    for (let j = 0; j < e.length && out.length < max; j += 2) {
+      const md = flat[e[j]];
+      if (md == null) continue;
+      const sent = SC.splitSentences(md.replace(/\*\*|_/g, ''))[e[j + 1]];
+      if (sent) out.push({ sec: secOf[e[j]], html: inner(renderPara(sent.trim(), { selfIdx: rIdx })) });
+    }
+    return out;
+  }
   async function renderDetail(tr, rIdx, row) {
     const t = T();
     const c = cat();
@@ -1161,16 +1282,25 @@
     let doc = null;
     for (let k = 0; k < state.rubrics.length; k++) {
       const rb = state.rubrics[k];
-      if (!row.hits[k] && !row.conf[k]) continue;
+      if (!row.hits[k] && !row.conf[k] && !row.neg[k]) continue;
       let html = '<div class="evid"><h4>' + esc(t.kind[rb.kind]) + ': ' + esc(rb.label) + '</h4>';
       try {
+        if (row.neg[k]) {
+          if (!doc && !r.ext) doc = await getDoc('remedies', r.id);
+          const ev = !doc ? [] : rb.kind === 'fac' ? facSentences(doc, rb, rIdx, 3).map(x => '<span class="sec">' + esc(x.sec) + ':</span> ' + x.html) : modClauses(doc, rb).map(esc);
+          html += '<p class="neg-ev">' + esc(t.negMark) + (ev.length ? ': ' + ev.join('; ') : '') + '</p>';
+        }
+        if (rb.kind === 'fac' && row.hits[k]) {
+          if (!doc && !r.ext) doc = await getDoc('remedies', r.id);
+          for (const x of (doc ? facSentences(doc, rb, rIdx, 3) : [])) html += '<p><span class="sec">' + esc(x.sec) + ':</span> ' + x.html + '</p>';
+        }
         if (row.conf[k]) {
           if (!doc && !r.ext) doc = await getDoc('remedies', r.id);
           const oppKey = (rb.key[0] === 'w' ? 'b' : 'w') + rb.key.slice(1);
           const cl = doc ? modClauses(doc, rb, oppKey, true) : [];
           html += '<p class="conf-ev">' + esc(t.evConf) + ' ' + (cl.length ? cl.map(x => '<b>' + esc(x) + '</b>').join('; ') : esc(row.conf[k])) + '</p>';
         }
-        if (!row.hits[k]) { /* лише протилежність */ }
+        if (!row.hits[k] || rb.kind === 'fac') { /* лише протилежність, «ні» або ознака — уже вище */ }
         else if (rb.kind === 'nos') {
           const v = rb.remedies.get(rIdx);
           const via = v && v.child != null ? ' <span class="muted small">(' + esc(t.evSub) + ' «' + esc(c.rubrics[v.child].t) + '»)</span>' : '';
@@ -1239,6 +1369,7 @@
           if (rb.kind === 'nos') ev = esc(v && v.child != null ? c.rubrics[v.child].t : rb.text);
           else if (rb.kind === 'mod' || rb.kind === 'etio') ev = docs[j] ? modClauses(docs[j], rb).map(esc).join('; ') : '';
           else if (rb.kind === 'art' || rb.kind === 'line') ev = '<a href="' + href('article/' + encodeURIComponent(rb.articleId)) + '?r=' + i + '">' + esc(c.articles[rb.articleIdx].title) + '</a>';
+          else if (rb.kind === 'fac') ev = docs[j] ? facSentences(docs[j], rb, i, 2).map(x => '<span class="sec">' + esc(x.sec) + ':</span> ' + x.html).join('<br>') : '';
           else if (rb.kind === 'free' && rb.res) { try { const e = await freeEvidence(rb, i, 2); ev = e.items.map(x => (x.sec ? '<span class="sec">' + esc(x.sec) + ':</span> ' : '') + x.html).join('<br>'); } catch (e) { ev = ''; } }
         }
         const cf = row && row.conf[k];

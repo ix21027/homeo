@@ -218,6 +218,24 @@ button.pick .n { color: var(--fg-2); font-size: .76rem; }
 table.rep td.g .conf { margin-left: 2px; }
 .conf-ev { color: var(--danger); }
 .conf-ev b { color: var(--fg); }
+/* покроковий підбір: місця, ознаки, уточнювальне питання */
+details.guide { margin: 4px 0 10px; }
+details.guide summary { cursor: pointer; color: var(--fg-2); font-size: .92rem; }
+.guide-where, .guide-g, .guide-q { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 8px 0; }
+.guide .lbl { font-size: .8rem; color: var(--fg-2); min-width: 4.5em; }
+.guide-place { border-left: 3px solid var(--accent-2); padding: 2px 0 2px 10px; margin: 8px 0; }
+.guide-pt { font-weight: 600; font-size: .92rem; }
+.guide button.place, .guide button.fac { font: inherit; font-size: .85rem; border: 1px solid var(--line); background: transparent; color: var(--fg); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+.guide button.place.on, .guide button.fac.on { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.guide button.fac.neg { border-style: dashed; color: var(--fg-2); text-decoration: line-through; }
+.guide button.fac.zero { opacity: .45; }
+.guide button.fac .n { font-size: .75rem; opacity: .75; }
+.guide button.place:hover, .guide button.fac:hover { border-color: var(--accent); }
+.guide-q { background: var(--accent-2); border-radius: 10px; padding: 6px 10px; }
+.chip.neg { background: transparent; border: 1px dashed var(--line); color: var(--fg-2); }
+table.rep td.ng .negm { font-style: normal; color: var(--fg-2); }
+.neg-ev { color: var(--fg-2); }
+table.rep td.sum sup.tog { color: var(--accent); font-weight: 700; margin-left: 1px; }
 /* чим відрізняються лідери */
 details.diff { margin: 16px 0 6px; }
 details.diff summary { cursor: pointer; font-weight: 600; }
@@ -315,7 +333,7 @@ table.cmp .rel { margin: 0 0 3px; }
   @page { margin: 12mm; }
   body { background: #fff; color: #000; font-size: 11pt; }
   .site-header, .menu-wrap, .rep-search, .picker, .cmp-bar, .more-row, .btn, .sort,
-  .case-name, .case-ctl, .chip .ctl, .chip > button, .toc, input.cmp-box, table.rep .chev, .chip select.chip-sec, details.diff, .art-wider { display: none !important; }
+  .case-name, .case-ctl, .chip .ctl, .chip > button, .toc, input.cmp-box, table.rep .chev, .chip select.chip-sec, details.diff, .art-wider, #guide { display: none !important; }
   main.wrap { padding: 0; max-width: none; min-height: 0; }
   .print-only { display: block; margin: 0 0 10px; }
   .print-only .print-case { font-family: var(--serif); font-size: 1.25rem; font-weight: 700; }

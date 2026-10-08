@@ -432,6 +432,8 @@
   // opts.sort: 'cover' (типово) | 'total' | 'name' (потрібен opts.nameOf)
   // Протилежність не зменшує показане покриття (row.cover), але сортування за покриттям іде за
   // row.cover − row.conflicts, а бали втрачають по одиниці (× вага × рідкість) за кожну.
+  // Рубрика з neg («Ні» на уточнювальне питання) не входить у покриття: препарат, що її має, лише
+  // трохи опускається (−0.5 у сортуванні, −0.5·ступінь у балах) — відсутність симптому в описі не доказ.
   function repertorize(rubrics, opts) {
     opts = opts || {};
     const rows = new Map();
@@ -440,6 +442,7 @@
     rubrics.forEach((rb, k) => {
       if (!rb.remedies) return;
       if (rb.excl) { for (const r of rb.remedies.keys()) excl.add(r); return; }
+      if (rb.neg) return;
       const w = (rb.weight || 1) * (rb.rarity || 1);
       if (rb.elim) nElim++;
       for (const [r, v] of rb.remedies) {
@@ -447,13 +450,22 @@
         const hits = typeof v === 'number' ? 1 : (v.hits || 1);
         const sc = typeof v === 'number' ? g : (v.score != null ? v.score : g);
         let row = rows.get(r);
-        if (!row) rows.set(r, row = { r, cover: 0, conflicts: 0, total: 0, sumHits: 0, sumScore: 0, elimOk: 0, grades: new Array(rubrics.length).fill(0), hits: new Array(rubrics.length).fill(0), conf: new Array(rubrics.length).fill(null) });
+        if (!row) rows.set(r, row = { r, cover: 0, conflicts: 0, negs: 0, together: 0, total: 0, sumHits: 0, sumScore: 0, elimOk: 0, grades: new Array(rubrics.length).fill(0), hits: new Array(rubrics.length).fill(0), conf: new Array(rubrics.length).fill(null), neg: new Array(rubrics.length).fill(false) });
         row.grades[k] = g; row.hits[k] = hits; row.cover++; row.total += g * w; row.sumHits += hits; row.sumScore += sc * w;
         if (rb.elim) row.elimOk++;
       }
     });
     rubrics.forEach((rb, k) => {
-      if (!rb.remedies || rb.excl || !rb.opp) return;
+      if (!rb.remedies || rb.excl || !rb.neg) return;
+      const w = (rb.weight || 1) * (rb.rarity || 1);
+      for (const [r, v] of rb.remedies) {
+        const row = rows.get(r);
+        if (!row) continue;
+        row.neg[k] = true; row.negs++; row.total -= 0.5 * (typeof v === 'number' ? v : v.g) * w;
+      }
+    });
+    rubrics.forEach((rb, k) => {
+      if (!rb.remedies || rb.excl || rb.neg || !rb.opp) return;
       const w = (rb.weight || 1) * (rb.rarity || 1);
       for (const [r, label] of rb.opp) {
         const row = rows.get(r);
@@ -461,12 +473,83 @@
         row.conf[k] = label; row.conflicts++; row.total -= w;
       }
     });
+    // Ознаки одного місця, описані в одному реченні («заложенность… и выделения… жидких белых масс»), —
+    // сильніший збіг, ніж ті самі ознаки, розкидані по великому розділу (так само, як слова в одному
+    // реченні текстового пошуку). row.together — сума по місцях (найбільше ознак в одному реченні − 1);
+    // у сортуванні важить як пів рубрики, у балах — як одиниця. Без цього нагорі опиняються препарати з
+    // найдовшими описами, що згадують майже все.
+    const byPlace = new Map();
+    rubrics.forEach(rb => {
+      if (!rb.pos || !rb.remedies || rb.excl || rb.neg) return;
+      if (!byPlace.has(rb.place)) byPlace.set(rb.place, []);
+      byPlace.get(rb.place).push(rb);
+    });
+    for (const list of byPlace.values()) {
+      if (list.length < 2) continue;
+      for (const row of rows.values()) {
+        const cnt = new Map();
+        let best = 0;
+        for (const rb of list) {
+          const ps = rb.pos.get(row.r);
+          if (!ps) continue;
+          for (const p of ps) { const c = (cnt.get(p) || 0) + 1; cnt.set(p, c); if (c > best) best = c; }
+        }
+        if (best > 1) { row.together += best - 1; row.total += best - 1; }
+      }
+    }
     const out = Array.from(rows.values()).filter(row => !excl.has(row.r) && row.elimOk === nElim);
-    const net = row => row.cover - row.conflicts;
+    const net = row => row.cover - row.conflicts - 0.5 * row.negs + 0.5 * row.together;
     const byCover = (a, b) => net(b) - net(a) || b.cover - a.cover || b.total - a.total || b.sumScore - a.sumScore || a.r - b.r;
     const byTotal = (a, b) => b.total - a.total || net(b) - net(a) || b.sumScore - a.sumScore || a.r - b.r;
     const byName = (a, b) => opts.nameOf(a.r).localeCompare(opts.nameOf(b.r)) || a.r - b.r;
     return out.sort(opts.sort === 'total' ? byTotal : opts.sort === 'name' && opts.nameOf ? byName : byCover);
+  }
+
+  // Рубрика-ознака покрокового підбору: препарати, місце і речення (Map(препарат → ['абзац.речення', …]))
+  // для бонусу «в одному реченні».
+  function facetRubric(catalog, i) {
+    const rb = catalog.rubrics[i];
+    const pos = new Map();
+    rb.r.forEach((r, k) => {
+      const e = rb.e && rb.e[k];
+      if (!e || !e.length) return;
+      const keys = new Set();
+      for (let j = 0; j < e.length; j += 2) keys.add(e[j] + '.' + e[j + 1]);
+      pos.set(r, Array.from(keys));
+    });
+    return { remedies: rubricRemedies(catalog, i), pos, place: rb.key.slice(0, rb.key.indexOf('.')) };
+  }
+
+  // ---- уточнювальне питання ----------------------------------------------
+  // Близькі до лідера кандидати: рядки, чий «чистий» бал покриття не нижчий за лідерів більш ніж на 1, до cap.
+  function nearLeaders(rows, cap) {
+    if (!rows.length) return [];
+    const net = row => row.cover - row.conflicts - 0.5 * (row.negs || 0) + 0.5 * (row.together || 0);
+    const top = Math.max.apply(null, rows.map(net));
+    return rows.filter(row => net(row) >= top - 1).slice(0, cap || 25);
+  }
+  // Наступне питання: рубрика каталогу з pool (номери; ознаки відкритих місць і модальності), яка ділить
+  // близьких до лідера кандидатів найближче до навпіл. Модальність рахується лише з розділу «Модальности»
+  // (ступінь 2). Не питаємо про рубрику, яку мають менше двох кандидатів або всі, крім одного.
+  // skip — Set номерів, про які вже питали чи які вже в рубриках. Повертає { i, count, of } або null.
+  function nextQuestion(catalog, rows, pool, skip, cap) {
+    const cand = nearLeaders(rows, cap);
+    const C = cand.length;
+    if (C < 3) return null;
+    const ids = cand.map(row => row.r);
+    const min = C >= 6 ? 2 : 1;
+    let best = null;
+    for (const i of pool) {
+      if (skip && skip.has(i)) continue;
+      const rb = catalog.rubrics[i];
+      const m = rubricRemedies(catalog, i);
+      let n = 0;
+      for (const r of ids) { const v = m.get(r); if (v && (rb.k !== 'mod' || v.g === 2)) n++; }
+      if (n < min || C - n < min) continue;
+      const score = Math.min(n, C - n) / C + (rb.k === 'fac' ? 0.01 : 0);
+      if (!best || score > best.score) best = { i, count: n, of: C, score };
+    }
+    return best;
   }
 
   // ---- підказки рубрик --------------------------------------------------
@@ -533,5 +616,5 @@
     return out.slice(0, limit || 8);
   }
 
-  return { makeIndex, freeText, confirmPhrases, phraseInSentence, gradeScore, repertorize, rubricRemedies, modRemedies, modOpposites, rarity, diffModalities, suggest, matchRemedies, foldForMatch, vocabRange, SECTION_WEIGHT };
+  return { makeIndex, freeText, confirmPhrases, phraseInSentence, gradeScore, repertorize, rubricRemedies, modRemedies, modOpposites, rarity, diffModalities, nearLeaders, nextQuestion, facetRubric, suggest, matchRemedies, foldForMatch, vocabRange, SECTION_WEIGHT };
 });

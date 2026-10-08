@@ -305,5 +305,82 @@ check('чим відрізняються: протилежні категорі�
   return list.map(x => x.c + (x.opposed ? '!' : '')).join(' ');
 });
 
+// ---- покроковий підбір: ознаки місць, «ні», «в одному реченні», уточнювальні питання ----
+const facIdx = (cat, key) => cat.rubrics.findIndex(x => (x.k === 'fac' || x.k === 'mod') && x.key === key);
+function guideRub(cat, key, neg) {
+  const i = facIdx(cat, key), rb = cat.rubrics[i];
+  if (rb.k === 'fac') return Object.assign(R.facetRubric(cat, i), { neg });
+  const m = R.rubricRemedies(cat, i);
+  return { remedies: m, rarity: R.rarity(cat, m.size), opp: R.modOpposites(cat, i, -1, m), neg };
+}
+const remIdx = (cat, id) => cat.remedies.findIndex(r => r.id === id);
+check('ознаки: заперечення не рахується («Неедкий насморк» — м’які, не їдкі)', () => {
+  const ich = remIdx(catRu, 'ichthyolum');
+  const has = key => R.rubricRemedies(catRu, facIdx(catRu, key)).has(ich);
+  assert(ich >= 0, 'немає Ichthyolum');
+  assert(has('nose.bland'), 'не в «мягкие»');
+  assert(!has('nose.acrid'), 'потрапив в «едкие»');
+});
+check('ознаки: ua і ru — ті самі препарати (перенесення за id)', () => {
+  for (const pl of catRu.places) for (const g of pl.groups) for (const i of g.items) {
+    const key = catRu.rubrics[i].key, j = facIdx(catUa, key);
+    const a = catRu.rubrics[i].r.map(r => catRu.remedies[r].id).sort().join(), b = catUa.rubrics[j].r.map(r => catUa.remedies[r].id).sort().join();
+    assert(a === b, key + ': ua ≠ ru');
+  }
+});
+check('«в одному реченні»: у Mag-phos «закладеність + рідкі» — одне речення (together ≥ 1)', () => {
+  const rows = R.repertorize([guideRub(catRu, 'nose.thin'), guideRub(catRu, 'nose.blocked')], {});
+  const row = rows.find(x => catRu.remedies[x.r].id === 'magnesium-phosphoricum');
+  assert(row && row.together >= 1, 'together ' + (row && row.together));
+});
+check('«Ні» — м’який штраф: не в покритті, але нижче за рівного без неї', () => {
+  const base = [guideRub(catRu, 'nose.thin'), guideRub(catRu, 'nose.blocked')];
+  const rows0 = R.repertorize(base, {});
+  const rows1 = R.repertorize(base.concat(guideRub(catRu, 'nose.sneeze', true)), {});
+  const a = rows0[0], b = rows1.find(x => x.r === a.r);
+  assert(b.cover === a.cover, 'покриття змінилось');
+  const sneeze = R.rubricRemedies(catRu, facIdx(catRu, 'nose.sneeze'));
+  const hit = rows1.find(x => sneeze.has(x.r)), miss = rows1.find(x => !sneeze.has(x.r) && x.cover === hit.cover && x.together === hit.together);
+  if (miss) assert(rows1.indexOf(miss) < rows1.indexOf(hit), 'препарат із «ні» не нижче');
+  assert(rows1.length === rows0.length, 'рядки викинуто');
+});
+for (const lang of ['ua', 'ru']) {
+  check(lang + ': підбір — факти з розмови (рідкі, закладений, щелепа, спазм, тепло, ніч, натискання): Mag-phos у топ-5', () => {
+    const cat = lang === 'ua' ? catUa : catRu;
+    const keys = ['nose.thin', 'nose.blocked', 'face.jaw', 'face.cramp', 'b.heat', 'w.night', 'b.pressure'];
+    const rows = R.repertorize(keys.map(k => guideRub(cat, k)), {});
+    const k = rows.findIndex(x => cat.remedies[x.r].id === 'magnesium-phosphoricum');
+    assert(k >= 0 && k < 5, `місце ${k + 1}: ${rows.slice(0, 5).map(x => cat.remedies[x.r].latin).join(', ')}`);
+    return `місце ${k + 1}; поруч ${rows.slice(0, 5).map(x => cat.remedies[x.r].latin.split(' ')[0]).join(', ')}`;
+  });
+}
+check('питання допомагають: «пацієнт» = опис препарату (Ніс), «так»/«не знаю», ≤ 6 питань', () => {
+  const pl = catRu.places.find(p => p.key === 'nose');
+  const facets = pl.groups.flatMap(g => g.items);
+  const pool = facets.concat(catRu.rubrics.map((r, i) => (r.k === 'mod' ? i : -1)).filter(i => i >= 0));
+  const has = (i, r) => { const v = R.rubricRemedies(catRu, i).get(r); return v && (catRu.rubrics[i].k !== 'mod' || v.g === 2); };
+  const mk = i => (catRu.rubrics[i].k === 'fac' ? R.facetRubric(catRu, i) : guideRub(catRu, catRu.rubrics[i].key));
+  let n = 0, start5 = 0, end5 = 0;
+  for (let r = 0; r < catRu.remedies.length; r++) {
+    const own = facets.filter(i => has(i, r));
+    if (own.length < 4) continue;
+    n++;
+    const start = own.slice().sort((a, b) => catRu.rubrics[a].r.length - catRu.rubrics[b].r.length).slice(0, 2);
+    const rubs = start.map(mk), asked = new Set(start);
+    let rows = R.repertorize(rubs, {});
+    if (rows.findIndex(x => x.r === r) < 5) start5++;
+    for (let q = 0; q < 6; q++) {
+      const nq = R.nextQuestion(catRu, rows, pool, asked, 25);
+      if (!nq) break;
+      asked.add(nq.i);
+      if (has(nq.i, r)) { rubs.push(mk(nq.i)); rows = R.repertorize(rubs, {}); }
+    }
+    if (rows.findIndex(x => x.r === r) < 5) end5++;
+  }
+  assert(end5 / n >= 0.75, `у топ-5 лише ${end5}/${n}`);
+  assert(end5 > start5, 'питання не допомогли');
+  return `у топ-5: на старті ${start5}/${n}, після питань ${end5}/${n}`;
+});
+
 console.log(`\nПідсумок: OK ${ok}, FAIL ${fails}`);
 process.exit(fails ? 1 : 0);
