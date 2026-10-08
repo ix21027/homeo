@@ -1087,7 +1087,8 @@
       return '<td class="c"><button type="button" class="diff-add ' + x + '"' + (L ? ' data-i="' + L.i + '"' : ' disabled') + ' title="' + esc(t.diffAdd) + '">' + esc(word[x]) + '</button></td>';
     };
     const name = cid => { const L = labels.get('m:b.' + cid) || labels.get('m:w.' + cid); return L ? L.label : cid; };
-    return '<details class="diff" open><summary>' + esc(t.diffTitle(ids.length)) + '</summary><p class="muted small">' + esc(t.diffHint) + '</p>' +
+    const mobile = window.matchMedia('(max-width: 640px)').matches;
+    return '<details class="diff"' + (mobile ? '' : ' open') + '><summary title="' + esc(t.diffHint) + '">' + esc(t.diffTitle(ids.length)) + '</summary>' +
       '<div class="table-wrap"><table class="rep diff-t"><thead><tr><th></th>' + ids.map(i => '<th>' + remedyLink(i) + '</th>').join('') + '</tr></thead><tbody>' +
       list.map(x => '<tr' + (x.opposed ? ' class="opp"' : '') + '><th class="lbl">' + esc(name(x.c)) + '</th>' + x.cells.map(v => cell(v, x.c)).join('') + '</tr>').join('') +
       '</tbody></table></div></details>';
