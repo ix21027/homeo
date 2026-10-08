@@ -8,7 +8,7 @@
 # features.js і решту наборів теки, друкує підсумок і зупиняє сервер. Код виходу ≠ 0, якщо хоч щось провалилось.
 #
 # Для живого сайту сервер не потрібен:
-#   BASE=https://ix21027.github.io/homeo-repertory/ node tools/uitest/basic.js
+#   BASE=https://ix21027.github.io/homeo/ node tools/uitest/basic.js
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PORT="${1:-${PORT:-8765}}"

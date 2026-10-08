@@ -340,6 +340,8 @@ function buildLang(lang, ruBuilt) {
   let relNames = 0, relResolved = 0;
   let clauseAligned = 0, clauseTotal = 0;
   const modRubrics = new Map();   // 'w.motion' → Map(remedy → ступінь: 2 секційна, 1 видобута)
+  const modSecs = new Map();      // 'w.motion' → Map(remedy → Set(розділ, з якого видобуто; канонічна назва — російська))
+  const secTitle = new Map();     // канонічна (російська) назва розділу → назва мовою збірки
   const etioRubrics = new Map();  // 'fright' → Set(remedy)
   remedyDocs.forEach((doc, i) => {
     const modSec = doc.sections.find(s => s.title === MODAL[lang]);
@@ -398,7 +400,7 @@ function buildLang(lang, ruBuilt) {
           const j = uaS.length === ruS.length ? m.sent : Math.min(uaS.length - 1, Math.floor(m.sent * uaS.length / Math.max(ruS.length, 1)));
           if (uaS[j]) { t = uaS[j].trim(); mineStats.aligned++; }
         }
-        return { d: m.d, c: m.c, t, src: 'text', sec: (okFlat && uaSecOf[m.flat]) || m.sec };
+        return { d: m.d, c: m.c, t, src: 'text', sec: (okFlat && uaSecOf[m.flat]) || m.sec, sk: m.sec };
       });
     }
     modsById.set(doc.id, mods); etioById.set(doc.id, etio); relById.set(doc.id, rel); minedById.set(doc.id, mined);
@@ -410,6 +412,18 @@ function buildLang(lang, ruBuilt) {
     mineStats.items += mined.length;
     if (mined.length) mineStats.remedies++;
     if (mined.some(m => m.c.some(c => !secKeys.has(m.d + '.' + c)))) mineStats.newCats++;
+    for (const m of mined) {
+      const sk = m.sk || m.sec;
+      if (!sk) continue;
+      if (!secTitle.has(sk) || (m.sec !== sk && secTitle.get(sk) === sk)) secTitle.set(sk, m.sec || sk);
+      for (const c of m.c) {
+        const key = m.d + '.' + c;
+        if (!modSecs.has(key)) modSecs.set(key, new Map());
+        const cur = modSecs.get(key);
+        if (!cur.has(i)) cur.set(i, new Set());
+        cur.get(i).add(sk);
+      }
+    }
     mods = mods.concat(mined.map(m => ({ d: m.d, c: m.c, t: m.t, src: m.src, sec: m.sec })));
     for (const m of mods) for (const c of m.c) {
       const key = m.d + '.' + c, g = m.src ? 1 : 2;
@@ -535,11 +549,17 @@ function buildLang(lang, ruBuilt) {
   // модальності та етіологія (мовно-незалежні ключі, підписи з таблиць)
   const modLabel = new Map(MOD_CATS.map(([k, , ru, ua]) => [k, lang === 'ua' ? ua : ru]));
   const etioLabel = new Map(ETIO_CATS.map(([k, , ru, ua]) => [k, lang === 'ua' ? ua : ru]));
+  // розділи видобутих модальностей: msec — канонічні (російські) назви для адрес, msecT — підписи мовою збірки;
+  // у рубриці s[k] — номери розділів (у msec), де модальність препарату r[k] видобуто з тексту, або 0
+  const msec = Array.from(secTitle.keys()).sort((a, b) => a.localeCompare(b, 'ru'));
+  const msecIdx = new Map(msec.map((x, k) => [x, k]));
   for (const d of ['w', 'b']) for (const [k] of MOD_CATS) {
     const set = modRubrics.get(d + '.' + k);
     if (!set || !set.size) continue;
     const rIdx = Array.from(set.keys()).sort((a, b) => a - b);
-    rubrics.push({ k: 'mod', key: d + '.' + k, t: DIR_LABEL[lang][d] + ': ' + modLabel.get(k), r: rIdx, g: rIdx.map(x => set.get(x)) });
+    const secs = modSecs.get(d + '.' + k);
+    const s = rIdx.map(x => secs && secs.has(x) ? Array.from(secs.get(x), t => msecIdx.get(t)).sort((a, b) => a - b) : 0);
+    rubrics.push({ k: 'mod', key: d + '.' + k, t: DIR_LABEL[lang][d] + ': ' + modLabel.get(k), r: rIdx, g: rIdx.map(x => set.get(x)), s });
   }
   for (const [k] of ETIO_CATS) {
     const set = etioRubrics.get(k);
@@ -552,7 +572,7 @@ function buildLang(lang, ruBuilt) {
   fs.mkdirSync(path.join(out, 'remedies'), { recursive: true });
   fs.mkdirSync(path.join(out, 'articles'), { recursive: true });
   const catalog = {
-    lang, built: new Date().toISOString().slice(0, 10), remedies, articles, rubrics,
+    lang, built: new Date().toISOString().slice(0, 10), remedies, articles, rubrics, msec, msecT: msec.map(x => secTitle.get(x)),
     stats: { remedies: remedies.filter(r => !r.ext).length, ext: remedies.filter(r => r.ext).length, articles: articles.length, rubrics: rubrics.length, units: nUnits, paras: pd.length, vocab: vocab.length },
   };
   fs.writeFileSync(path.join(out, 'catalog.json'), JSON.stringify(catalog));

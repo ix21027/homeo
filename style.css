@@ -210,6 +210,25 @@ button.pick .n { color: var(--fg-2); font-size: .76rem; }
 .chip.excl { text-decoration: line-through; opacity: .75; }
 .chip.elim { border-color: var(--accent); }
 .chip .maybe { font-size: .78rem; color: var(--fg-2); font-style: italic; }
+/* розділ дії модальності: «усюди» чи один розділ опису */
+.chip select.chip-sec { font: inherit; font-size: .8rem; color: var(--fg-2); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 0 2px; max-width: 11em; cursor: pointer; }
+.chip select.chip-sec:hover, .chip select.chip-sec:focus { border-color: var(--accent); color: var(--accent); }
+/* протилежна модальність: у клітинці, підсумку, порівнянні й підставах */
+.conf { font-style: normal; color: var(--danger); font-size: .78rem; font-weight: 600; }
+table.rep td.g .conf { margin-left: 2px; }
+.conf-ev { color: var(--danger); }
+.conf-ev b { color: var(--fg); }
+/* чим відрізняються лідери */
+details.diff { margin: 16px 0 6px; }
+details.diff summary { cursor: pointer; font-weight: 600; }
+details.diff p { margin: 4px 0 8px; }
+table.diff-t { width: auto; }
+table.diff-t th.lbl { text-align: left; font-weight: 400; color: var(--fg-2); white-space: nowrap; }
+table.diff-t td.c { text-align: center; }
+table.diff-t tr.opp th.lbl { color: var(--fg); font-weight: 600; }
+button.diff-add { font: inherit; font-size: .82rem; border: 1px solid transparent; border-radius: 999px; padding: 1px 9px; cursor: pointer; background: var(--accent-2); color: var(--accent); }
+button.diff-add.w { background: transparent; border-color: var(--line); color: var(--fg); }
+button.diff-add:hover { border-color: var(--accent); }
 .results-head { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
 .results-head .sort { margin-left: auto; }
 .results-head .btn.small { padding: 2px 9px; font-size: .82rem; }
@@ -296,7 +315,7 @@ table.cmp .rel { margin: 0 0 3px; }
   @page { margin: 12mm; }
   body { background: #fff; color: #000; font-size: 11pt; }
   .site-header, .menu-wrap, .rep-search, .picker, .cmp-bar, .more-row, .btn, .sort,
-  .case-name, .case-ctl, .chip .ctl, .chip > button, .toc, input.cmp-box, table.rep .chev { display: none !important; }
+  .case-name, .case-ctl, .chip .ctl, .chip > button, .toc, input.cmp-box, table.rep .chev, .chip select.chip-sec, details.diff, .art-wider { display: none !important; }
   main.wrap { padding: 0; max-width: none; min-height: 0; }
   .print-only { display: block; margin: 0 0 10px; }
   .print-only .print-case { font-family: var(--serif); font-size: 1.25rem; font-weight: 700; }

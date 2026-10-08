@@ -238,9 +238,17 @@
       return out;
     }
 
+    // слово, якого немає в індексі навіть після синонімів і виправлення одруків, не обнуляє
+    // запит (найчастіше це побутове слово на кшталт «зводить»): відкидаємо його, чіп покаже «без: …»
     let active = slots;
+    const dead = slots.filter(s => !s.units.length && s.ph == null);
+    if (dead.length && dead.length < slots.length) {
+      active = slots.filter(s => !dead.includes(s));
+      for (const s of dead) res.dropped.push(s.word);
+    }
     let out = run(active);
-    while (inc.length >= 3 && res.dropped.length < 2 && active.length >= 2) {
+    let soft = 0;
+    while (inc.length >= 3 && soft < 2 && active.length >= 2) {
       let n = 0;
       for (const x of out.paras) if (idx.pr[x.p] >= 0) n++;
       if (n >= 3) break;
@@ -250,6 +258,7 @@
       for (const s of cand) if (s.idf < worst.idf) worst = s;
       active = active.filter(s => s !== worst);
       res.dropped.push(worst.word);
+      soft++;
       out = run(active);
     }
     res.stems = out.stems;
@@ -344,9 +353,85 @@
     return m;
   }
 
+  // ---- модальності: місце дії, протилежності, рідкість --------------------
+  // Модальність, звужена до розділу (sec — номер у catalog.msec): видобута з речень цього розділу —
+  // ступінь 2; клауза розділу «Модальности» (загальна для препарату) — ступінь 1; видобута лише
+  // з інших розділів не рахується. Без розділу — звичайна рубрика каталогу.
+  function modRemedies(catalog, i, sec) {
+    if (sec == null || sec < 0) return rubricRemedies(catalog, i);
+    const rb = catalog.rubrics[i];
+    const m = new Map();
+    rb.r.forEach((r, k) => {
+      if (rb.s && rb.s[k] && rb.s[k].includes(sec)) m.set(r, { g: 2, hits: 1, local: true });
+      else if (rb.g[k] === 2) m.set(r, { g: 1, hits: 1 });
+    });
+    return m;
+  }
+  // Протилежна модальність: Map(препарат → підпис протилежної рубрики) для тих, у кого зворотний
+  // напрям стоїть у розділі «Модальности» (для звуженої рубрики — ще й видобутий з того самого
+  // розділу), а запитаного напряму того ж рівня немає. Видобуте з інших розділів не рахується:
+  // «хуже в постели» у «Зубах» не скасовує «лучше от тепла» в «Модальностях».
+  function modOpposites(catalog, i, sec, own) {
+    const rb = catalog.rubrics[i];
+    const key = (rb.key[0] === 'w' ? 'b' : 'w') + rb.key.slice(1);
+    const out = new Map();
+    const ob = catalog.rubrics.find(x => x.k === 'mod' && x.key === key);
+    if (!ob) return out;
+    const local = sec != null && sec >= 0;
+    ob.r.forEach((r, k) => {
+      if (!(ob.g[k] === 2 || (local && ob.s && ob.s[k] && ob.s[k].includes(sec)))) return;
+      const v = own.get(r);
+      if (v && v.g === 2) return;
+      out.set(r, ob.t);
+    });
+    return out;
+  }
+  // Вага рідкості рубрики модальності чи причини: idf відносно рубрики на чверть препаратів
+  // (множник 1), у межах 0.5…2 — «Хуже: ночью» (половина препаратів) ≈0.5, «Лучше: надавливание» ≈1.
+  function rarity(catalog, n) {
+    const N = (catalog.stats && catalog.stats.remedies) || catalog.remedies.length;
+    const f = Math.log((N + 1) / (n + 1)) / Math.log((N + 1) / (N / 4 + 1));
+    return Math.max(0.5, Math.min(2, f));
+  }
+  // Чим відрізняються препарати ids: категорії модальностей розділу «Модальности» (ступінь 2), у
+  // яких вони розходяться. Клітинки: '' | 'b' | 'w' | 'bw'. Спершу прямо протилежні (в одного «краще»,
+  // в іншого «гірше»), далі ті, що є лише в частини препаратів. skip — Set категорій ('heat'), уже
+  // взятих у рубрики.
+  function diffModalities(catalog, ids, skip, limit) {
+    const per = new Map();
+    catalog.rubrics.forEach(rb => {
+      if (rb.k !== 'mod') return;
+      const d = rb.key[0], c = rb.key.slice(2);
+      if (skip && skip.has(c)) return;
+      rb.r.forEach((r, k) => {
+        if (rb.g[k] !== 2) return;
+        const j = ids.indexOf(r);
+        if (j < 0) return;
+        if (!per.has(c)) per.set(c, ids.map(() => ''));
+        const a = per.get(c);
+        if (!a[j].includes(d)) a[j] = (a[j] + d).split('').sort().join('');
+      });
+    });
+    const out = [];
+    let order = 0;
+    for (const [c, cells] of per) {
+      order++;
+      const filled = cells.filter(Boolean).length;
+      if (filled < 2 && cells.length > 2) continue;   // ознака одного препарату з багатьох мало що розрізняє
+      if (cells.every(x => x === cells[0])) continue;
+      const opposed = cells.includes('b') && cells.includes('w');
+      out.push({ c, cells, opposed, filled, order });
+    }
+    out.sort((a, b) => (b.opposed - a.opposed) || (b.filled - a.filled) || (a.order - b.order));
+    return out.slice(0, limit || 8);
+  }
+
   // ---- зведення ---------------------------------------------------------
-  // rubrics: [{ remedies: Map(remedy → {g, hits, score?} | number), weight?, elim?, excl? }]
+  // rubrics: [{ remedies: Map(remedy → {g, hits, score?} | number), weight?, elim?, excl?,
+  //             rarity? (множник балів), opp? (Map(remedy → підпис протилежної модальності)) }]
   // opts.sort: 'cover' (типово) | 'total' | 'name' (потрібен opts.nameOf)
+  // Протилежність не зменшує показане покриття (row.cover), але сортування за покриттям іде за
+  // row.cover − row.conflicts, а бали втрачають по одиниці (× вага × рідкість) за кожну.
   function repertorize(rubrics, opts) {
     opts = opts || {};
     const rows = new Map();
@@ -355,21 +440,31 @@
     rubrics.forEach((rb, k) => {
       if (!rb.remedies) return;
       if (rb.excl) { for (const r of rb.remedies.keys()) excl.add(r); return; }
-      const w = rb.weight || 1;
+      const w = (rb.weight || 1) * (rb.rarity || 1);
       if (rb.elim) nElim++;
       for (const [r, v] of rb.remedies) {
         const g = typeof v === 'number' ? v : v.g;
         const hits = typeof v === 'number' ? 1 : (v.hits || 1);
         const sc = typeof v === 'number' ? g : (v.score != null ? v.score : g);
         let row = rows.get(r);
-        if (!row) rows.set(r, row = { r, cover: 0, total: 0, sumHits: 0, sumScore: 0, elimOk: 0, grades: new Array(rubrics.length).fill(0), hits: new Array(rubrics.length).fill(0) });
+        if (!row) rows.set(r, row = { r, cover: 0, conflicts: 0, total: 0, sumHits: 0, sumScore: 0, elimOk: 0, grades: new Array(rubrics.length).fill(0), hits: new Array(rubrics.length).fill(0), conf: new Array(rubrics.length).fill(null) });
         row.grades[k] = g; row.hits[k] = hits; row.cover++; row.total += g * w; row.sumHits += hits; row.sumScore += sc * w;
         if (rb.elim) row.elimOk++;
       }
     });
+    rubrics.forEach((rb, k) => {
+      if (!rb.remedies || rb.excl || !rb.opp) return;
+      const w = (rb.weight || 1) * (rb.rarity || 1);
+      for (const [r, label] of rb.opp) {
+        const row = rows.get(r);
+        if (!row) continue;
+        row.conf[k] = label; row.conflicts++; row.total -= w;
+      }
+    });
     const out = Array.from(rows.values()).filter(row => !excl.has(row.r) && row.elimOk === nElim);
-    const byCover = (a, b) => b.cover - a.cover || b.total - a.total || b.sumScore - a.sumScore || a.r - b.r;
-    const byTotal = (a, b) => b.total - a.total || b.cover - a.cover || b.sumScore - a.sumScore || a.r - b.r;
+    const net = row => row.cover - row.conflicts;
+    const byCover = (a, b) => net(b) - net(a) || b.cover - a.cover || b.total - a.total || b.sumScore - a.sumScore || a.r - b.r;
+    const byTotal = (a, b) => b.total - a.total || net(b) - net(a) || b.sumScore - a.sumScore || a.r - b.r;
     const byName = (a, b) => opts.nameOf(a.r).localeCompare(opts.nameOf(b.r)) || a.r - b.r;
     return out.sort(opts.sort === 'total' ? byTotal : opts.sort === 'name' && opts.nameOf ? byName : byCover);
   }
@@ -438,5 +533,5 @@
     return out.slice(0, limit || 8);
   }
 
-  return { makeIndex, freeText, confirmPhrases, phraseInSentence, gradeScore, repertorize, rubricRemedies, suggest, matchRemedies, foldForMatch, vocabRange, SECTION_WEIGHT };
+  return { makeIndex, freeText, confirmPhrases, phraseInSentence, gradeScore, repertorize, rubricRemedies, modRemedies, modOpposites, rarity, diffModalities, suggest, matchRemedies, foldForMatch, vocabRange, SECTION_WEIGHT };
 });

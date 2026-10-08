@@ -65,6 +65,11 @@
       caseSave: 'Зберегти випадок', caseUpdate: 'Оновити випадок', caseNamePh: 'Назва випадку', caseOk: 'Зберегти', caseCancel: 'Скасувати',
       menuCases: 'Випадки', casesEmpty: 'Немає збережених випадків', caseDel: 'Видалити випадок', caseDelAsk: 'видалити?',
       caseN: n => n + ' ' + plural(n, ['рубрика', 'рубрики', 'рубрик']), flagElim: 'елімінативна', flagExcl: 'виключена', menuPrint: 'Друк',
+      secAny: 'усюди', secTitle: 'Де діє модальність: усюди (розділ «Модальності») чи в одному розділі опису — тоді вище ті, в кого її сказано саме там',
+      conf: label => 'Протилежне: ' + label, confSum: n => 'протилежних модальностей: ' + n, evConf: 'Протилежне в описі:',
+      diffTitle: n => 'Чим відрізняються перші ' + n, diffB: 'краще', diffW: 'гірше', diffBW: 'і так, і так', diffAdd: 'Додати рубрику',
+      diffHint: 'Модальності з розділу «Модальності», у яких препарати розходяться. Натисніть «краще» чи «гірше», щоб додати рубрику.',
+      artWider: (rub, n) => 'Ширше за статтю: у рубриці «' + rub + '» ще ' + n + ' ' + plural(n, ['препарат', 'препарати', 'препаратів']) + ' — підібрати в реперторії',
     },
     ru: {
       title: 'Реперторий — гомеопатические препараты по симптомам', htmlLang: 'ru',
@@ -103,6 +108,11 @@
       caseSave: 'Сохранить случай', caseUpdate: 'Обновить случай', caseNamePh: 'Название случая', caseOk: 'Сохранить', caseCancel: 'Отменить',
       menuCases: 'Случаи', casesEmpty: 'Нет сохранённых случаев', caseDel: 'Удалить случай', caseDelAsk: 'удалить?',
       caseN: n => n + ' ' + plural(n, ['рубрика', 'рубрики', 'рубрик']), flagElim: 'элиминативная', flagExcl: 'исключена', menuPrint: 'Печать',
+      secAny: 'везде', secTitle: 'Где действует модальность: везде (раздел «Модальности») или в одном разделе описания — тогда выше те, у кого она сказана именно там',
+      conf: label => 'Противоположное: ' + label, confSum: n => 'противоположных модальностей: ' + n, evConf: 'Противоположное в описании:',
+      diffTitle: n => 'Чем отличаются первые ' + n, diffB: 'лучше', diffW: 'хуже', diffBW: 'и так, и так', diffAdd: 'Добавить рубрику',
+      diffHint: 'Модальности из раздела «Модальности», в которых препараты расходятся. Нажмите «лучше» или «хуже», чтобы добавить рубрику.',
+      artWider: (rub, n) => 'Шире статьи: в рубрике «' + rub + '» ещё ' + n + ' ' + plural(n, ['препарат', 'препарата', 'препаратов']) + ' — подобрать в репертории',
     },
   };
   const KIND_LETTER = { free: 'f', nos: 'n', art: 'a', line: 'l', mod: 'm', etio: 'e' };
@@ -273,7 +283,7 @@
   }
 
   // ---------------------------------------------------------------- повідомити про помилку
-  const ISSUE_URL = 'https://github.com/ix21027/homeo-repertory/issues/new';
+  const ISSUE_URL = 'https://github.com/ix21027/homeo/issues/new';
   let lastSel = '';
   function selectionText() {
     const s = window.getSelection ? window.getSelection() : null;
@@ -467,6 +477,8 @@
     if (seg[1] === 'rep' || seg.length === 1) {
       const specs = state.rubrics.map(rb => {
         if (rb.kind === 'nos' || rb.kind === 'line') { const x = cat().rubrics[rb.catIdx].x; return x ? rubricSpec(rb, x) : null; }
+        // назва розділу текстової рубрики — мовою інтерфейсу, тож перекладаємо її разом із мовою
+        if (rb.kind === 'free' && rb.section) { const k = SECTIONS[state.lang].indexOf(rb.section); if (k >= 0) return rubricSpec(rb, SECTIONS[lang][k] + '~' + rb.text); }
         return rubricSpec(rb);
       }).filter(Boolean);
       const q = new URLSearchParams();
@@ -617,7 +629,7 @@
     if (body == null) {
       if (rb.kind === 'free') body = (rb.section || '') + '~' + rb.text;
       else if (rb.kind === 'art') body = rb.articleId;
-      else if (rb.kind === 'mod' || rb.kind === 'etio') body = rb.key;
+      else if (rb.kind === 'mod' || rb.kind === 'etio') body = rb.key + (rb.sec ? '@' + rb.sec : '');
       else body = rb.text;
     }
     return KIND_LETTER[rb.kind] + flags + ':' + body;
@@ -636,17 +648,47 @@
     }
     else if (kind === 'art') { const i = c.rubrics.findIndex(r => r.k === 'art' && c.articles[r.a].id === body); rb = i >= 0 ? makeCatRubric(i) : null; }
     else if (kind === 'line') { const i = c.rubrics.findIndex(r => r.k === 'line' && r.t === body); rb = i >= 0 ? makeCatRubric(i) : null; }
-    else { const i = c.rubrics.findIndex(r => r.k === kind && r.key === body); rb = i >= 0 ? makeCatRubric(i) : null; }
+    else {
+      // модальність, звужена до розділу: «b.heat@Лицо» (назва розділу канонічна, російська)
+      const at = kind === 'mod' ? body.indexOf('@') : -1;
+      const key = at >= 0 ? body.slice(0, at) : body;
+      const i = c.rubrics.findIndex(r => r.k === kind && r.key === key);
+      rb = i >= 0 ? makeCatRubric(i, at >= 0 ? body.slice(at + 1) : '') : null;
+    }
     if (!rb) return null;
     rb.elim = m[2].includes('!'); rb.excl = m[2].includes('-'); rb.weight = m[3] ? +m[3] : 1;
     return rb;
   }
-  function makeCatRubric(i) {
-    const rb = cat().rubrics[i];
-    const r = { kind: rb.k, text: rb.t, catIdx: i, remedies: R.rubricRemedies(cat(), i), label: rb.t, weight: 1, elim: false, excl: false };
-    if (rb.k === 'art' || rb.k === 'line') { r.articleIdx = rb.a; r.articleId = cat().articles[rb.a].id; }
+  // sec — канонічна (російська) назва розділу для модальності, звуженої до одного розділу опису
+  function makeCatRubric(i, sec) {
+    const c = cat();
+    const rb = c.rubrics[i];
+    const r = { kind: rb.k, text: rb.t, catIdx: i, remedies: R.rubricRemedies(c, i), label: rb.t, weight: 1, elim: false, excl: false };
+    if (rb.k === 'art' || rb.k === 'line') { r.articleIdx = rb.a; r.articleId = c.articles[rb.a].id; }
     if (rb.k === 'mod' || rb.k === 'etio') r.key = rb.key;
+    if (rb.k === 'mod') {
+      const si = sec && c.msec ? c.msec.indexOf(sec) : -1;
+      if (si >= 0) { r.sec = sec; r.secIdx = si; r.remedies = R.modRemedies(c, i, si); r.label = rb.t + ' · ' + c.msecT[si]; }
+      r.opp = R.modOpposites(c, i, si, r.remedies);
+    }
+    if (rb.k === 'mod' || rb.k === 'etio') r.rarity = R.rarity(c, r.remedies.size);
     return r;
+  }
+  // Розділ із поля пошуку (назва мовою інтерфейсу) → канонічна назва для модальності, якщо там є видобуті
+  function secFromSelect(value) {
+    if (!value) return '';
+    const k = SECTIONS[state.lang].indexOf(value);
+    const ru = k >= 0 ? SECTIONS.ru[k] : value;
+    const c = cat();
+    return c.msec && c.msec.includes(ru) ? ru : '';
+  }
+  // Розділи, де модальність видобуто з тексту: [{sec, title, n}] за кількістю препаратів
+  function modSections(catIdx) {
+    const c = cat();
+    const rb = c.rubrics[catIdx];
+    const cnt = new Map();
+    if (rb.s) for (const list of rb.s) if (list) for (const k of list) cnt.set(k, (cnt.get(k) || 0) + 1);
+    return Array.from(cnt, ([k, n]) => ({ sec: c.msec[k], title: c.msecT[k], n })).sort((a, b) => b.n - a.n || a.title.localeCompare(b.title));
   }
   function makeFreeRubric(text, section) {
     text = text.trim();
@@ -816,7 +858,7 @@
     function pick(i) {
       const it = items[i];
       if (!it) return;
-      if (it.free) addRubric(makeFreeRubric(it.q, sel.value)); else addRubric(makeCatRubric(it.i));
+      if (it.free) addRubric(makeFreeRubric(it.q, sel.value)); else addRubric(makeCatRubric(it.i, it.rb.k === 'mod' ? secFromSelect(sel.value) : ''));
       input.value = ''; closeSugg(); input.focus();
     }
     input.addEventListener('input', openSugg);
@@ -859,7 +901,10 @@
       const list = c.rubrics.map((rb, i) => ({ rb, i })).filter(x => g === 'e' ? x.rb.k === 'etio' : (x.rb.k === 'mod' && x.rb.key.startsWith(g + '.'))).sort((a, b) => sectionalCount(b.rb) - sectionalCount(a.rb));
       return '<div class="picker-group"><div class="picker-title">' + esc(title) + '</div>' + list.map(x => '<button type="button" class="pick" data-i="' + x.i + '">' + esc(catLabel(x.rb)) + ' <span class="n">' + sectionalCount(x.rb) + '</span></button>').join('') + '</div>';
     }).join('');
-    body.querySelectorAll('button.pick').forEach(b => b.addEventListener('click', () => addRubric(makeCatRubric(+b.dataset.i))));
+    body.querySelectorAll('button.pick').forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.i, sel = $('#repSection');
+      addRubric(makeCatRubric(i, c.rubrics[i].k === 'mod' && sel ? secFromSelect(sel.value) : ''));
+    }));
   }
 
   // Прапорці рубрики словами — видно лише у друці, замість кнопок керування
@@ -881,7 +926,9 @@
       const n = rb.pending ? '…' : rb.error ? t.error : (rb.remedies ? rb.remedies.size : 0);
       const corr = rb.res && rb.res.corrections && rb.res.corrections.length ? ' <span class="maybe">' + esc(t.maybe) + ' ' + esc(rb.res.corrections.map(x => x.to[0] + '…').join(', ')) + '</span>' : '';
       const drop = rb.res && rb.res.dropped && rb.res.dropped.length ? ' <span class="maybe">' + esc(t.without) + ' ' + esc(rb.res.dropped.join(', ')) + '</span>' : '';
-      return '<span class="chip' + (rb.pending ? ' pending' : '') + (rb.excl ? ' excl' : '') + (rb.elim ? ' elim' : '') + (rb.weight > 1 ? ' weighted' : '') + '"><span class="k">' + esc(t.kind[rb.kind]) + '</span> ' + esc(rb.label) + corr + drop + flagWords(rb) +
+      // модальність: підпис без розділу + перемикач «усюди / розділ» (у друці — назва розділу текстом)
+      const text = rb.kind === 'mod' ? esc(rb.text) + secSelect(rb, k) : esc(rb.label);
+      return '<span class="chip' + (rb.pending ? ' pending' : '') + (rb.excl ? ' excl' : '') + (rb.elim ? ' elim' : '') + (rb.weight > 1 ? ' weighted' : '') + '"><span class="k">' + esc(t.kind[rb.kind]) + '</span> ' + text + corr + drop + flagWords(rb) +
         ' <span class="n">' + n + '</span>' +
         '<span class="ctl"><button type="button" data-k="' + k + '" data-act="w" class="' + (rb.weight > 1 ? 'on' : '') + '" title="' + esc(t.weight) + '" aria-label="' + esc(t.weight) + '">×' + rb.weight + '</button>' +
         '<button type="button" data-k="' + k + '" data-act="e" class="' + (rb.elim ? 'on' : '') + '" title="' + esc(t.elim) + '" aria-label="' + esc(t.elim) + '" aria-pressed="' + rb.elim + '">!</button>' +
@@ -896,7 +943,26 @@
       else if (b.dataset.act === 'x') { rb.excl = !rb.excl; if (rb.excl) rb.elim = false; }
       rerender();
     }));
+    box.querySelectorAll('select.chip-sec').forEach(sl => sl.addEventListener('change', () => {
+      const k = +sl.dataset.k, old = state.rubrics[k];
+      const rb = makeCatRubric(old.catIdx, sl.value);
+      rb.weight = old.weight; rb.elim = old.elim; rb.excl = old.excl;
+      state.rubrics[k] = rb;
+      state.open.clear();
+      rerender();
+    }));
     const c = $('#clearAll'); if (c) c.addEventListener('click', () => { state.rubrics = []; state.open.clear(); state.cmp = []; state.cmpOpen = false; state.caseId = null; rerender(); });
+  }
+  function secSelect(rb, k) {
+    const t = T();
+    const list = modSections(rb.catIdx);
+    if (!list.length) return '';
+    const cur = rb.sec || '';
+    if (cur && !list.some(x => x.sec === cur)) list.unshift({ sec: cur, title: cat().msecT[rb.secIdx], n: 0 });
+    return ' <select class="chip-sec" data-k="' + k + '" title="' + esc(t.secTitle) + '" aria-label="' + esc(t.secTitle) + '">' +
+      '<option value=""' + (cur ? '' : ' selected') + '>' + esc(t.secAny) + '</option>' +
+      list.map(x => '<option value="' + esc(x.sec) + '"' + (x.sec === cur ? ' selected' : '') + '>' + esc(x.title) + (x.n ? ' (' + x.n + ')' : '') + '</option>').join('') +
+      '</select>' + (cur ? '<span class="chip-flags"> · ' + esc(cat().msecT[rb.secIdx]) + '</span>' : '');
   }
 
   // Статті, що відповідають рубрикам: повнотекстові збіги + статті рубрик «Стаття»/«Рядок»
@@ -938,8 +1004,13 @@
       (cols.length > 1 ? '<th class="g" title="' + esc(t.sumTitle) + '">Σ</th>' : '') + '</tr>';
     const body = shown.map(row => {
       const r = c.remedies[row.r];
-      const cells = cols.map(k => { const g = row.grades[k]; return '<td class="g g' + g + '">' + (g ? '<span title="' + row.hits[k] + ' ' + esc(t.hits) + '">' + (state.rubrics[k].kind === 'free' ? row.hits[k] : '●') + '</span>' : '') + '</td>'; }).join('');
-      const sum = cols.length > 1 ? '<td class="sum">' + row.cover + '/' + cols.length + (state.sort === 'total' ? ' <span class="muted small">' + row.total + '</span>' : '') + '</td>' : '';
+      const cells = cols.map(k => {
+        const g = row.grades[k], cf = row.conf[k];
+        return '<td class="g g' + g + (cf ? ' cf' : '') + '">' + (g ? '<span title="' + row.hits[k] + ' ' + esc(t.hits) + '">' + (state.rubrics[k].kind === 'free' ? row.hits[k] : '●') + '</span>' : '') +
+          (cf ? '<i class="conf" title="' + esc(t.conf(cf)) + '" aria-label="' + esc(t.conf(cf)) + '">✕</i>' : '') + '</td>';
+      }).join('');
+      const sum = cols.length > 1 ? '<td class="sum">' + row.cover + '/' + cols.length + (row.conflicts ? ' <i class="conf" title="' + esc(t.confSum(row.conflicts)) + '">−' + row.conflicts + '</i>' : '') +
+        (state.sort === 'total' ? ' <span class="muted small">' + fmtTotal(row.total) + '</span>' : '') + '</td>' : '';
       const checked = state.cmp.includes(row.r);
       const open = state.open.has(row.r);
       const name = '<td class="rem"><input type="checkbox" class="cmp-box" data-r="' + row.r + '"' + (checked ? ' checked' : '') + ' title="' + esc(t.cmpCheck) + '" aria-label="' + esc(t.cmpCheck) + '"> ' +
@@ -948,6 +1019,7 @@
         (open ? '<tr class="detail" data-r="' + row.r + '"><td colspan="' + (cols.length + 2) + '"><div class="detail-box">' + esc(t.loading) + '</div></td></tr>' : '');
     }).join('');
     const artLine = state.articles ? articleLine() : '';
+    const diff = diffBlock(shown.slice(0, 5).map(x => x.r));
     const cmpBar = state.cmp.length ? '<div class="cmp-bar">' + esc(t.compareSel) + ' ' + state.cmp.map(i => remedyLink(i)).join(', ') +
       (state.cmp.length >= 2 ? ' <button type="button" class="btn small" id="cmpOpen">' + esc(t.compare) + '</button>' : '') + ' <button type="button" class="btn secondary small" id="cmpClear">' + esc(t.clear) + '</button></div>' : '';
     const allOpen = shown.every(row => state.open.has(row.r));
@@ -962,8 +1034,9 @@
       '<div class="print-date">' + esc(caseDate(Date.now())) + '</div></div>';
     box.innerHTML = '<p class="muted small results-head">' + esc(t.found(rows.length)) + ' ' + toggleAll + '<span class="head-right">' + sortSel + caseCtl + '</span></p>' + artLine + cmpBar + printHead +
       '<div class="table-wrap"><table class="rep"><thead>' + head + '</thead><tbody>' + body + '</tbody></table>' +
-      (rows.length > shown.length ? '<div class="more-row"><button type="button" class="btn secondary" id="moreBtn">' + esc(t.more) + '</button></div>' : '') + '</div>';
+      (rows.length > shown.length ? '<div class="more-row"><button type="button" class="btn secondary" id="moreBtn">' + esc(t.more) + '</button></div>' : '') + '</div>' + diff;
     bindSort(box);
+    bindDiff(box);
     box.querySelectorAll('tr.row').forEach(tr => tr.addEventListener('click', e => {
       if (e.target.closest('a') || e.target.closest('input')) return;
       const r = +tr.dataset.r;
@@ -994,6 +1067,33 @@
       if (e.key === 'Enter') { e.preventDefault(); $('#caseOk').click(); }
       else if (e.key === 'Escape') { e.preventDefault(); $('#caseCancel').click(); }
     });
+  }
+  function fmtTotal(x) { return String(Math.round(x * 10) / 10); }
+  // Чим відрізняються лідери (чи препарати порівняння): модальності розділу «Модальности», у яких
+  // вони розходяться; «краще»/«гірше» в клітинці додає рубрику. Лише дані каталогу, без документів.
+  function diffBlock(ids) {
+    if (ids.length < 2) return '';
+    const t = T();
+    const c = cat();
+    const skip = new Set(state.rubrics.filter(rb => rb.kind === 'mod').map(rb => rb.key.slice(2)));
+    const list = R.diffModalities(c, ids, skip, 8);
+    if (!list.length) return '';
+    const labels = modLabels();
+    const word = { b: t.diffB, w: t.diffW, bw: t.diffBW };
+    const cell = (x, cid) => {
+      if (!x) return '<td class="c"></td>';
+      if (x === 'bw') return '<td class="c muted small">' + esc(word.bw) + '</td>';
+      const L = labels.get('m:' + x + '.' + cid);
+      return '<td class="c"><button type="button" class="diff-add ' + x + '"' + (L ? ' data-i="' + L.i + '"' : ' disabled') + ' title="' + esc(t.diffAdd) + '">' + esc(word[x]) + '</button></td>';
+    };
+    const name = cid => { const L = labels.get('m:b.' + cid) || labels.get('m:w.' + cid); return L ? L.label : cid; };
+    return '<details class="diff" open><summary>' + esc(t.diffTitle(ids.length)) + '</summary><p class="muted small">' + esc(t.diffHint) + '</p>' +
+      '<div class="table-wrap"><table class="rep diff-t"><thead><tr><th></th>' + ids.map(i => '<th>' + remedyLink(i) + '</th>').join('') + '</tr></thead><tbody>' +
+      list.map(x => '<tr' + (x.opposed ? ' class="opp"' : '') + '><th class="lbl">' + esc(name(x.c)) + '</th>' + x.cells.map(v => cell(v, x.c)).join('') + '</tr>').join('') +
+      '</tbody></table></div></details>';
+  }
+  function bindDiff(box) {
+    box.querySelectorAll('button.diff-add[data-i]').forEach(b => b.addEventListener('click', () => addRubric(makeCatRubric(+b.dataset.i))));
   }
   function bindSort(box) {
     const s = $('#sortSel', box);
@@ -1033,13 +1133,21 @@
   // Підстави рубрики: клаузи розділу як є, видобуті з тексту — речення плюс назва розділу
   // (їх буває багато на препарат, тому не більше MINED_MAX).
   const MINED_MAX = 3;
-  function modClauses(doc, rb) {
-    const key = rb.key;
+  // Для модальності, звуженої до розділу, спершу йдуть речення саме цього розділу; key — інший
+  // ключ (протилежна модальність), onlyStrong — лише те, що робить протилежність (розділ «Модальности»
+  // і видобуте з того самого розділу).
+  function modClauses(doc, rb, key, onlyStrong) {
+    key = key || rb.key;
     if (rb.kind !== 'mod') return (doc.etio || []).filter(e => e.c.includes(key)).map(e => e.t).filter(Boolean);
     const d = key[0], cid = key.slice(2);
     const hit = (doc.mods || []).filter(m => m.d === d && m.c.includes(cid) && m.t);
     const out = hit.filter(m => !m.src).map(m => m.t);
-    for (const m of hit.filter(m => m.src === 'text').slice(0, MINED_MAX)) out.push(m.t + (m.sec ? ' (' + m.sec + ')' : ''));
+    let mined = hit.filter(m => m.src === 'text');
+    if (rb.sec) {
+      const title = cat().msecT[rb.secIdx];
+      mined = mined.filter(m => m.sec === title).concat(onlyStrong ? [] : mined.filter(m => m.sec !== title));
+    } else if (onlyStrong) mined = [];
+    for (const m of mined.slice(0, MINED_MAX)) out.push(m.t + (m.sec ? ' (' + m.sec + ')' : ''));
     return out;
   }
 
@@ -1052,10 +1160,17 @@
     let doc = null;
     for (let k = 0; k < state.rubrics.length; k++) {
       const rb = state.rubrics[k];
-      if (!row.hits[k]) continue;
+      if (!row.hits[k] && !row.conf[k]) continue;
       let html = '<div class="evid"><h4>' + esc(t.kind[rb.kind]) + ': ' + esc(rb.label) + '</h4>';
       try {
-        if (rb.kind === 'nos') {
+        if (row.conf[k]) {
+          if (!doc && !r.ext) doc = await getDoc('remedies', r.id);
+          const oppKey = (rb.key[0] === 'w' ? 'b' : 'w') + rb.key.slice(1);
+          const cl = doc ? modClauses(doc, rb, oppKey, true) : [];
+          html += '<p class="conf-ev">' + esc(t.evConf) + ' ' + (cl.length ? cl.map(x => '<b>' + esc(x) + '</b>').join('; ') : esc(row.conf[k])) + '</p>';
+        }
+        if (!row.hits[k]) { /* лише протилежність */ }
+        else if (rb.kind === 'nos') {
           const v = rb.remedies.get(rIdx);
           const via = v && v.child != null ? ' <span class="muted small">(' + esc(t.evSub) + ' «' + esc(c.rubrics[v.child].t) + '»)</span>' : '';
           html += '<p>' + esc(t.evClinic) + ' <b>' + esc(v && v.child != null ? c.rubrics[v.child].t : rb.text) + '</b>' + via + (r.ext ? '' : ' — <a href="' + href('remedy/' + encodeURIComponent(r.id)) + '?sec=' + encodeURIComponent(CLINIC[state.lang]) + '">' + esc(t.open) + '</a>') + '</p>';
@@ -1125,11 +1240,13 @@
           else if (rb.kind === 'art' || rb.kind === 'line') ev = '<a href="' + href('article/' + encodeURIComponent(rb.articleId)) + '?r=' + i + '">' + esc(c.articles[rb.articleIdx].title) + '</a>';
           else if (rb.kind === 'free' && rb.res) { try { const e = await freeEvidence(rb, i, 2); ev = e.items.map(x => (x.sec ? '<span class="sec">' + esc(x.sec) + ':</span> ' : '') + x.html).join('<br>'); } catch (e) { ev = ''; } }
         }
-        cells.push('<td class="c' + (g ? ' g' + g : '') + '">' + (g ? '<span class="dot g' + g + '" title="' + g + '">' + (rb.kind === 'free' ? row.hits[k] : '●') + '</span> ' : '') + ev + '</td>');
+        const cf = row && row.conf[k];
+        cells.push('<td class="c' + (g ? ' g' + g : '') + '">' + (g ? '<span class="dot g' + g + '" title="' + g + '">' + (rb.kind === 'free' ? row.hits[k] : '●') + '</span> ' : '') + ev +
+          (cf ? ' <i class="conf" title="' + esc(t.conf(cf)) + '">✕ ' + esc(cf) + '</i>' : '') + '</td>');
       }
       html += '<tr><th class="lbl">' + esc(t.kind[rb.kind]) + ': ' + esc(rb.label) + '</th>' + cells.join('') + '</tr>';
     }
-    if (cols.length > 1) html += '<tr><th class="lbl">Σ</th>' + ids.map(i => { const row = rowOf.get(i); return '<td class="c"><b>' + (row ? row.cover + '/' + cols.length + ' · ' + row.total : '0') + '</b></td>'; }).join('') + '</tr>';
+    if (cols.length > 1) html += '<tr><th class="lbl">Σ</th>' + ids.map(i => { const row = rowOf.get(i); return '<td class="c"><b>' + (row ? row.cover + '/' + cols.length + (row.conflicts ? ' −' + row.conflicts : '') + ' · ' + fmtTotal(row.total) : '0') + '</b></td>'; }).join('') + '</tr>';
     const labels = modLabels();
     const modRow = (dir, title) => '<tr><th class="lbl">' + esc(title) + '</th>' + ids.map((i, j) => {
       const d = docs[j]; if (!d) return '<td class="c"></td>';
@@ -1145,9 +1262,10 @@
       return '<td class="c">' + Array.from(cats, ([cid, L]) => '<a class="tag" href="' + href('rep') + '?r=' + encodeURIComponent('e:' + cid) + '">' + esc(L.label) + '</a>').join(' ') + '</td>';
     }).join('') + '</tr>';
     html += '<tr><th class="lbl">' + esc(t.relTitle) + '</th>' + ids.map((i, j) => '<td class="c">' + (docs[j] ? relHtml(docs[j], i) : '') + '</td>').join('') + '</tr>';
-    html += '</tbody></table></div>';
+    html += '</tbody></table></div>' + diffBlock(ids);
     if (!$('#results')) return;
     box.innerHTML = html;
+    bindDiff(box);
     $('#cmpClose').addEventListener('click', () => { state.cmpOpen = false; writeHash(); renderResults(); });
   }
 
@@ -1244,6 +1362,21 @@
     view.innerHTML = html;
   }
 
+  // Рубрика «Клініки» за назвою статті лікувальника («Насморк (острый ринит)» → «Насморк») і скільки
+  // в ній препаратів, яких стаття не називає: стаття — лише добірка, і точний препарат може знайтися поза нею.
+  function articleClinic(a) {
+    if (a.group !== 'lechebnik') return null;
+    const c = cat();
+    const base = a.title.replace(/\s*[(,].*$/, '').trim();
+    if (base.length < 3) return null;
+    const found = R.suggest(c, base, 8, state.lang).filter(x => x.rb.k === 'nos' && x.score >= 4.5);
+    if (!found.length) return null;
+    const i = found[0].i;
+    const inArt = new Set(a.rem);
+    let n = 0;
+    for (const r of R.rubricRemedies(c, i).keys()) if (!inArt.has(r) && !c.remedies[r].ext) n++;
+    return n ? { rb: c.rubrics[i], n } : null;
+  }
   async function viewArticle(view, id, params) {
     const t = T();
     const c = cat();
@@ -1260,6 +1393,8 @@
       const mobile = window.matchMedia('(max-width: 640px)').matches;
       html += '<details class="tagbox"' + (mobile ? '' : ' open') + '><summary>' + esc(t.nRemedies(a.rem.length)) + '</summary><div class="tags">' + a.rem.map(i => c.remedies[i].ext ? '<span class="muted small">' + esc(c.remedies[i].latin) + '</span>' : '<a href="' + href('remedy/' + encodeURIComponent(c.remedies[i].id)) + '">' + esc(c.remedies[i].latin) + '</a>').join('') + '</div></details>';
       if (a.group === 'lechebnik' && a.rem.length >= 2) html += '<p class="small"><a href="' + href('rep') + '?r=' + encodeURIComponent('a:' + a.id) + '">' + esc(t.addArticle) + '</a></p>';
+      const wide = articleClinic(a);
+      if (wide) html += '<p class="small art-wider"><a href="' + href('rep') + '?r=' + encodeURIComponent('n:' + wide.rb.t) + '">' + esc(t.artWider(wide.rb.t, wide.n)) + '</a></p>';
     }
     html += '<div class="doc">';
     doc.blocks.forEach((b, bi) => {

@@ -221,5 +221,89 @@ check('ua: фраза «страх смерті» — підмножина зв�
   return `препаратів ${ph.rows.length} проти ${plain.rows.length}; речень із RU-стемів ${ph.res.unverified}`;
 });
 
+// ---- модальності за розділом, протилежності, рідкість, синоніми (випадок 08.10) ----
+// Випадок, як його набрав би користувач: прозорі водянисті виділення при закладеному носі, щелепу
+// «зводить», краще від тепла (в обличчі) і натискання, гірше вночі. За Кларком підходить Mag-phos
+// (спазматична невралгія обличчя, «чередование заложенности и профузных… жидких выделений», лучше от
+// тепла і надавливания). Ночі в нього немає — рубрика лишається, бо її назвав би користувач.
+function modRub(cat, key, sec) {
+  const i = cat.rubrics.findIndex(x => x.k === 'mod' && x.key === key);
+  const si = sec ? cat.msec.indexOf(sec) : -1;
+  const remedies = R.modRemedies(cat, i, si);
+  return { remedies, rarity: R.rarity(cat, remedies.size), opp: R.modOpposites(cat, i, si, remedies) };
+}
+function freeRub(idx, q, sec, lang) {
+  const res = R.freeText(idx, q, sec, lang, { articles: false });
+  return { res, remedies: new Map(Array.from(res.byRemedy, ([r, v]) => [r, { g: v.g, hits: v.hits, score: v.score }])) };
+}
+const CASE = {
+  ua: { idx: () => idxUa(), cat: catUa, nose: ['Ніс', 'водянисті виділення закладеність'], face: ['Обличчя', 'зводить щелепу'] },
+  ru: { idx: () => idxRu, cat: catRu, nose: ['Нос', 'водянистые выделения заложенность'], face: ['Лицо', 'сводит челюсть'] },
+};
+for (const lang of ['ua', 'ru']) {
+  check(lang + ': випадок «зводить щелепу» — Magnesium phosphoricum у перших трьох', () => {
+    const C = CASE[lang];
+    const rubs = [freeRub(C.idx(), C.nose[1], C.nose[0], lang), freeRub(C.idx(), C.face[1], C.face[0], lang),
+      modRub(C.cat, 'b.heat', 'Лицо'), modRub(C.cat, 'b.pressure'), modRub(C.cat, 'w.night')];
+    const rows = R.repertorize(rubs, {});
+    const k = rows.findIndex(x => C.cat.remedies[x.r].id === 'magnesium-phosphoricum');
+    assert(k >= 0 && k < 3, `Mag-phos на місці ${k + 1}; перші: ${rows.slice(0, 3).map(x => C.cat.remedies[x.r].latin).join(', ')}`);
+    return `місце ${k + 1} з ${rows.length}`;
+  });
+}
+check('ua: побутове слово без постингів не обнуляє запит («без: …»)', () => {
+  const { res, remedies } = freeRub(idxUa(), 'щелепу ззззводить', 'Обличчя', 'ua');
+  assert(remedies.size > 0, 'нічого не знайдено');
+  assert(res.dropped.includes('ззззводить'), 'слово не відкинуто: ' + res.dropped.join(','));
+  return `препаратів ${remedies.size}`;
+});
+check('синоніми односторонні: «сводит» шукає «спазм», а «спазм» — не «сводит»', () => {
+  const alts = q => SC.queryTerms(q, 'ru').inc[0].alts;
+  assert(alts('сводит').includes('спазм'), alts('сводит').join(','));
+  assert(!alts('спазм').includes('свод'), alts('спазм').join(','));
+  assert(!alts('скула').includes('челюст'), 'скула тягне челюсть: ' + alts('скула').join(','));
+  assert(!alts('водянистые').includes('понос'), 'водянистый тягне понос через «жидкий»');
+});
+check('модальність за розділом: видобута в розділі — 2, із «Модальностей» — 1, з інших розділів — немає', () => {
+  const rb = catRu.rubrics.find(x => x.k === 'mod' && x.key === 'b.heat');
+  const si = catRu.msec.indexOf('Лицо');
+  assert(si >= 0 && rb.s, 'немає розділів у каталозі');
+  const m = R.modRemedies(catRu, catRu.rubrics.indexOf(rb), si);
+  rb.r.forEach((r, k) => {
+    const local = rb.s[k] && rb.s[k].includes(si);
+    const want = local ? 2 : (rb.g[k] === 2 ? 1 : 0);
+    const got = m.has(r) ? m.get(r).g : 0;
+    assert(got === want, `${name(r)}: ${got} ≠ ${want}`);
+  });
+  return `${m.size} препаратів, з них у «Лице» ${Array.from(m.values()).filter(v => v.local).length}`;
+});
+check('протилежність лише з розділу «Модальности»: видобуте «хуже в постели» не знімає «лучше от тепла»', () => {
+  const i = catRu.rubrics.findIndex(x => x.k === 'mod' && x.key === 'b.heat');
+  const own = R.rubricRemedies(catRu, i);
+  const opp = R.modOpposites(catRu, i, -1, own);
+  const mp = catRu.remedies.findIndex(r => r.id === 'magnesium-phosphoricum');
+  assert(!opp.has(mp), 'Mag-phos позначено протилежним');
+  const mez = catRu.remedies.findIndex(r => r.id === 'mezereum');
+  const ip = catRu.rubrics.findIndex(x => x.k === 'mod' && x.key === 'b.pressure');
+  assert(R.modOpposites(catRu, ip, -1, R.rubricRemedies(catRu, ip)).has(mez), 'Mezereum («хуже от надавливания») не позначено');
+});
+check('рідкість: «Хуже: ночью» важить менше за «Лучше: надавливание»', () => {
+  const n = key => catRu.rubrics.find(x => x.k === 'mod' && x.key === key).r.length;
+  const a = R.rarity(catRu, n('w.night')), b = R.rarity(catRu, n('b.pressure'));
+  assert(a < b, `${a} ≥ ${b}`);
+  return `${a.toFixed(2)} проти ${b.toFixed(2)}`;
+});
+check('чим відрізняються: протилежні категорії йдуть першими, взяті в рубрики пропущено', () => {
+  const ids = ['magnesium-phosphoricum', 'mezereum', 'nux-vomica'].map(id => catRu.remedies.findIndex(r => r.id === id));
+  const list = R.diffModalities(catRu, ids, new Set(['heat']), 8);
+  assert(list.length, 'порожньо');
+  assert(!list.some(x => x.c === 'heat'), 'heat не пропущено');
+  const firstPlain = list.findIndex(x => !x.opposed);
+  assert(firstPlain < 0 || list.slice(firstPlain).every(x => !x.opposed), 'порядок порушено');
+  const pr = list.find(x => x.c === 'pressure');
+  assert(pr && pr.opposed, 'натискання (Mag-phos краще, Mezereum гірше) не серед протилежних');
+  return list.map(x => x.c + (x.opposed ? '!' : '')).join(' ');
+});
+
 console.log(`\nПідсумок: OK ${ok}, FAIL ${fails}`);
 process.exit(fails ? 1 : 0);

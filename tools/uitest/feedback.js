@@ -50,7 +50,7 @@ fs.mkdirSync(OUT, { recursive: true });
     if (!/Зв.язок/.test(title)) throw new Error('заголовок секції: ' + title);
     await openMenu();
     const href = await fbHref();
-    if (!/^https:\/\/github\.com\/ix21027\/homeo-repertory\/issues\/new\?/.test(href)) throw new Error(href);
+    if (!/^https:\/\/github\.com\/ix21027\/homeo\/issues\/new\?/.test(href)) throw new Error(href);
     if (!href.includes(encodeURIComponent('#/ua/rep'))) throw new Error('немає закодованого хеша: ' + href);
     const attrs = await page.$eval('#feedbackLink', e => e.target + '|' + e.rel + '|' + e.textContent);
     if (attrs !== '_blank|noopener|Повідомити про помилку') throw new Error('атрибути: ' + attrs);
