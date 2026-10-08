@@ -506,12 +506,14 @@
   }
 
   // Рубрика-ознака покрокового підбору: препарати, місце і речення (Map(препарат → ['абзац.речення', …]))
-  // для бонусу «в одному реченні».
-  function facetRubric(catalog, i) {
+  // для бонусу «в одному реченні». facets — вміст data/<мова>/facets.json ({ e: {ключ: [пари на препарат]} });
+  // без нього pos порожній (бонусу немає, поки файл не завантажився).
+  function facetRubric(catalog, i, facets) {
     const rb = catalog.rubrics[i];
     const pos = new Map();
+    const all = facets && facets.e && facets.e[rb.key];
     rb.r.forEach((r, k) => {
-      const e = rb.e && rb.e[k];
+      const e = all && all[k];
       if (!e || !e.length) return;
       const keys = new Set();
       for (let j = 0; j < e.length; j += 2) keys.add(e[j] + '.' + e[j + 1]);

@@ -160,6 +160,17 @@
     }
     return state.idxPromise[l];
   }
+  // Позиції речень ознак підбору (data/<мова>/facets.json): вантажаться з першою ознакою
+  function loadFacets() {
+    const l = state.lang;
+    if (!state.facPromise) state.facPromise = {};
+    if (!state.facPromise[l]) {
+      state.facPromise[l] = fetchJson('data/' + l + '/facets.json')
+        .then(j => { state.facets = state.facets || {}; state.facets[l] = j; return j; })
+        .catch(e => { state.facPromise[l] = null; throw e; });
+    }
+    return state.facPromise[l];
+  }
   async function loadCatalog(lang) {
     if (!state.cat[lang]) state.cat[lang] = await fetchJson('data/' + lang + '/catalog.json');
     return state.cat[lang];
@@ -354,7 +365,7 @@
   // і всі статті. Список мов теж, інакше після рестарту без мережі init() не знає про UA.
   function offlineUrls(lang) {
     const c = state.cat[lang];
-    const urls = ['data/langs.json', 'data/' + lang + '/catalog.json', 'data/' + lang + '/index.json'];
+    const urls = ['data/langs.json', 'data/' + lang + '/catalog.json', 'data/' + lang + '/index.json', 'data/' + lang + '/facets.json'];
     for (const r of c.remedies) if (!r.ext) urls.push('data/' + lang + '/remedies/' + encodeURIComponent(r.id) + '.json');
     for (const a of c.articles) urls.push('data/' + lang + '/articles/' + encodeURIComponent(a.id) + '.json');
     return urls;
@@ -678,7 +689,12 @@
     const r = { kind: rb.k, text: rb.t, catIdx: i, remedies: R.rubricRemedies(c, i), label: rb.t, weight: 1, elim: false, excl: false };
     if (rb.k === 'art' || rb.k === 'line') { r.articleIdx = rb.a; r.articleId = c.articles[rb.a].id; }
     if (rb.k === 'mod' || rb.k === 'etio' || rb.k === 'fac') r.key = rb.key;
-    if (rb.k === 'fac') Object.assign(r, R.facetRubric(c, i));
+    if (rb.k === 'fac') {
+      const f = state.facets && state.facets[state.lang];
+      Object.assign(r, R.facetRubric(c, i, f));
+      // без позицій таблиця вже працює; бонус «в одному реченні» додається, щойно файл завантажиться
+      if (!f) loadFacets().then(j => { r.pos = R.facetRubric(c, i, j).pos; renderResults(); }).catch(() => { /* лише без бонусу */ });
+    }
     if (rb.k === 'mod') {
       const si = sec && c.msec ? c.msec.indexOf(sec) : -1;
       if (si >= 0) { r.sec = sec; r.secIdx = si; r.remedies = R.modRemedies(c, i, si); r.label = rb.t + ' · ' + c.msecT[si]; }
@@ -1029,6 +1045,10 @@
     if (!box) return;
     const t = T(), c = cat();
     if (!c.places || !c.places.length) { box.innerHTML = ''; return; }
+    // розгорнутість беремо з DOM: подія toggle асинхронна, і перемальовування (напр., після завантаження
+    // facets.json) встигало згорнути щойно відкриту панель
+    const cur = $('details.guide', box);
+    if (cur) state.guideOpen = cur.open;
     if (state.guideOpen == null) state.guideOpen = !window.matchMedia('(max-width: 640px)').matches;
     const open = c.places.filter(p => state.places.includes(p.key));
     const ready = state.rubrics.length > 0 && state.rubrics.every(rb => rb.remedies);
@@ -1261,10 +1281,11 @@
   function facSentences(doc, rb, rIdx, max) {
     const crb = cat().rubrics[rb.catIdx];
     const k = crb.r.indexOf(rIdx);
-    if (k < 0 || !crb.e || !crb.e[k]) return [];
+    const all = state.facets && state.facets[state.lang] && state.facets[state.lang].e[crb.key];
+    if (k < 0 || !all || !all[k]) return [];
     const flat = [], secOf = [];
     doc.sections.forEach(sec => sec.paras.forEach(p => { flat.push(p); secOf.push(sec.title); }));
-    const e = crb.e[k], out = [];
+    const e = all[k], out = [];
     for (let j = 0; j < e.length && out.length < max; j += 2) {
       const md = flat[e[j]];
       if (md == null) continue;
@@ -1274,6 +1295,7 @@
     return out;
   }
   async function renderDetail(tr, rIdx, row) {
+    if (state.rubrics.some(rb => rb.kind === 'fac')) await loadFacets().catch(() => { /* підстави ознак будуть порожні */ });
     const t = T();
     const c = cat();
     const r = c.remedies[rIdx];
@@ -1352,6 +1374,7 @@
     const ids = state.cmp.slice();
     box.innerHTML = '<p class="muted">' + esc(t.loading) + '</p>';
     const docs = await Promise.all(ids.map(i => c.remedies[i].ext ? null : getDoc('remedies', c.remedies[i].id).catch(() => null)));
+    if (state.rubrics.some(rb => rb.kind === 'fac')) await loadFacets().catch(() => { /* без підстав ознак */ });
     const rowOf = new Map(rows.map(r => [r.r, r]));
     const cols = state.rubrics.map((rb, k) => k).filter(k => !state.rubrics[k].excl);
     let html = '<div class="cmp-head"><h2>' + esc(t.compareTitle) + '</h2><button type="button" class="btn secondary small" id="cmpClose">' + esc(t.close) + '</button></div>';

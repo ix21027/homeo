@@ -306,10 +306,11 @@ check('чим відрізняються: протилежні категорі�
 });
 
 // ---- покроковий підбір: ознаки місць, «ні», «в одному реченні», уточнювальні питання ----
+const facRu = read('data/ru/facets.json'), facUa = read('data/ua/facets.json');
 const facIdx = (cat, key) => cat.rubrics.findIndex(x => (x.k === 'fac' || x.k === 'mod') && x.key === key);
 function guideRub(cat, key, neg) {
   const i = facIdx(cat, key), rb = cat.rubrics[i];
-  if (rb.k === 'fac') return Object.assign(R.facetRubric(cat, i), { neg });
+  if (rb.k === 'fac') return Object.assign(R.facetRubric(cat, i, cat === catUa ? facUa : facRu), { neg });
   const m = R.rubricRemedies(cat, i);
   return { remedies: m, rarity: R.rarity(cat, m.size), opp: R.modOpposites(cat, i, -1, m), neg };
 }
@@ -354,12 +355,12 @@ for (const lang of ['ua', 'ru']) {
     return `місце ${k + 1}; поруч ${rows.slice(0, 5).map(x => cat.remedies[x.r].latin.split(' ')[0]).join(', ')}`;
   });
 }
-check('питання допомагають: «пацієнт» = опис препарату (Ніс), «так»/«не знаю», ≤ 6 питань', () => {
-  const pl = catRu.places.find(p => p.key === 'nose');
+function guideSanity(placeKey) {
+  const pl = catRu.places.find(p => p.key === placeKey);
   const facets = pl.groups.flatMap(g => g.items);
   const pool = facets.concat(catRu.rubrics.map((r, i) => (r.k === 'mod' ? i : -1)).filter(i => i >= 0));
   const has = (i, r) => { const v = R.rubricRemedies(catRu, i).get(r); return v && (catRu.rubrics[i].k !== 'mod' || v.g === 2); };
-  const mk = i => (catRu.rubrics[i].k === 'fac' ? R.facetRubric(catRu, i) : guideRub(catRu, catRu.rubrics[i].key));
+  const mk = i => (catRu.rubrics[i].k === 'fac' ? R.facetRubric(catRu, i, facRu) : guideRub(catRu, catRu.rubrics[i].key));
   let n = 0, start5 = 0, end5 = 0;
   for (let r = 0; r < catRu.remedies.length; r++) {
     const own = facets.filter(i => has(i, r));
@@ -377,9 +378,23 @@ check('питання допомагають: «пацієнт» = опис пр
     }
     if (rows.findIndex(x => x.r === r) < 5) end5++;
   }
+  return { n, start5, end5 };
+}
+check('питання допомагають: «пацієнт» = опис препарату (Ніс), «так»/«не знаю», ≤ 6 питань', () => {
+  const { n, start5, end5 } = guideSanity('nose');
   assert(end5 / n >= 0.75, `у топ-5 лише ${end5}/${n}`);
   assert(end5 > start5, 'питання не допомогли');
   return `у топ-5: на старті ${start5}/${n}, після питань ${end5}/${n}`;
+});
+check('питання допомагають у кожному місці (після питань більше, ніж на старті)', () => {
+  const out = [];
+  for (const pl of catRu.places) {
+    const { n, start5, end5 } = guideSanity(pl.key);
+    if (n < 10) continue;
+    assert(end5 > start5, pl.key + `: ${start5} → ${end5} з ${n}`);
+    out.push(`${pl.key} ${Math.round(100 * start5 / n)}→${Math.round(100 * end5 / n)}%`);
+  }
+  return out.join(', ');
 });
 
 console.log(`\nПідсумок: OK ${ok}, FAIL ${fails}`);

@@ -611,15 +611,18 @@ function buildLang(lang, ruBuilt) {
     const s = rIdx.map(x => secs && secs.has(x) ? Array.from(secs.get(x), t => msecIdx.get(t)).sort((a, b) => a - b) : 0);
     rubrics.push({ k: 'mod', key: d + '.' + k, t: DIR_LABEL[lang][d] + ': ' + modLabel.get(k), r: rIdx, g: rIdx.map(x => set.get(x)), s });
   }
-  // ознаки підбору: ступінь 2 — ознака в ≥ 2 реченнях місця, 1 — в одному; e — до восьми пар (абзац, речення)
-  // для підстав; places — місця з групами (номери рубрик)
+  // ознаки підбору: ступінь 2 — ознака в ≥ 2 реченнях місця, 1 — в одному; places — місця з групами (номери
+  // рубрик). Позиції речень (до восьми пар абзац, речення на препарат) — окремо, у facets.json: потрібні лише
+  // для бонусу «в одному реченні» й підстав, тож вантажаться з першою ознакою, а не з каталогом.
+  const facetPos = {};
   const places = PLACES.map(pl => ({
     key: pl.key, t: pl[lang], secs: pl.secs,
     groups: pl.groups.map(g => ({ t: g[lang], items: g.items.map(it => {
       const key = pl.key + '.' + it.key;
       const m = facetRubrics.get(key) || new Map();
       const rIdx = Array.from(m.keys()).sort((a, b) => a - b);
-      rubrics.push({ k: 'fac', key, t: pl[lang] + ': ' + it[lang], r: rIdx, g: rIdx.map(x => (m.get(x).n >= 2 ? 2 : 1)), e: rIdx.map(x => m.get(x).pos) });
+      rubrics.push({ k: 'fac', key, t: pl[lang] + ': ' + it[lang], r: rIdx, g: rIdx.map(x => (m.get(x).n >= 2 ? 2 : 1)) });
+      facetPos[key] = rIdx.map(x => m.get(x).pos);
       return rubrics.length - 1;
     }) })),
   }));
@@ -639,6 +642,7 @@ function buildLang(lang, ruBuilt) {
   };
   fs.writeFileSync(path.join(out, 'catalog.json'), JSON.stringify(catalog));
   fs.writeFileSync(path.join(out, 'index.json'), JSON.stringify({ v: 3, lang, docs, pd, ps, pp, pr, pn, vocab, post }));
+  fs.writeFileSync(path.join(out, 'facets.json'), JSON.stringify({ e: facetPos }));
   for (const doc of remedyDocs) fs.writeFileSync(path.join(out, 'remedies', doc.id + '.json'), JSON.stringify(doc));
   for (const doc of articleDocs) fs.writeFileSync(path.join(out, 'articles', doc.id + '.json'), JSON.stringify(doc));
 
