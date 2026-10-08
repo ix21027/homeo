@@ -12,5 +12,5 @@ unresolved in intro lists: Formicicum acidum×1, Ferrum aceticum×1, Capsicum ve
 [ua] mined modalities: sentence text carried over for 4598/4598 items
 [ua] remedy block headers: 3046; unresolved in headers: 32; unresolved in intro lists: 6
 cross-linked nosology rubrics ru→ua: 2480/2498
-[ru] data: 18.24 MB
+[ru] data: 18.25 MB
 [ua] data: 19.02 MB
