@@ -8,7 +8,7 @@ origin: https://homeopat-sam.com/-/a371
 remedy_blocks: 13
 ---
 
-У патогенезах наступних гомеопатичних препаратів є зміни кольору нігтів: **Aesculus hippocastanum Arsenicum album Carbo vegetabilis Conium Eupatorium purpureum Ferrum phosphoricum Graphites Mercurius corrosives Nitricum acidum Oxalicum acidum Silicea**
+У патогенезах наступних гомеопатичних препаратів є зміни кольору нігтів: **Aesculus hippocastanum Arsenicum album Carbo vegetabilis Conium Eupatorium purpureum Ferrum phosphoricum Graphites Mercurius corrosivus Nitricum acidum Oxalicum acidum Silicea**
 
 ### Veratrum album
 

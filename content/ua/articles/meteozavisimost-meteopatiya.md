@@ -11,7 +11,7 @@ remedy_blocks: 13
 
 Фірма "Атлас". Москва.2001.
 
-У патогенезах наступних препаратів спостерігаються головні болі та інші симптоми, спричинені зміною погоди або погіршення при зміні погоди:
+У патогенезах наступних препаратів спостерігаються головні болі та інші симптоми, спричинені зміною погоди або такі, що погіршуються при зміні погоди:
 
 **Actea spicata Alumen Baryta carbonica Bryonia Calcarea carbonica Calcarea phosphorica Cimicifuga Dulcamara Gelsemium Graphytes Ipecacuanha Magnesia carbonica Natrium carbonicum Natrium muriaticum Nitricum acidum Phosphorus Physostigma Psorinum Ranunculus bulbosus Rhododendron Rhus toxicodendron Silicea Spigelia Tarentula hispanica Tuberculinum**
 
@@ -35,7 +35,7 @@ _Неш_: Погіршення при зміні від спекотної по�
 
 ### Calcarea phosphorica (Калькарея фосфорика)
 
-Головний біль посилюється при зміні погоди і часто супроводжуються неполадками з боку кишечника.
+Головний біль посилюється при зміні погоди і часто супроводжується неполадками з боку кишечника.
 
 ### Cimicifuga (Цимицифуга)
 
@@ -43,7 +43,7 @@ _Неш_: Погіршення при зміні від спекотної по�
 
 ### Dulcamara (Дулькамара)
 
-Найгірша зміна погоди (метеопатія).
+Гірше від зміни погоди (метеопатія).
 
 Погіршення, коли тепла погода змінюється на холодну та суху на сиру.
 

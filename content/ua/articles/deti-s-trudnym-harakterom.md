@@ -11,7 +11,7 @@ remedy_blocks: 18
 
 **1. Аналітичне дослідження**
 
-**Різкий, категоричний, нелюбовний**: Tarentula, Natrum muriaticum.
+**Різкий, категоричний, нелюб'язний**: Tarentula, Natrum muriaticum.
 
 **Неуважний**: Nux moschata, Phosphorus.
 
@@ -57,7 +57,7 @@ remedy_blocks: 18
 
 **Боягузтість**: Gelsemium, Lycopodium.
 
-**Жорстокість**: Anacardium, Platina, Abrotanum, Absintium, Crocus, Curare, Nux vomica, Opium. **Оберігається**: Anacardium, Nitricum acidum.
+**Жорстокість**: Anacardium, Platina, Abrotanum, Absintium, Crocus, Curare, Nux vomica, Opium. **Лається**: Anacardium, Nitricum acidum.
 
 **Обманник:** Argentum nitricum, Bufo rana, Coca, Drosera.
 
@@ -91,7 +91,7 @@ remedy_blocks: 18
 
 **Страх, боїться собак**: Belladonna, China, Causticum, Hyoscyamus, Stramonium, Tuberculinum. **Страх, боїться незнайомих**: Baryta carbonica, Carbo vegetabilis, Causticum, Cuprum, Thuja, Ambra grisea, Lachesis.
 
-**Страх, коли з ним розмовляють** Kali bromatum, Sepia.
+**Страх, коли з ним розмовляють**: Kali bromatum, Sepia.
 
 **Симулює хворобу**: Tarentula, Argentum nitricum, Belladonna, Veratrum album.
 
@@ -143,7 +143,7 @@ remedy_blocks: 18
 
 **Змінність**: Ignatia.
 
-**Дитяча лінощі**: Baryta carbonica, Lachesis.
+**Дитяча лінь**: Baryta carbonica, Lachesis.
 
 **Нахабний**: Lycopodium, Platina, Veratrum album, Cantharis, Graphytes, Hyoscyamus, Lac canunum, Nux vomica, Petroleum, Psorinum.
 
@@ -153,7 +153,7 @@ remedy_blocks: 18
 
 **Ревність**: Hyoscyamus, Lachesis, Apis, Calcarea sulphurica, Cenchris, Nux vomica, Pulsatilla, Lycopodium, Nux moschata, Stapysagria, Kali carbonicum, Medorrhinum.
 
-**Сстрибує з ліжка**: Belladonna, China, Hyoscyamus, Opium, Stramonium, Aconitum, Argentum nitricum, Arsenicum album, Chininum sulphuricum, Cuprum, Glonoinum, Mercurius.
+**Зістрибує з ліжка**: Belladonna, China, Hyoscyamus, Opium, Stramonium, Aconitum, Argentum nitricum, Arsenicum album, Chininum sulphuricum, Cuprum, Glonoinum, Mercurius.
 
 **Вистрибує у вікно**: Aurum, Carboneum sulphuratum, China, Glonoinum.
 
@@ -183,9 +183,9 @@ remedy_blocks: 18
 
 **Насмешник**: Lachesis, Arsenicum album, China, Ipecacuanha, Paris quadrifolia, Platina, Tarentula. **Відсутність уявлень про мораль**: Anacardium, Kali chloricum, Laurocerasus.
 
-**Кидливий**: Anacardium, Aurum, Bryonia, Nux vomica, Pulsatilla, Silicea.
+**Бурчливий**: Anacardium, Aurum, Bryonia, Nux vomica, Pulsatilla, Silicea.
 
-**Самовродження**: Arsenicum album.
+**Самокалічення**: Arsenicum album.
 
 **Хоче бути оголеним**: Hyoscyamus, Belladonna, Calcarea carbonica, Chamomilla, Nux vomica, Tarentula.
 
@@ -193,7 +193,7 @@ remedy_blocks: 18
 
 **Упертість у повної дитини**: Calcarea carbonica.
 
-**Упертість у дитини мерзляку, норовливу і незручну**: Capsicum.
+**Упертість у дитини мерзлякуватої, норовливої і незграбної**: Capsicum.
 
 **Упертість у впертої дитини, яка однак плаче, якщо з нею заговорять ласкаво**: Silicea. **Вразливий**: Nux vomica, Tuberculinum.
 
@@ -269,11 +269,11 @@ remedy_blocks: 18
 
 ### Anacardium
 
-Для Кента проблема цих ліків пов'язана з психічним роздвоєнням, оскільки суб'єкт постійно роздираємо вищою волею, яка вчить його чесноти та мудрості, і нижчою, яка штовхає його до найгіршого. У цих випадках він стає страшним, у нього напади сильного гніву, ненависті, він безжально жорстокий, позбавлений моральних основ, суперечить, провокує, говорить грубості. Зрозуміло, що він у сварці до грубості. Зрозуміло, що він у сварці з усією родиною. Він постійно вагається і є одна деталь, яка дозволяє це виявити: він додає помилки до своїх диктувань в останній момент.
+Для Кента проблема цих ліків пов'язана з психічним роздвоєнням, оскільки суб'єкт постійно роздираний вищою волею, яка вчить його чесноти та мудрості, і нижчою, яка штовхає його до найгіршого. У цих випадках він стає страшним, у нього напади сильного гніву, ненависті, він безжально жорстокий, позбавлений моральних основ, суперечить, провокує, говорить грубості. Зрозуміло, що він у сварці до грубості. Зрозуміло, що він у сварці з усією родиною. Він постійно вагається і є одна деталь, яка дозволяє це виявити: він додає помилки до своїх диктувань в останній момент.
 
 ### Aurum
 
-дуже гнівливий і запальний, а також диктатор і забіяка. Фізичний ознака, що дозволяє його визначити: пупкова і пахвинна грижі (грижа у дітей: Nitricum acidum, Lyvopodium, Nux vomica).
+дуже гнівливий і запальний, а також диктатор і забіяка. Фізична ознака, що дозволяє його визначити: пупкова і пахвинна грижі (грижа у дітей: Nitricum acidum, Lycopodium, Nux vomica).
 
 ### Borax
 
@@ -305,7 +305,7 @@ remedy_blocks: 18
 
 ### Lachesis
 
-тут також на першому плані ревнощі та сексуальне збудження з безсоромною поведінкою, мастурбацією, дурним сміхом, красномовством (Hyoscyamus). Але, крім цього, помітний диктаторський та егоцентричний аспект. Дитина може іноді впасти в депресію, наприклад, через народження маленького брата. У школі ця неслухняна і глузлива дитина балакучий і лінивий. Щоб його визначити, є два хороші фізичні симптоми: він пришепотіває і у нього виступає пупкова грижа.
+тут також на першому плані ревнощі та сексуальне збудження з безсоромною поведінкою, мастурбацією, дурним сміхом, красномовством (Hyoscyamus). Але, крім цього, помітний диктаторський та егоцентричний аспект. Дитина може іноді впасти в депресію, наприклад, через народження маленького брата. У школі ця неслухняна і глузлива дитина балакуча і лінива. Щоб його визначити, є два хороші фізичні симптоми: він шепелявить і у нього виступає пупкова грижа.
 
 ### Lycopodium
 
@@ -317,7 +317,7 @@ remedy_blocks: 18
 
 ### Nux vomica
 
-міг би скласти гарну компанію для бешкетника з Mercurius. Він також нетерплячий, імпульсивний, може бути дуже агресивний (до вбивства), злий, жорстокий та грубий. У фізичному плані: схильність до фебрильних судом; запори та безрезультатними позивами; пахова та (або) пупкова грижа.
+міг би скласти гарну компанію для бешкетника з Mercurius. Він також нетерплячий, імпульсивний, може бути дуже агресивний (до вбивства), злий, жорстокий та грубий. У фізичному плані: схильність до фебрильних судом; запори та безрезультатні позиви; пахова та (або) пупкова грижа.
 
 ### Stramonium
 

@@ -8,7 +8,7 @@ origin: https://homeopat-sam.com/-/a462
 remedy_blocks: 19
 ---
 
-Для вирішення цієї проблеми найчастіше призначають такі гомеопатичні препарати: **Alumen Anacardium Aurum metallicum Bryonia Calcarea carbonica Calendula Camphora Dulcamara Hepar sulfur Kali bichromicum Magnesium muriaticum Magnetis polus ausralis Natrium carbonicum Nux vomica Natrium muriaticum Rumex Silicea Sulphur Tuberculinum**
+Для вирішення цієї проблеми найчастіше призначають такі гомеопатичні препарати: **Alumen Anacardium Aurum metallicum Bryonia Calcarea carbonica Calendula Camphora Dulcamara Hepar sulfur Kali bichromicum Magnesium muriaticum Magnetis polus australis Natrium carbonicum Nux vomica Natrium muriaticum Rumex Silicea Sulphur Tuberculinum**
 
 ### Alumen (Алюмін)
 
@@ -16,7 +16,7 @@ remedy_blocks: 19
 
 ### Anacardium (Анакардіум)
 
-Цей засіб, як і Rhus, має озноб, схильність до простудних захворювань, чутливість до протягів і полегшення від спеки.
+Цей засіб, як і Rhus, має зябкість, схильність до простудних захворювань, чутливість до протягів і полегшення від спеки.
 
 ### Aurum metallicum (Aurum metallium)
 
@@ -66,7 +66,7 @@ remedy_blocks: 19
 
 ### Kali bichromicum (Калі біхромікум)
 
-Часова характеристика дуже характерна. Схильність до рухової болю; біль часто змінює локалізацію (ревматичний біль чергується з болем у животі).
+Часова характеристика дуже характерна. Схильність до переміщення болю; біль часто змінює локалізацію (ревматичний біль чергується з болем у животі).
 
 Густі слизисто-гнійні виділення.
 

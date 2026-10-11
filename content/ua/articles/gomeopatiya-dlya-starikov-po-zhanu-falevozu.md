@@ -13,7 +13,7 @@ remedy_blocks: 0
 
 Але й тут гомеопатія має свої межі: організм реагує більш мляво, а іноді і сильно. Наприклад, неправильно призначений, коли організм вже не піддається лікуванню. У цьому випадку варто задовольнятися тимчасовим полегшенням. Тому слід уникати поліхрестів, особливо на початку лікування. Ви повинні використовувати невеликі ліки, які забезпечують тимчасове полегшення.
 
-При порушенні життєво важливих функцій або в гострих випадках краще негайно вдатися до алопатичному лікуванню (пневмонія у літніх людей потребує алопатичному лікуванню), а гомеопатія втручається пізніше, щоб створити комфорт і обмежити тяжкі наслідки. Тут найважливішим фактором стає великий досвід лікаря, який призначає ліки.
+При порушенні життєво важливих функцій або в гострих випадках краще негайно вдатися до алопатичного лікування (пневмонія у літніх людей потребує алопатичного лікування), а гомеопатія втручається пізніше, щоб створити комфорт і обмежити тяжкі наслідки. Тут найважливішим фактором стає великий досвід лікаря, який призначає ліки.
 
 У всіх випадках гомеопатія дасть літнім людям, окрім відновлення загального балансу, якщо це ще можливо, приклад енергії, незалежної від матерії. Дійсно, у гомеопатичних ліках ефективність обернено пропорційна кількості речовини та пропорційна рівню енергії.
 
@@ -119,7 +119,7 @@ remedy_blocks: 0
 
 **Кашель спазматичний** – Ambra, Ipecacuanha.
 
-**Чорхотка** – Natrium sulphuricum.
+**Чахотка** – Natrium sulphuricum.
 
 **Параліч легень** – Baryta carbonica, China, Antimonium tartaricum, Arsenicum album, Carbo vegetabilis, Opium, Lycopodium, Phosphorus.
 
@@ -133,7 +133,7 @@ remedy_blocks: 0
 
 **Катар сечового міхура** - Alumina, Carbo vegetabilis, Terebinthiniae, Sulphur.
 
-**Слабка сечова бульбашка** – Arsenicum album, Gelsemium.
+**Слабкий сечовий міхур** – Arsenicum album, Gelsemium.
 
 **Параліч сечового міхура** – Arsenicum album, Cannabis sativa, Cicuta, Equisetum, Gelsemium, Secale, Conium, Kali phosphoricum, Thuja.
 
@@ -149,7 +149,7 @@ remedy_blocks: 0
 
 **Мимовільне сечовипускання** - Allium cepa, Arsenicum album, Aurum muriaticum, Cicuta, Iodum, Secale, Thuja.
 
-**Мижвільне сечовипускання з гіпертрофією простати у літніх чоловіків** - Allivum sativa, Aloe, Cicuta, Iodum, Pareira, Secale, Thuja, Digitalis, Kali phosphoricum, Nux vomica. **Гіпертрофія простати у людей похилого віку** – Baryta carbonica, Digitalis, Selenium, Benzoicum acidum, Conium, Iodum, Staphysagria, Aloe, Nux vomica, Sabadilla, Sulphur.
+**Мимовільне сечовипускання з гіпертрофією простати у літніх чоловіків** - Allivum sativa, Aloe, Cicuta, Iodum, Pareira, Secale, Thuja, Digitalis, Kali phosphoricum, Nux vomica. **Гіпертрофія простати у людей похилого віку** – Baryta carbonica, Digitalis, Selenium, Benzoicum acidum, Conium, Iodum, Staphysagria, Aloe, Nux vomica, Sabadilla, Sulphur.
 
 **Ущільнення простати** - Thuja, Conium, Copaiva, Iodum, Psorinum, Selenium, Silicea, Sulphur, Plumbum, Senecio.
 
@@ -163,7 +163,7 @@ remedy_blocks: 0
 
 **Часте сім'явипорскування у літніх чоловіків** - Baryta carbonica, Causticum, Natrium carbonicum. **Ерозія піхви у літніх жінок** – Mercurius.
 
-**Расні місячні у літніх жінок** – Lachesis, Platinum.
+**Рясні місячні у літніх жінок** – Lachesis, Platinum.
 
 **Ациклічні маткові кровотечі у літніх жінок** – Calcarea carbonica, Ignatia, Manganum, Mercurius, Chamomilla, Hydrastis, Lachesis, Phosphorus, Sepia.
 
@@ -175,4 +175,4 @@ remedy_blocks: 0
 
 **Депресія, стогони** – Baryta carbonica.
 
-**Забувається стара людина** – Ambra, Baryta carbonica, Lycopodium, Phosphoricum acidum.
+**Забудькувата стара людина** – Ambra, Baryta carbonica, Lycopodium, Phosphoricum acidum.
