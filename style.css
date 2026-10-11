@@ -303,8 +303,8 @@ table.cmp .rel { margin: 0 0 3px; }
   .site-header { position: static; }
   .header-row { gap: 6px 8px; }
   .brand { font-size: 1.1rem; }
-  .nav { order: 3; flex-basis: 100%; }
-  .nav a { padding: 5px 8px; font-size: .95rem; }
+  .nav { order: 3; flex-basis: 100%; flex-wrap: wrap; gap: 2px; }
+  .nav a { padding: 5px 7px; font-size: .92rem; white-space: nowrap; }
   .header-tools { margin-left: auto; }
   main { padding-top: 16px; }
   main.wrap { padding-top: 14px; }
@@ -352,3 +352,14 @@ table.cmp .rel { margin: 0 0 3px; }
   table.rep td.g.g3 span { font-weight: 700; text-decoration: underline; }
   a { color: #000; text-decoration: none; }
 }
+
+/* «Відмінності»: список станів і тези препаратів */
+.keys-filter { width: 100%; max-width: 420px; margin: 4px 0 6px; padding: 8px 10px; font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; }
+.crumbs { margin: 0 0 4px; font-size: .9rem; }
+dl.keys { margin: 14px 0 0; }
+dl.keys dt { margin-top: 14px; padding-top: 10px; border-top: 1px dotted var(--line); font-weight: 600; }
+dl.keys dt:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
+dl.keys dt .small { font-weight: 400; margin-left: 6px; }
+dl.keys dd { margin: 4px 0 0; }
+dl.keys dd ul { margin: 0; padding-left: 1.2em; }
+dl.keys dd li { margin: 2px 0; }

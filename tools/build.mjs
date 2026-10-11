@@ -646,6 +646,33 @@ function buildLang(lang, ruBuilt) {
   for (const doc of remedyDocs) fs.writeFileSync(path.join(out, 'remedies', doc.id + '.json'), JSON.stringify(doc));
   for (const doc of articleDocs) fs.writeFileSync(path.join(out, 'articles', doc.id + '.json'), JSON.stringify(doc));
 
+  // --- «Відмінності»: тези, що відрізняють препарати однієї статті (tools/keynotes.json — стислі тези
+  // агентів із посиланням на абзац блоку, перевірені на збіг зі своїм абзацом). Блок шукаємо за заголовком.
+  const keysFile = path.join(ROOT, 'tools', 'keynotes.json');
+  if (fs.existsSync(keysFile)) {
+    const kn = JSON.parse(fs.readFileSync(keysFile, 'utf8'));
+    const keys = [];
+    let kBlocks = 0, kMissing = 0;
+    for (const art of kn.articles) {
+      const ai = articles.findIndex(a => a.id === art.id);
+      if (ai < 0) continue;
+      const doc = articleDocs[ai];
+      const items = [];
+      for (const r of art.remedies) {
+        const head = r['head_' + lang];
+        const bi = doc.blocks.findIndex(b => b.kind === 'remedy' && b.title === head);
+        if (bi < 0) { kMissing++; continue; }
+        const notes = r.notes.map(n => n[lang]).filter(Boolean);
+        if (!notes.length) continue;
+        items.push({ b: bi, t: head, r: doc.blocks[bi].rem, n: notes });
+        kBlocks++;
+      }
+      if (items.length >= 2) keys.push({ a: ai, id: art.id, title: articles[ai].title, items });
+    }
+    fs.writeFileSync(path.join(out, 'keynotes.json'), JSON.stringify(keys));
+    rep.push(`[${lang}] keynotes: articles ${keys.length}, remedy blocks ${kBlocks}, unmatched headers ${kMissing}`);
+  }
+
   const cnt = k => rubrics.filter(r => r.k === k).length;
   rep.push(`[${lang}] remedies: ${catalog.stats.remedies} (+${catalog.stats.ext} без сторінки); articles: ${articles.length}; rubrics: ${rubrics.length} (nos ${cnt('nos')}, art ${cnt('art')}, line ${cnt('line')}, mod ${cnt('mod')}, etio ${cnt('etio')})`);
   rep.push(`[${lang}] nos: merged forms ${merged}; hierarchy links ${links}; grade distribution 1/2/3: ${gradeDist[1]}/${gradeDist[2]}/${gradeDist[3]}`);

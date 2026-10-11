@@ -30,7 +30,9 @@
   const I18N = {
     ua: {
       title: 'Реперторій — гомеопатичні препарати за симптомами', htmlLang: 'uk',
-      navRep: 'Симптоми', navRemedies: 'Препарати', navArticles: 'Статті',
+      navRep: 'Симптоми', navRemedies: 'Препарати', navArticles: 'Статті', navKeys: 'Відмінності',
+      keysTitle: 'Відмінності препаратів', keysIntro: 'Для кожного стану — короткі ознаки, якими препарати статті відрізняються один від одного. Тези стисло передають текст статті; посилання веде до повного опису.',
+      keysFilter: 'Пошук стану', keysToArticle: 'Уся стаття', keysInArticle: 'у статті', keysNone: 'Нічого не знайдено.',
       kind: { free: 'Текст', nos: 'Клініка', art: 'Стаття', line: 'Рубрика', mod: 'Модальність', etio: 'Причина', fac: 'Ознака' },
       repPlaceholder: 'Симптом, хвороба або рубрика…', allSections: 'Усі розділи', freeSearch: 'Шукати в текстах', freeKind: 'повнотекстово',
       error: 'помилка', clear: 'Очистити', remove: 'Прибрати', removeRubric: 'Прибрати рубрику', loadingIndex: 'Завантаження індексу…',
@@ -77,7 +79,9 @@
     },
     ru: {
       title: 'Реперторий — гомеопатические препараты по симптомам', htmlLang: 'ru',
-      navRep: 'Симптомы', navRemedies: 'Препараты', navArticles: 'Статьи',
+      navRep: 'Симптомы', navRemedies: 'Препараты', navArticles: 'Статьи', navKeys: 'Отличия',
+      keysTitle: 'Отличия препаратов', keysIntro: 'Для каждого состояния — краткие признаки, которыми препараты статьи отличаются друг от друга. Тезисы кратко передают текст статьи; ссылка ведёт к полному описанию.',
+      keysFilter: 'Поиск состояния', keysToArticle: 'Вся статья', keysInArticle: 'в статье', keysNone: 'Ничего не найдено.',
       kind: { free: 'Текст', nos: 'Клиника', art: 'Статья', line: 'Рубрика', mod: 'Модальность', etio: 'Причина', fac: 'Признак' },
       repPlaceholder: 'Симптом, болезнь или рубрика…', allSections: 'Все разделы', freeSearch: 'Искать в текстах', freeKind: 'полнотекстово',
       error: 'ошибка', clear: 'Очистить', remove: 'Убрать', removeRubric: 'Убрать рубрику', loadingIndex: 'Загрузка индекса…',
@@ -365,7 +369,7 @@
   // і всі статті. Список мов теж, інакше після рестарту без мережі init() не знає про UA.
   function offlineUrls(lang) {
     const c = state.cat[lang];
-    const urls = ['data/langs.json', 'data/' + lang + '/catalog.json', 'data/' + lang + '/index.json', 'data/' + lang + '/facets.json'];
+    const urls = ['data/langs.json', 'data/' + lang + '/catalog.json', 'data/' + lang + '/index.json', 'data/' + lang + '/facets.json', 'data/' + lang + '/keynotes.json'];
     for (const r of c.remedies) if (!r.ext) urls.push('data/' + lang + '/remedies/' + encodeURIComponent(r.id) + '.json');
     for (const a of c.articles) urls.push('data/' + lang + '/articles/' + encodeURIComponent(a.id) + '.json');
     return urls;
@@ -470,9 +474,11 @@
     $('#nav a[data-route="rep"]').textContent = t.navRep;
     $('#nav a[data-route="remedies"]').textContent = t.navRemedies;
     $('#nav a[data-route="articles"]').textContent = t.navArticles;
+    $('#nav a[data-route="keys"]').textContent = t.navKeys;
     $('#nav a[data-route="rep"]').setAttribute('href', href('rep'));
     $('#nav a[data-route="remedies"]').setAttribute('href', href('remedies'));
     $('#nav a[data-route="articles"]').setAttribute('href', href('articles'));
+    $('#nav a[data-route="keys"]').setAttribute('href', href('keys'));
     $('.brand').setAttribute('href', href('rep'));
     $('#menuBtn').setAttribute('aria-label', t.menu);
     $('#menuBtn').setAttribute('title', t.menu);
@@ -634,6 +640,7 @@
       else if (p === 'remedy' && seg[2]) { setNav('remedies'); await viewRemedy(view, seg[2], params); }
       else if (p === 'articles') { setNav('articles'); viewArticles(view); }
       else if (p === 'article' && seg[2]) { setNav('articles'); await viewArticle(view, seg[2], params); }
+      else if (p === 'keys') { setNav('keys'); await viewKeys(view, seg[2]); }
       else { view.innerHTML = '<p class="error">' + T().notFound + '</p>'; }
     } catch (e) {
       console.error(e);
@@ -1515,6 +1522,64 @@
         items.map(x => '<li><a href="' + href('article/' + encodeURIComponent(x.a.id)) + '">' + esc(x.a.title) + '</a>' + (x.a.rem.length ? '<span class="sub">' + esc(t.nRemedies(x.a.rem.length)) + '</span>' : '') + '</li>').join('') + '</ul></div>';
     }
     view.innerHTML = html;
+  }
+
+  // ---------------------------------------------------------------- «Відмінності»
+  // data/<мова>/keynotes.json: [{a, id, title, items: [{b: блок статті, t: заголовок, r: препарати, n: [тези]}]}]
+  async function loadKeys(lang) {
+    state.keys = state.keys || {};
+    if (!state.keys[lang]) state.keys[lang] = await fetchJson('data/' + lang + '/keynotes.json');
+    return state.keys[lang];
+  }
+  async function viewKeys(view, id) {
+    const t = T();
+    const c = cat();
+    const keys = await loadKeys(state.lang);
+    if (!id) {
+      const coll = new Intl.Collator(t.htmlLang);
+      const groups = new Map();
+      for (const k of keys) {
+        const topic = (c.articles[k.a] || {}).topic;
+        if (!groups.has(topic)) groups.set(topic, []);
+        groups.get(topic).push(k);
+      }
+      const order = TOPIC_ORDER.filter(k => groups.has(k)).concat(Array.from(groups.keys()).filter(k => !TOPIC_ORDER.includes(k)));
+      let html = '<h1>' + esc(t.keysTitle) + '</h1><p class="muted">' + esc(t.keysIntro) + '</p>' +
+        '<input type="search" class="keys-filter" id="keysFilter" placeholder="' + esc(t.keysFilter) + '" aria-label="' + esc(t.keysFilter) + '">';
+      for (const g of order) {
+        const items = groups.get(g).sort((x, y) => coll.compare(x.title, y.title));
+        html += '<section class="keys-group"><h2 class="group-title">' + esc(TOPIC[state.lang][g] || g || '') + '</h2><div class="cols"><ul class="list">' +
+          items.map(k => '<li data-q="' + esc(k.title.toLowerCase()) + '"><a href="' + href('keys/' + encodeURIComponent(k.id)) + '">' + esc(k.title) + '</a><span class="sub">' + esc(t.nRemedies(k.items.length)) + '</span></li>').join('') +
+          '</ul></div></section>';
+      }
+      html += '<p class="muted" id="keysNone" hidden>' + esc(t.keysNone) + '</p>';
+      view.innerHTML = html;
+      const inp = $('#keysFilter');
+      inp.addEventListener('input', () => {
+        const q = inp.value.trim().toLowerCase();
+        let any = false;
+        view.querySelectorAll('.keys-group').forEach(sec => {
+          let vis = 0;
+          sec.querySelectorAll('li').forEach(li => { const on = !q || li.dataset.q.includes(q); li.hidden = !on; if (on) vis++; });
+          sec.hidden = !vis; if (vis) any = true;
+        });
+        $('#keysNone').hidden = any;
+      });
+      return;
+    }
+    const k = keys.find(x => x.id === id);
+    if (!k) { view.innerHTML = '<p class="error">' + esc(t.noArticle) + '</p>'; return; }
+    const artHref = href('article/' + encodeURIComponent(k.id));
+    let html = '<p class="crumbs"><a href="' + href('keys') + '">' + esc(t.navKeys) + '</a></p><h1>' + esc(k.title) + '</h1>' +
+      '<p><a href="' + artHref + '">' + esc(t.keysToArticle) + '</a></p><dl class="keys">';
+    for (const it of k.items) {
+      const rem = it.r.filter(i => c.remedies[i]);
+      const name = rem.length ? rem.map(i => remedyLink(i)).join(', ') : esc(it.t);
+      const inArt = artHref + (rem.length ? '?r=' + rem[0] : '');
+      html += '<dt>' + name + ' <a class="small muted" href="' + inArt + '">' + esc(t.keysInArticle) + '</a></dt><dd><ul>' +
+        it.n.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></dd>';
+    }
+    view.innerHTML = html + '</dl>';
   }
 
   // Рубрика «Клініки» за назвою статті лікувальника («Насморк (острый ринит)» → «Насморк») і скільки
