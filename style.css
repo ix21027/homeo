@@ -353,13 +353,20 @@ table.cmp .rel { margin: 0 0 3px; }
   a { color: #000; text-decoration: none; }
 }
 
-/* «Відмінності»: список станів і тези препаратів */
-.keys-filter { width: 100%; max-width: 420px; margin: 4px 0 6px; padding: 8px 10px; font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; }
-.crumbs { margin: 0 0 4px; font-size: .9rem; }
-dl.keys { margin: 14px 0 0; }
-dl.keys dt { margin-top: 14px; padding-top: 10px; border-top: 1px dotted var(--line); font-weight: 600; }
+/* тези відмінностей: перемикач «Повністю / Скорочено» у статті, розділ «Особливості за станами» у препараті */
+.art-mode { display: inline-flex; margin: 6px 0 4px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.art-mode a { padding: 5px 12px; color: var(--fg-2); font-size: .92rem; }
+.art-mode a + a { border-left: 1px solid var(--line); }
+.art-mode a.on { background: var(--accent-2); color: var(--accent); font-weight: 600; }
+.art-mode a:hover { text-decoration: none; }
+ul.keynotes { margin: 4px 0 0; padding-left: 1.2em; }
+ul.keynotes li { margin: 2px 0; }
+.rem-keys { margin: 10px 0 14px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; }
+.rem-keys summary { cursor: pointer; font-weight: 600; }
+.rem-keys > p { margin: 6px 0 0; }
+dl.keys { margin: 10px 0 0; }
+dl.keys dt { margin-top: 10px; padding-top: 8px; border-top: 1px dotted var(--line); font-weight: 600; }
 dl.keys dt:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
-dl.keys dt .small { font-weight: 400; margin-left: 6px; }
 dl.keys dd { margin: 4px 0 0; }
 dl.keys dd ul { margin: 0; padding-left: 1.2em; }
 dl.keys dd li { margin: 2px 0; }

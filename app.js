@@ -30,9 +30,8 @@
   const I18N = {
     ua: {
       title: 'Реперторій — гомеопатичні препарати за симптомами', htmlLang: 'uk',
-      navRep: 'Симптоми', navRemedies: 'Препарати', navArticles: 'Статті', navKeys: 'Відмінності',
-      keysTitle: 'Відмінності препаратів', keysIntro: 'Для кожного стану — короткі ознаки, якими препарати статті відрізняються один від одного. Тези стисло передають текст статті; посилання веде до повного опису.',
-      keysFilter: 'Пошук стану', keysToArticle: 'Уся стаття', keysInArticle: 'у статті', keysNone: 'Нічого не знайдено.',
+      navRep: 'Симптоми', navRemedies: 'Препарати', navArticles: 'Статті',
+      artFull: 'Повністю', artShort: 'Скорочено', artModeLbl: 'Читати', remKeys: n => 'Ключові особливості (' + n + ')', remKeysHint: 'Стислі тези з опису препарату — за ними його впізнають і відрізняють від інших. Назва групи веде до розділу опису.',
       kind: { free: 'Текст', nos: 'Клініка', art: 'Стаття', line: 'Рубрика', mod: 'Модальність', etio: 'Причина', fac: 'Ознака' },
       repPlaceholder: 'Симптом, хвороба або рубрика…', allSections: 'Усі розділи', freeSearch: 'Шукати в текстах', freeKind: 'повнотекстово',
       error: 'помилка', clear: 'Очистити', remove: 'Прибрати', removeRubric: 'Прибрати рубрику', loadingIndex: 'Завантаження індексу…',
@@ -79,9 +78,8 @@
     },
     ru: {
       title: 'Реперторий — гомеопатические препараты по симптомам', htmlLang: 'ru',
-      navRep: 'Симптомы', navRemedies: 'Препараты', navArticles: 'Статьи', navKeys: 'Отличия',
-      keysTitle: 'Отличия препаратов', keysIntro: 'Для каждого состояния — краткие признаки, которыми препараты статьи отличаются друг от друга. Тезисы кратко передают текст статьи; ссылка ведёт к полному описанию.',
-      keysFilter: 'Поиск состояния', keysToArticle: 'Вся статья', keysInArticle: 'в статье', keysNone: 'Ничего не найдено.',
+      navRep: 'Симптомы', navRemedies: 'Препараты', navArticles: 'Статьи',
+      artFull: 'Полностью', artShort: 'Кратко', artModeLbl: 'Читать', remKeys: n => 'Ключевые особенности (' + n + ')', remKeysHint: 'Краткие тезисы из описания препарата — по ним его узнают и отличают от других. Название группы ведёт к разделу описания.',
       kind: { free: 'Текст', nos: 'Клиника', art: 'Статья', line: 'Рубрика', mod: 'Модальность', etio: 'Причина', fac: 'Признак' },
       repPlaceholder: 'Симптом, болезнь или рубрика…', allSections: 'Все разделы', freeSearch: 'Искать в текстах', freeKind: 'полнотекстово',
       error: 'ошибка', clear: 'Очистить', remove: 'Убрать', removeRubric: 'Убрать рубрику', loadingIndex: 'Загрузка индекса…',
@@ -474,11 +472,9 @@
     $('#nav a[data-route="rep"]').textContent = t.navRep;
     $('#nav a[data-route="remedies"]').textContent = t.navRemedies;
     $('#nav a[data-route="articles"]').textContent = t.navArticles;
-    $('#nav a[data-route="keys"]').textContent = t.navKeys;
     $('#nav a[data-route="rep"]').setAttribute('href', href('rep'));
     $('#nav a[data-route="remedies"]').setAttribute('href', href('remedies'));
     $('#nav a[data-route="articles"]').setAttribute('href', href('articles'));
-    $('#nav a[data-route="keys"]').setAttribute('href', href('keys'));
     $('.brand').setAttribute('href', href('rep'));
     $('#menuBtn').setAttribute('aria-label', t.menu);
     $('#menuBtn').setAttribute('title', t.menu);
@@ -640,7 +636,7 @@
       else if (p === 'remedy' && seg[2]) { setNav('remedies'); await viewRemedy(view, seg[2], params); }
       else if (p === 'articles') { setNav('articles'); viewArticles(view); }
       else if (p === 'article' && seg[2]) { setNav('articles'); await viewArticle(view, seg[2], params); }
-      else if (p === 'keys') { setNav('keys'); await viewKeys(view, seg[2]); }
+      else if (p === 'keys') { location.replace(seg[2] ? href('article/' + encodeURIComponent(seg[2])) + '?v=s' : href('articles')); return; }
       else { view.innerHTML = '<p class="error">' + T().notFound + '</p>'; }
     } catch (e) {
       console.error(e);
@@ -1470,6 +1466,15 @@
     let html = '<div class="doc-head"><h1>' + esc(doc.latin) + (doc.alt ? ' <span class="muted">(' + esc(doc.alt) + ')</span>' : '') + '</h1>' +
       '<div class="sub">' + esc([doc.translit, doc.common].filter(Boolean).join(' — ')) + '</div>' +
       (doc.source ? '<div class="meta">' + esc(t.source) + ' ' + esc(doc.source) + '</div>' : '') + '</div>';
+    // «Ключові особливості»: тези з власного опису препарату, згруповані за розділами (doc.keys з build.mjs)
+    if (doc.keys && doc.keys.length) {
+      const nk = doc.keys.reduce((a, g) => a + g.n.length, 0);
+      const mobile = window.matchMedia('(max-width: 640px)').matches;
+      const has = new Set(doc.sections.map(x => x.title));
+      html += '<details class="rem-keys"' + (mobile ? '' : ' open') + '><summary>' + esc(t.remKeys(nk)) + '</summary><p class="muted small">' + esc(t.remKeysHint) + '</p><dl class="keys">' +
+        doc.keys.map(g => '<dt>' + (has.has(g.s) ? '<a href="#' + secId(g.s) + '">' + esc(g.s) + '</a>' : esc(g.s)) + '</dt><dd><ul>' + g.n.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></dd>').join('') +
+        '</dl></details>';
+    }
     html += '<nav class="toc" aria-label="' + esc(t.sections) + '">' + doc.sections.map(s => '<a href="#' + secId(s.title) + '">' + esc(s.title) + '</a>').join('') + '</nav>';
     html += '<div class="doc">';
     const tagLinks = (dir, kind) => {
@@ -1524,64 +1529,14 @@
     view.innerHTML = html;
   }
 
-  // ---------------------------------------------------------------- «Відмінності»
-  // data/<мова>/keynotes.json: [{a, id, title, items: [{b: блок статті, t: заголовок, r: препарати, n: [тези]}]}]
+  // ---------------------------------------------------------------- тези відмінностей
+  // data/<мова>/keynotes.json: [{a, id, title, items: [{b: блок статті, t: заголовок, r: препарати, n: [тези]}]}] —
+  // скорочений режим статті («Скорочено / Повністю») і розділ «Особливості за станами» на сторінці препарату
   async function loadKeys(lang) {
     state.keys = state.keys || {};
     if (!state.keys[lang]) state.keys[lang] = await fetchJson('data/' + lang + '/keynotes.json');
     return state.keys[lang];
   }
-  async function viewKeys(view, id) {
-    const t = T();
-    const c = cat();
-    const keys = await loadKeys(state.lang);
-    if (!id) {
-      const coll = new Intl.Collator(t.htmlLang);
-      const groups = new Map();
-      for (const k of keys) {
-        const topic = (c.articles[k.a] || {}).topic;
-        if (!groups.has(topic)) groups.set(topic, []);
-        groups.get(topic).push(k);
-      }
-      const order = TOPIC_ORDER.filter(k => groups.has(k)).concat(Array.from(groups.keys()).filter(k => !TOPIC_ORDER.includes(k)));
-      let html = '<h1>' + esc(t.keysTitle) + '</h1><p class="muted">' + esc(t.keysIntro) + '</p>' +
-        '<input type="search" class="keys-filter" id="keysFilter" placeholder="' + esc(t.keysFilter) + '" aria-label="' + esc(t.keysFilter) + '">';
-      for (const g of order) {
-        const items = groups.get(g).sort((x, y) => coll.compare(x.title, y.title));
-        html += '<section class="keys-group"><h2 class="group-title">' + esc(TOPIC[state.lang][g] || g || '') + '</h2><div class="cols"><ul class="list">' +
-          items.map(k => '<li data-q="' + esc(k.title.toLowerCase()) + '"><a href="' + href('keys/' + encodeURIComponent(k.id)) + '">' + esc(k.title) + '</a><span class="sub">' + esc(t.nRemedies(k.items.length)) + '</span></li>').join('') +
-          '</ul></div></section>';
-      }
-      html += '<p class="muted" id="keysNone" hidden>' + esc(t.keysNone) + '</p>';
-      view.innerHTML = html;
-      const inp = $('#keysFilter');
-      inp.addEventListener('input', () => {
-        const q = inp.value.trim().toLowerCase();
-        let any = false;
-        view.querySelectorAll('.keys-group').forEach(sec => {
-          let vis = 0;
-          sec.querySelectorAll('li').forEach(li => { const on = !q || li.dataset.q.includes(q); li.hidden = !on; if (on) vis++; });
-          sec.hidden = !vis; if (vis) any = true;
-        });
-        $('#keysNone').hidden = any;
-      });
-      return;
-    }
-    const k = keys.find(x => x.id === id);
-    if (!k) { view.innerHTML = '<p class="error">' + esc(t.noArticle) + '</p>'; return; }
-    const artHref = href('article/' + encodeURIComponent(k.id));
-    let html = '<p class="crumbs"><a href="' + href('keys') + '">' + esc(t.navKeys) + '</a></p><h1>' + esc(k.title) + '</h1>' +
-      '<p><a href="' + artHref + '">' + esc(t.keysToArticle) + '</a></p><dl class="keys">';
-    for (const it of k.items) {
-      const rem = it.r.filter(i => c.remedies[i]);
-      const name = rem.length ? rem.map(i => remedyLink(i)).join(', ') : esc(it.t);
-      const inArt = artHref + (rem.length ? '?r=' + rem[0] : '');
-      html += '<dt>' + name + ' <a class="small muted" href="' + inArt + '">' + esc(t.keysInArticle) + '</a></dt><dd><ul>' +
-        it.n.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></dd>';
-    }
-    view.innerHTML = html + '</dl>';
-  }
-
   // Рубрика «Клініки» за назвою статті лікувальника («Насморк (острый ринит)» → «Насморк») і скільки
   // в ній препаратів, яких стаття не називає: стаття — лише добірка, і точний препарат може знайтися поза нею.
   function articleClinic(a) {
@@ -1606,6 +1561,12 @@
     const doc = await getDoc('articles', id);
     const a = c.articles[aIdx];
     const focus = params.has('r') ? +params.get('r') : -1;
+    const keys = (await loadKeys(state.lang).catch(() => [])).find(k => k.id === id);
+    let mode = params.get('v');
+    if (mode === 's' || mode === 'f') { try { localStorage.setItem('artMode', mode); } catch (e) { /* ignore */ } }
+    else { try { mode = localStorage.getItem('artMode'); } catch (e) { mode = null; } }
+    const short = !!keys && mode === 's';
+    const byBlock = new Map(keys ? keys.items.map(it => [it.b, it.n]) : []);
     const hl = params.get('hl') ? Array.from(new Set(SC.queryTerms(params.get('hl'), state.lang).inc.flatMap(x => x.alts))) : null;
     let html = '<div class="doc-head"><h1>' + esc(doc.title) + '</h1><div class="meta">' + esc(TOPIC[state.lang][a.topic] || a.topic) +
       (doc.author ? ' · ' + esc(t.author) + ' ' + esc(doc.author) : '') + (doc.source ? ' · ' + esc(t.source) + ' ' + esc(doc.source) : '') + '</div></div>';
@@ -1616,16 +1577,23 @@
       const wide = articleClinic(a);
       if (wide) html += '<p class="small art-wider"><a href="' + href('rep') + '?r=' + encodeURIComponent('n:' + wide.rb.t) + '">' + esc(t.artWider(wide.rb.t, wide.n)) + '</a></p>';
     }
-    html += '<div class="doc">';
+    if (keys) {
+      const q = v => href('article/' + encodeURIComponent(id)) + '?v=' + v + (focus >= 0 ? '&r=' + focus : '');
+      html += '<div class="seg art-mode" role="group" aria-label="' + esc(t.artModeLbl) + '"><a href="' + q('f') + '" data-v="f"' + (short ? '' : ' class="on" aria-current="true"') + '>' + esc(t.artFull) + '</a>' +
+        '<a href="' + q('s') + '" data-v="s"' + (short ? ' class="on" aria-current="true"' : '') + '>' + esc(t.artShort) + '</a></div>';
+    }
+    html += '<div class="doc' + (short ? ' doc-short' : '') + '">';
     doc.blocks.forEach((b, bi) => {
       const isFocus = focus >= 0 && b.rem.includes(focus);
       if (b.kind === 'remedy') {
         const links = b.rem.filter(i => !c.remedies[i].ext);
         const title = links.length ? '<a href="' + href('remedy/' + encodeURIComponent(c.remedies[links[0]].id)) + '">' + esc(b.title) + '</a>' : esc(b.title);
-        html += '<div class="block' + (isFocus ? ' hl' : '') + '" id="blk-' + bi + '"><h3>' + title + '</h3>' + b.paras.map(p => renderPara(p, { hl })).join('') + '</div>';
+        const notes = short ? byBlock.get(bi) : null;
+        const body = notes ? '<ul class="keynotes">' + notes.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : b.paras.map(p => renderPara(p, { hl })).join('');
+        html += '<div class="block' + (isFocus ? ' hl' : '') + '" id="blk-' + bi + '"><h3>' + title + '</h3>' + body + '</div>';
       } else if (b.kind === 'sub') {
         html += '<h2 id="blk-' + bi + '">' + esc(b.title) + '</h2>' + b.paras.map(p => renderPara(p, { hl })).join('');
-      } else {
+      } else if (!short) {
         html += b.paras.map(p => renderPara(p, { hl })).join('');
       }
     });

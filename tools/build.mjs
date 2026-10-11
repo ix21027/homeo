@@ -643,6 +643,20 @@ function buildLang(lang, ruBuilt) {
   fs.writeFileSync(path.join(out, 'catalog.json'), JSON.stringify(catalog));
   fs.writeFileSync(path.join(out, 'index.json'), JSON.stringify({ v: 3, lang, docs, pd, ps, pp, pr, pn, vocab, post }));
   fs.writeFileSync(path.join(out, 'facets.json'), JSON.stringify({ e: facetPos }));
+  // «Ключові особливості» препарату — стислі тези з його власного опису (tools/remedy-keys.json: агенти за
+  // текстом розділу, з посиланням на абзац; слабко прив'язані тези перевірено окремо). Групи — за розділами опису.
+  const rkFile = path.join(ROOT, 'tools', 'remedy-keys.json');
+  if (fs.existsSync(rkFile)) {
+    const rk = new Map(JSON.parse(fs.readFileSync(rkFile, 'utf8')).remedies.map(r => [r.id, r.groups]));
+    let nDocs = 0, nNotes = 0;
+    for (const doc of remedyDocs) {
+      const g = rk.get(doc.id);
+      if (!g) continue;
+      doc.keys = g.map(x => ({ s: x['s_' + lang], n: x.notes.map(n => n[lang]) })).filter(x => x.n.length);
+      nDocs++; nNotes += doc.keys.reduce((a, x) => a + x.n.length, 0);
+    }
+    rep.push(`[${lang}] remedy keys: ${nDocs} remedies, ${nNotes} theses`);
+  }
   for (const doc of remedyDocs) fs.writeFileSync(path.join(out, 'remedies', doc.id + '.json'), JSON.stringify(doc));
   for (const doc of articleDocs) fs.writeFileSync(path.join(out, 'articles', doc.id + '.json'), JSON.stringify(doc));
 
