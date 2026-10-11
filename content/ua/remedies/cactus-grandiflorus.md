@@ -314,7 +314,7 @@ Snader вважав Cactus зовсім особливим препаратом,
 
 Припинення менструальних виділень ночами - Causticum.
 
-Белі - Ammonium muriaticum.
+Білі - Ammonium muriaticum.
 
 Лихоманка, що перемежується - Arsenicum album, Bryonia, Calcarea carbonica, Eupatorium perfoliatum, Natrium muriaticum, Rhus toxicodendron, Sulphur. Набряки - Digitalis, Kalmia.
 
